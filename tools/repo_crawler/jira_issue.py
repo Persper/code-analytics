@@ -17,7 +17,7 @@ class JiraIssue:
     def download(self, issue_id, file_path):
         url = self.url_prefix + issue_id + "/" + issue_id + self.url_suffix
         try:
-            print urllib.urlretrieve(url, file_path)
+            print urllib.urlretrieve(url, file_path)[0]
         except Exception as e:
             print "[Error] JiraIssue.download: ", type(e), e
 
