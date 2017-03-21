@@ -1,6 +1,6 @@
 Run setup.sh to install dependent software. Ubuntu/Debian Linux is assumed.
 
-Then, run stats-repo.py to show statistics of repos.
-Usage: stats-repo.py [URL]
+Then, run stats_repo.py to show statistics of repos.
+Usage: stats_repo.py [URL]
 	Clone a git repo and show its stats.
 	If URL is omitted, show stats of all repos in the current dir. 
