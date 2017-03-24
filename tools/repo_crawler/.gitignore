@@ -1,6 +1,2 @@
-hbase*
-incubator-systemml*
-maven*
-setup.sh*
-spark*
-zookeeper*
+*-issues
+deleted.files
