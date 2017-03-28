@@ -2,9 +2,9 @@ from enum import Enum
 import argparse
 import networkx as nx
 from git import Repo
-from parse_patch import parse_patch
-from cpp_tools import get_func_ranges_cpp, fname_filter_cpp
-from ruby_tools import get_func_ranges_ruby, fname_filter_ruby
+from graphs.parse_patch import parse_patch
+from graphs.cpp_tools import get_func_ranges_cpp, fname_filter_cpp
+from graphs.ruby_tools import get_func_ranges_ruby, fname_filter_ruby
 
 EMPTY_TREE_SHA = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 

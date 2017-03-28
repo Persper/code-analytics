@@ -4,7 +4,7 @@ import subprocess
 from git import Repo
 import networkx as nx
 
-from write_graph_to_dot import write_G_to_dot_with_pr
+from graphs.write_graph_to_dot import write_G_to_dot_with_pr
 
 def underscore_to_camelcase(value):
     def camelcase(): 
