@@ -12,6 +12,8 @@ sudo -H pip3 install --upgrade pip
 sudo -H pip3 install jupyter
 ```
 
+Note: Python 3.5+ is required.
+
 2. Install Python packages
 
 ```
@@ -37,7 +39,7 @@ Run graphs/srcml. E.g.:
 
 All notebooks should be run in the root dir of this project.
 
-E.g.:
+E.g., the portal notebook for development value analysis:
 ```
 jupyter notebook dev_analysis.ipynb
 ```
