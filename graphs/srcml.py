@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+import argparse
 import shutil
 import os
 import glob
@@ -15,10 +18,12 @@ def copy_dir(src, dst, *, follow_sym=True):
 
 def transform_dir(input_dir='linux-kernel', output_dir='linux-kernel-xml', extensions=('.c', '.h')):    
     # copy directory structure
+    input_dir = os.path.expanduser(input_dir)
+    output_dir = os.path.expanduser(output_dir)
     if os.path.isdir(output_dir):
         shutil.rmtree(output_dir)
     shutil.copytree(input_dir, output_dir, copy_function=copy_dir)
-        
+
     print("Transforming source code to xml...")
     counter = 0
     for ext in extensions:
@@ -26,11 +31,13 @@ def transform_dir(input_dir='linux-kernel', output_dir='linux-kernel-xml', exten
             if counter % 100 == 0:
                 print('Processed {}'.format(counter))
             # linux-kernel/arch/alpha/boot/bootp.c -> arch/alpha/boot/bootp.c
-            without_root = fname.split('/', 1)[1]
-            output_path = os.path.join(output_dir, without_root) + ".xml"
-            subprocess.call(
-                'srcml {} --position -o {}'.format(fname, output_path), shell=True)
-            
+            pre = os.path.commonprefix((input_dir, fname))
+            rel = os.path.relpath(fname, pre)
+            output_path = os.path.join(output_dir, rel) + ".xml"
+
+            cmd = 'srcml {} --position -o {}'.format(fname, output_path)
+            subprocess.call(cmd, shell=True)
+
             counter += 1
     print("Tranformation completed, {} processed.".format(counter))
 
@@ -65,3 +72,12 @@ def transform_src_to_tree(source_code):
 
     return root
 
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('SOURCE', help='source dir', type=str)
+    parser.add_argument('OUTPUT', help='output dir', type=str)
+    args = parser.parse_args()
+    transform_dir(args.SOURCE, args.OUTPUT)
+
+if __name__ == '__main__':
+    main()
