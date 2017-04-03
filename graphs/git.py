@@ -1,5 +1,6 @@
-from git.exc import InvalidGitRepositoryError
+from git.exc import InvalidGitRepositoryError, NoSuchPathError
 from git import Repo
+import sys
 
 def initialize_repo(repo_path):
     try:
