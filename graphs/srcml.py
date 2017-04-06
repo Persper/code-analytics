@@ -52,8 +52,6 @@ def transform_src_to_tree(source_code):
         if not f.closed:
             f.close()
         os.remove(f.name)
-        import pdb
-        pdb.set_trace()
         return None
 
     # rename so that srcml can open it
