@@ -44,14 +44,16 @@ def transform_dir(input_dir='linux-kernel', output_dir='linux-kernel-xml', exten
 def transform_src_to_tree(source_code):
     root = None
     try:
-        f = tempfile.NamedTemporaryFile(mode='w+', delete=False)
-        f.write(source_code)
+        f = tempfile.NamedTemporaryFile(mode='wb+', delete=False)
+        f.write(source_code.encode('utf-8', 'replace'))
         f.close()
-    except UnicodeEncodeError:
+    except UnicodeEncodeError as e:
         print("UnicodeEncodeError in transform_src_to_tree!")
         if not f.closed:
             f.close()
         os.remove(f.name)
+        import pdb
+        pdb.set_trace()
         return None
 
     # rename so that srcml can open it
