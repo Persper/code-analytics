@@ -30,15 +30,15 @@ cd misc/
 
 Download and install srcML: <http://www.srcml.org/>.
 
-Download target repos into `~/Persper/repos` (the assumed default path).
+Download target repos into `./repos` (the assumed default path).
 E.g.:
 ```
-git clone https://github.com/torvalds/linux.git ~/Persper/repos/linux
+git clone https://github.com/torvalds/linux.git ./repos/linux
 ```
 
 Run graphs/srcml. E.g.:
 ```
-./graphs/srcml.py ~/Persper/repos/linux ~/Persper/repos/linux-xml/
+./graphs/srcml.py ~/Persper/repos/linux ./repos/linux-xml/
 ```
 
 4. Run a notebook
