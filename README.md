@@ -17,7 +17,13 @@ Note: Python 3.5+ is required.
 2. Install Python packages
 
 ```
-sudo -H pip3 install networkx numpy gitpython
+sudo -H pip3 install networkx numpy scipy gitpython
+```
+
+(Try to) apply a patch to gitpython 2.1.x:
+```
+cd misc/
+./apply_patch.py
 ```
 
 3. Generate XML representations of repos
