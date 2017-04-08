@@ -30,11 +30,12 @@ Download target repos into `./repos` (the assumed default path).
 E.g.:
 ```
 git clone https://github.com/torvalds/linux.git ./repos/linux
+git -C ./repos/linux checkout v4.10
 ```
 
 Run graphs/srcml. E.g.:
 ```
-./graphs/srcml.py ./repos/linux ./repos/linux-xml/
+./graphs/srcml.py ./repos/linux ./repos/linux-4.10-xml/
 ```
 
 3. Install Jupyter
@@ -70,10 +71,15 @@ Read help info of dev_analysis.py:
 
 To output results of PageRank and DevRank over the call graph:
 ```
-./dev_analysis.py -x ./repos/linux-xml/kernel/ -o linux-kernel.xlsx -a 0.05 1 0.05 -pd
+./dev_analysis.py -x ./repos/linux-4.10-xml/kernel/ -o linux-kernel.xlsx -a 0 1 0.05 -pd
 ```
 
 To output results of DevRank over the call-commit graph:
 ```
-./dev_analysis.py -s ./repos/linux/ -x ./repos/linux-xml/ -o linux-cc.xlsx -n 100 200 -a 0 1 0.05 -c
+./dev_analysis.py -s ./repos/linux/ -x ./repos/linux-4.10-xml/ -o linux-cc.xlsx -n 100 200 -a 0 1 0.05 -c
+```
+
+A sample long-time run:
+```
+nohup ./dev_analysis.py -s ./repos/linux/ -x ./repos/linux-4.10-xml/ -o linux-4.10-cc.xlsx -n 1000 10000 -a 0 1 0.05 -c > dev.out 2>&1 &
 ```

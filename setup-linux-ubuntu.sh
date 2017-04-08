@@ -3,7 +3,9 @@
 export LC_ALL="en_US.UTF-8"
 export LC_CTYPE="en_US.UTF-8"
 
+sudo apt-get update
 sudo apt install -y python3 python3-pip
+sudo -H pip3 install --upgrade pip
 sudo -H pip3 install lxml networkx numpy scipy gitpython openpyxl
 
 if [ ! -f misc/.done ]; then
