@@ -8,12 +8,12 @@
 Download and install Python: <https://www.python.org/downloads/>
 Note: Python 3.5+ is required.
 
-Install packages networkx numpy scipy gitpython openpyxl: <https://packaging.python.org/installing/>
+Install packages lxml networkx numpy scipy gitpython openpyxl: <https://packaging.python.org/installing/>
 
 E.g., Ubuntu:
 ```
 sudo apt install -y python3 python3-pip
-sudo -H pip3 install networkx numpy scipy gitpython openpyxl
+sudo -H pip3 install lxml networkx numpy scipy gitpython openpyxl
 ```
 
 (Try to) apply a patch to gitpython 2.1.x:
@@ -61,6 +61,7 @@ Enjoy your interactions with the notebook!
 ### Batch Mode
 
 Do the above Step 1 and Step 2.
+Note: setup-linux-ubuntu.sh can be used for Ubuntu Server.
 
 Read help info of dev_analysis.py:
 ```
