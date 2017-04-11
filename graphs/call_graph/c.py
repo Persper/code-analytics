@@ -62,8 +62,8 @@ def handle_call(call_node):
         callee_name = name_node[-1].text
     return callee_name
 
-def remove_edges_of_node(G, n):
-    """Remove all edges of n, but keep the node itself in the graph
+def remove_edges_of_node(G, n, in_edges=True, out_edges=True):
+    """Remove edges of n, but keep the node itself in the graph
     
     >>> G3 = nx.DiGraph()
     >>> G3.add_path([0, 1, 2, 3, 4])
@@ -80,12 +80,14 @@ def remove_edges_of_node(G, n):
         # raise NetworkXError("The node %s is not in the digraph."%(n, ))
         print("The node %s is not in the digraph."%(n, ))
         return 
-    for u in nbrs:
-        del G.pred[u][n]
-    G.succ[n] = {}
-    for u in G.pred[n]:
-        del G.succ[u][n]
-    G.pred[n] = {}
+    if out_edges:
+        for u in nbrs:
+            del G.pred[u][n]
+        G.succ[n] = {}
+    if in_edges: 
+        for u in G.pred[n]:
+            del G.succ[u][n]
+        G.pred[n] = {}
     
 def get_func_ranges_c(root):
     func_ranges, func_names = [], []
@@ -102,7 +104,7 @@ def get_func_ranges_c(root):
 def update_call_graph(roots, change_info, G):
     for func_name in change_info:
         if func_name in G:
-            remove_edges_of_node(G, func_name)
+            remove_edges_of_node(G, func_name, in_edges=False)
             G.node[func_name]['num_lines'] += change_info[func_name]
         
     # here roots should be constructed from new commit
