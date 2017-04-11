@@ -1,5 +1,7 @@
 import time
 from graphs.git import initialize_repo
+import functools
+print = functools.partial(print, flush=True)
 
 class Processor():
 
