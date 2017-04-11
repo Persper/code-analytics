@@ -47,8 +47,10 @@ class CallCommitGraph(Processor):
 
             # parse patch
             additions, deletions = self.parse_patch(diff.diff)
-            if not (additions and deletions):
+            if additions == None or deletions == None:
                 return -1
+            else:
+                assert(len(additions) == 0)
                 
             # detect which functions are changed
             last_commit = commit.parents[0]
@@ -76,7 +78,7 @@ class CallCommitGraph(Processor):
 
             # parse patch
             additions, deletions = self.parse_patch(diff.diff)
-            if not (additions and deletions):
+            if additions == None or deletions == None:
                 return -1
                 
             # parse new contents to tree
@@ -110,7 +112,7 @@ class CallCommitGraph(Processor):
 
             # parse patch
             additions, deletions = self.parse_patch(diff.diff)
-            if not (additions and deletions):
+            if additions == None or deletions == None:
                 return -1 
 
             # parse new contents to tree
