@@ -51,9 +51,9 @@ class Processor():
                     diff.change_type = 'M'
                 else:
                     diff.change_type = 'U'
-                    print("Take a look at this commit!!! {}".format(sha))
-                    # raise Exception('Non-existent Change Type!')
+                    print("Unknown change type encountered.")
                     continue
+
             if verbose:
                 print('{}:{}'.format(sha, " ".join([diff.change_type for diff in diff_index])))
 
