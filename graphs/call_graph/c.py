@@ -101,21 +101,23 @@ def get_func_ranges_c(root):
         func_names.append(func_name)
     return func_names, func_ranges
     
-def update_call_graph(roots, change_info, G):
-    for func_name in change_info:
+def update_call_graph(G, roots, modified_func):
+    for func_name in modified_func:
         if func_name in G:
             remove_edges_of_node(G, func_name, in_edges=False)
-            G.node[func_name]['num_lines'] += change_info[func_name]
+            G.node[func_name]['num_lines'] += modified_func[func_name]
         
-    # here roots should be constructed from new commit
-    # info of new functions is added to change_info
-    build_call_graph(roots, change_info, G)
+    # here roots should be constructed from the more recent commit
+    # new functions and their sizes are stored in new_func dictionary
+    _, new_func, _ = build_call_graph(roots, G)
+    return new_func
         
 
-def build_call_graph(roots, change_info, G=None):
+def build_call_graph(roots, G=None):
     if G == None:
         G = nx.DiGraph()
         
+    new_func = {}
     func_to_file = {}
     for root in roots:
         # print('------ ' + root.attrib['filename'] + ' ------')
@@ -134,17 +136,18 @@ def build_call_graph(roots, change_info, G=None):
                 
             if caller_name not in G:
                 # Case 1: hasn't been defined and hasn't been called
-                change_info[caller_name] = num_lines
+                new_func[caller_name] = num_lines
                 G.add_node(caller_name, {'num_lines': num_lines, 'defined': True}) 
             elif not G.node[caller_name]['defined']:
                 # Case 2: has been called but hasn't been defined
-                change_info[caller_name] = num_lines
+                new_func[caller_name] = num_lines
                 G.node[caller_name]['defined'] = True
                 G.node[caller_name]['num_lines'] = num_lines
             else:
                 # Case 3: has been called and has been defined
-                # pass because its change_info[caller_name] and 
-                # G.node[caller_name]['num_lines'] have already been updated
+                # pass because it's not a new function
+                # so no need to add it to new_func and to 
+                # update G.node[caller_name]['num_lines']
                 pass
                 
                 
@@ -165,4 +168,4 @@ def build_call_graph(roots, change_info, G=None):
                     G.add_node(callee_name, {'num_lines': 1, 'defined': False})
                 G.add_edge(caller_name, callee_name)
                 
-    return G, func_to_file
+    return G, new_func, func_to_file

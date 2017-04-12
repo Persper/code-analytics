@@ -38,7 +38,7 @@ def build_call_graph(xml_dir):
     for xml in glob.glob(xml_dir + '/**/*.[ch].xml', recursive=True):
         tree = etree.parse(xml)
         roots = [tree.getroot()]
-        _, f2f = call_graph.c.build_call_graph(roots, {}, G=graph)
+        _, _, f2f = call_graph.c.build_call_graph(roots, G=graph)
         for func, fname in f2f.items():
             func2file[func] = fname
     print("Number of nodes: {}".format(len(graph.nodes())))

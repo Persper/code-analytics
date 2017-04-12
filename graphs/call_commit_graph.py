@@ -23,12 +23,7 @@ class CallCommitGraph(Processor):
         self.history = {}
 
     def start_process_commit(self, commit):
-        self.commit_roots = [] 
         self.history[commit.hexsha] = {}
-
-    def finish_process_commit(self, commit):
-        update_call_graph(self.commit_roots, 
-            self.history[commit.hexsha], self.G)
 
     def on_add(self, diff, commit):
         fname = diff.b_blob.path
@@ -37,7 +32,13 @@ class CallCommitGraph(Processor):
             root = transform_src_to_tree(file_contents)
             if root == None:
                 return -1 
-            self.commit_roots.append(root)
+
+            # update call graph
+            new_func = update_call_graph(self.G, [root], {}) 
+
+            # update self.history
+            for func_name in new_func:
+                self.history[commit.hexsha][func_name] = new_func[func_name]
 
         return 0 
 
@@ -60,15 +61,15 @@ class CallCommitGraph(Processor):
                 return -1
             func_names, func_ranges = get_func_ranges_c(root)
 
-            change_info = get_changed_functions(func_names, func_ranges, 
+            modified_func = get_changed_functions(func_names, func_ranges, 
                 additions, deletions)
 
-            # update self.history
-            for func_name in change_info:
-                self.history[commit.hexsha][func_name] = change_info[func_name]
-            
-            # no self.commit_roots.append for change_type 'D'
+            # update call graph
+            update_call_graph(self.G, [], modified_func)
 
+            # update self.history
+            for func_name in modified_func:
+                self.history[commit.hexsha][func_name] = modified_func[func_name]
         return 0
 
     def on_rename(self, diff, commit):
@@ -95,14 +96,18 @@ class CallCommitGraph(Processor):
                 return -1 
             func_names, func_ranges = get_func_ranges_c(old_root)
 
-            change_info = get_changed_functions(func_names, func_ranges, 
+            modified_func = get_changed_functions(func_names, func_ranges, 
                 additions, deletions)
 
-            # update self.history
-            for func_name in change_info:
-                self.history[commit.hexsha][func_name] = change_info[func_name]
+            # update call graph
+            new_func = update_call_graph(self.G, [new_root], modified_func) 
 
-            self.commit_roots.append(new_root)
+            # update self.history
+            for func_name in new_func:
+                self.history[commit.hexsha][func_name] = new_func[func_name] 
+
+            for func_name in modified_func:
+                self.history[commit.hexsha][func_name] = modified_func[func_name]
 
         return 0
 
@@ -129,13 +134,17 @@ class CallCommitGraph(Processor):
                 return -1 
             func_names, func_ranges = get_func_ranges_c(old_root)
 
-            change_info = get_changed_functions(func_names, func_ranges, additions, deletions)
+            modified_func = get_changed_functions(func_names, func_ranges, additions, deletions)
                 
+            # update call graph
+            new_func = update_call_graph(self.G, [new_root], modified_func)
+
             # update self.history
-            for func_name in change_info:
-                self.history[commit.hexsha][func_name] = change_info[func_name]
-                
-            self.commit_roots.append(new_root)
+            for func_name in new_func:
+                self.history[commit.hexsha][func_name] = new_func[func_name] 
+
+            for func_name in modified_func:
+                self.history[commit.hexsha][func_name] = modified_func[func_name]
 
         return 0
 
