@@ -1,7 +1,7 @@
 import networkx as nx
 from graphs.processor import Processor
 from graphs.patch_parser import PatchParser
-from graphs.srcml import transform_dir, transform_src_to_tree
+from graphs.srcml import transform_src_to_tree
 from graphs.detect_change import get_changed_functions
 from graphs.call_graph.c import update_call_graph, get_func_ranges_c
 from graphs.devrank import devrank

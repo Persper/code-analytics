@@ -16,7 +16,13 @@ def copy_dir(src, dst, *, follow_sym=True):
         shutil.copystat(src, dst, follow_symlinks=follow_sym)
     return dst
 
-def transform_dir(input_dir='linux-kernel', output_dir='linux-kernel-xml', extensions=('.c', '.h')):    
+def transform_dir(input_dir, output_dir, extensions=('.c', '.h')):    
+    """Run srcML recursively under a directory
+
+    First copy directory structure from input_dir to output_dir,
+    then for every source file that ends with ext in extentions,
+    run srcML and output to corresponding directory under output_dir.
+    """
     # copy directory structure
     input_dir = os.path.expanduser(input_dir)
     output_dir = os.path.expanduser(output_dir)
