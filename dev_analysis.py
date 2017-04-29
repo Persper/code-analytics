@@ -121,6 +121,7 @@ def main():
         ranks_array = fname_array(ranks_array, func2file)
         ws = wb.create_sheet('PageRank-C')
         output(ranks_array, ws, args.a[0], args.a[1], args.a[2])
+        wb.save(args.o)
     if args.d:
         if graph is None:
             graph, func2file = build_call_graph(xml_dir)
@@ -128,6 +129,7 @@ def main():
         ranks_array = fname_array(ranks_array, func2file)
         ws = wb.create_sheet('DevRank-C')
         output(ranks_array, ws, args.a[0], args.a[1], args.a[2])
+        wb.save(args.o)
     if args.c:
         if args.s is None or args.n is None:
             sys.exit('Specify -s and -n for call-commit graph.')
@@ -143,11 +145,10 @@ def main():
             ranks_array = fname_array(ranks_array, func2file)
             ws = wb.create_sheet('DevRank-CC n=' + str(n))
             output(ranks_array, ws, args.a[0], args.a[1], args.a[2])
+            wb.save(args.o)
 
     if not args.p and not args.d and not args.c:
         sys.exit('Specify -p, -d or -c.')
-    else:
-        wb.save(args.o)
 
 if __name__ == '__main__':
     main()
