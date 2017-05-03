@@ -12,13 +12,16 @@ class Processor():
         self.repo = initialize_repo(repo_path)
         self.git = self.repo.git
 
-    def process(self, rev=None, num_commits=None, from_beginning=False, verbose=False):
+    def process(self, rev=None, num_commits=None, 
+                from_beginning=False, verbose=False):
         if from_beginning:
             if num_commits == None:
                 num_commits = 0
-            self.commits = list(self.repo.iter_commits())[-num_commits:]
+            self.commits = list(
+                self.repo.iter_commits(first_parent=True))[-num_commits:]
         else:
-            self.commits = list(self.repo.iter_commits(rev, max_count=num_commits))
+            self.commits = list(self.repo.iter_commits(
+                rev, max_count=num_commits, first_parent=True))
 
         self.start_process()
 
