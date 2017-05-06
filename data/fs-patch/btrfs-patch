@@ -490,7 +490,7 @@ ChangeLog-2.6.30
         . (30):(misc->api)  2  16   46 
     Btrfs: use the right node in reada_for_balance
         . (30):(tree):(p:acce):(s:performance->io)  1  12   5 
-    Btrfs: fix oops on pamapping->host during writepage
+    Btrfs: fix oops on page->mapping->host during writepage
         . (30):(extent):(b:concurrency->ato):(s:crash->null):(r:fail):(rep:lock_page_update)  1  32   8 
     Btrfs: add a priority queue to the async thread helpers
         . (30):(other,file,extent,file):(p:sche):(s:performance->io):(rep:io_order)  5  56   15 
@@ -1356,7 +1356,7 @@ ChangeLog-2.6.38
         . (38):(tree):(b:sem->state->tree):(s:crash):(note:miss_state_update_tree)  1  1   0 
     Btrfs: don't release pages when we can't clear the uptodate bits
         . (38):(extent):(b:error_handling->ms_err):(s:corruption):(r:fail):(rep:miss_mem_err)  1  9   1 
-    Btrfs: fix paprivate races
+    Btrfs: fix page->private races
         . (38):(file,extent):(b:concurrency->ato):(s:corruption):(r:fail):(rep:acc_alloc_race)  2  41   5 
     Btrfs: Fix page count calculation
         . (38):(file):(b:sem->wlog):(s:corruption):(note:wrong_logic)  1  4   4 

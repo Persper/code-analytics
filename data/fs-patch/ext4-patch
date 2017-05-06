@@ -162,7 +162,7 @@ ChangeLog-2.6.23
         . (23):(misc->code)  1  9   4 
     Fix compilation with EXT_DEBUG, also fix leXX_to_cpu conversions.
         . (23):(misc->compile)  1  10   8 
-    ext4: remove extra IS_RDONLY() check b
+    ext4: remove extra IS_RDONLY() check
         . (23):(misc->code)
     ext4: Use is_power_of_2()
         . (23):(misc->api)  1  2   3  
@@ -380,7 +380,7 @@ ChangeLog-2.6.25
         . (25):(misc->api)  4  34   38 
     ext4: Rename i_file_acl to i_file_acl_lo
         . (25):(misc->api)  2  3   3 
-    ext4: Fix sparse warnings.
+    ext4:  Fix sparse warnings.
         . (25):(misc->code)
     ext4: Introduce ext4_update_*_feature
         . (25):(misc->api)
@@ -394,7 +394,7 @@ ChangeLog-2.6.25
         . (25):(dir,extent,inode,dir,super):(f)  8  143   226 
     ext4: Avoid rec_len overflow with 64KB block size
         . (25):(dir):(b:sem->gene):(s:corruption):(rep:wrong_type)  3  63   46 
-    ext4: Support large blocksize up to PAGESIZE
+    ext4:  Support large blocksize up to PAGESIZE
         . (25):(super):(f) 2 7 2 
 --------------------------------------------------------------------------------------------  
 ChangeLog-2.6.26
@@ -496,7 +496,7 @@ ChangeLog-2.6.26
         . (26):(super):(b:sem->gene):(s:error->op_fail):(rep:simple_typo)  1  1   1 
     ext4: fdatasync should skip metadata writeout when overwriting
         . (26):(file):(p:acce):(s:performance->io):(rep:avoid_redun_write)  1  3   0 
-    ext4: check return of ext4_orphan_get properly
+    ext4:  check return of ext4_orphan_get properly
         . (26):(super):(b:error_handling->wr_err):(s:crash):(r:fail):(rep:bad_ac) 1 2 2 
     ext4: use non-racy method for proc entries creation
         . (26):(balloc):(b:concurrency->ato):(s:corruption)  1  4   11 
@@ -926,7 +926,7 @@ ChangeLog-2.6.29
         . (29):(misc->code)  5  19   20 
     ext4: Allow ext4 to run without a journal
         . (29):(balloc,extent,inode,ioctl,dir,resize,super,xattr):(f)  13  452   224 
-    ext4: Widen type of ext4_sb_info.s_mb_maxs()
+    ext4: Widen type of ext4_sb_info.s_mb_maxs[]
         . (29):(balloc):(b:sem->gene):(s:crash):(real):(rep:wrong_type) 2 4 1 
     ext4: When resizing set the EXT4_BG_INODE_ZEROED flag for new block groups
         . (29):(misc->code)  1  1   0 
@@ -1996,7 +1996,7 @@ ChangeLog-2.6.39
         . (39):(super):(b:mem->re):(s:wb):(r:fail)  1  6   0 
     ext4: fix credits computing for indirect mapped files
         . (39):(inode):(b:sem->state->journal):(s:error->op_fail):(rep:wrong_journal_credit)  1  5   6 
-    ext4: remove unnecessary (cm)time update of quota file
+    ext4: remove unnecessary [cm]time update of quota file
         . (39):(super):(p:acce):(s:performance->io) 2 16  4 
     ext4: use little-endian bitops
         . (39):(misc->api)  1  6   6 
@@ -2180,7 +2180,7 @@ ChangeLog-2.6.25
 		. (25):(misc->code)			
     jbd2: correctly unescape journal data blocks
 		. (25):(journal->recovery):(b:sem->gene):(s:corruption):(rep:simple_typo) 1 1 1 
-	JBD2: Clear buffer_ordered flag for barried IO request on success
+	JBD2:  Clear buffer_ordered flag for barried IO request on success
 		. (25):(journal->commit):(b:sem->conf):(s:error->op_fail):(rep:forget_config) 1 2 1 
 	BKL-removal: remove incorrect comment refering to lock_kernel() from jbd/jbd2 
 		. (25):(misc->code)				

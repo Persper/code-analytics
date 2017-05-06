@@ -10,7 +10,7 @@ ChangeLog-2.6.1
 ChangeLog-2.6.2 
 	[PATCH] ext3: s_next_generation fixes
 		. (2):(inode,super):(b:concurrency->ato):(s:corruption):(rep:lock_inode_update) 3 8 2 
-	[PATCH] ext3: fix determination of inode journaling mode	
+	[PATCH] ext3: fix determination of inode journalling mode	
 		. (2):(other):(b:sem->state->inode):(s:corruption):(note:wrong_state_check_inode) 1 14 3 
 	[PATCH] ext3: update a_ops when running `chattr +j'
 		. (2):(xattr):(b:sem->state->inode):(s:corruption):(note:wrong_state_update_inode) 1 1 0 
@@ -36,7 +36,7 @@ ChangeLog-2.6.5
 ChangeLog-2.6.6 
 	[PATCH] ext3 fsync() and fdatasync() speedup
 		. (6):(file):(p:acce):(s:performance->io):(rep:avoid_redun_write) 4 65 18 
-	[PATCH] Add commit=0 to ext3, meaning "set commit to default"
+	[PATCH] Add commit=0 to ext3, meaning "set commit to default".
 		. (6):(super):(f)  3 10 1 
 	[PATCH] ext3fs sb= mount option fix
 		. (6):(super):(b:sem->conf):(s:error->op_fail):(rep:forget_config)  1 4 1 
@@ -132,7 +132,7 @@ ChangeLog-2.6.11
 		. (11):(inode):(c:err_ck):(rep:grace) 4 28 13 
 	[PATCH] ext3: support for EA in inode
 		. (11):(xattr):(f)  6 625 38 
-	[PATCH] Ext(23): apply umask to symlinks with ACLs configured out	
+	[PATCH] Ext[23]: apply umask to symlinks with ACLs configured out	
 		. (11):(misc->code)									
 	[PATCH] remove dead ext3_put_inode prototype
 		. (11):(misc->code)									
@@ -148,7 +148,7 @@ ChangeLog-2.6.11
 		. (11):(xattr):(f)	6 67 646 
 	[PATCH] ext3/EA: mbcache cleanup
 		. (11):(misc->code)								
-	[PATCH] ext3/EA: Race in ext(23) xattr sharing code
+	[PATCH] ext3/EA: Race in ext[23] xattr sharing code
 		. (11):(xattr):(b:concurrency->ato):(s:crash) 3 90 37 
 	[PATCH] ext3/EA: Ext3: do not use journal_release_buffer
 		. (11):(xattr):(b:concurrency->ato):(s:error->op_fail) 1 67 75 
@@ -246,7 +246,7 @@ ChangeLog-2.6.16
 		. (16):(inode):(b:sem->conf):(s:wb):(rep:forget_config)	1  8   9
 	[PATCH] ext3: ext3_symlink should use GFP_NOFS allocations inside	
 		. (16):(dir):(b:concurrency->inter):(s:crash->assert):(r:fail):(real):(rep:wrong_kmalloc_flag)	3  15   3
-	[PATCH] Fix two ext\[23\] uninitialized warnings	
+	[PATCH] Fix two ext[23] uninitialized warnings	
 		. (16):(misc->compile)				2  2   2
 	[PATCH] ext3: remove d_splice_alias NULL check from ext3_lookup	
 		. (16):(misc->code)		1  1   4
@@ -342,13 +342,13 @@ ChangeLog-2.6.18
 		. (18):(misc->code)					1  2   1
 	Don't include private headers from user-visible part of linux/ext3_fs.h	
 		. (18):(misc->code)					1  2   5
-	\[RBTREE\] Update ext3 to use rb_parent() accessor macro.	
+	[RBTREE] Update ext3 to use rb_parent() accessor macro.	
 		. (18):(misc->api)		1  1   1
 --------------------------------------------------------------------------------------------
 ChangeLog-2.6.19 
 	[PATCH] ext3: errors behaviour fix	
 		. (19):(super):(b:sem->conf):(s:error->wr_err):(r:fail):(ss):(rep:forget_config)	1  2   0
-	[PATCH] BLOCK: Move the Ext3 device ioctl compat stuff to the Ext3 driver (try #6)	
+	[PATCH] BLOCK: Move the Ext3 device ioctl compat stuff to the Ext3 driver [try #6]	
 		. (19):(misc->code)							    		5  66  28
 	[PATCH] ext3: make meta data reads use READ_META	
 		. (19):(misc->code)							    		2  5   3
@@ -728,7 +728,7 @@ ChangeLog-2.6.33
 		. (33):(super):(p:sync->rm_lock):(s:performance->cpu):(ss):(rep:remove_lock)	1 0 8 
 	ext3: Remove outdated comment about lock_super()
 		. (33):(misc->code)	
-	ext3: quota macros cleanup (V2)
+	ext3: quota macros cleanup [V2]
 		. (33):(misc->code)		
 	ext3: PTR_ERR return of wrong pointer in setup_new_group_blocks()
 		. (33):(resize):(b:sem->gene):(s:error->wr_err):(r:fail):(ss):(rep:simple_typo) 1 1 1 

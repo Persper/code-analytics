@@ -290,7 +290,7 @@ ChangeLog-2.6.6
 		. (6):(xattr):(b:error_handling->wr_err):(s:error->wr_err):(r:fail) 1 1 1 
 	[XFS] Correct the (file size >= stripe unit) check inside
 		. (6):(file):(b:sem->state->inode):(s:corruption):(note:wrong_state_check_inode) 1 4 3 
-	[XFS] Only use paprivate to track page state for page cache pages
+	[XFS] Only use page->private to track page state for page cache pages
 		. (6):(misc->code)
 	[XFS] Fix some cases where we returned fill_super success, instead
 		. (6):(super):(b:error_handling->wr_err):(s:error->op_fail):(r:fail) 1 10 6 
@@ -508,7 +508,7 @@ ChangeLog-2.6.9
 		. (9):(quota):(f) 7 199 66 
 	[XFS] Fix warnings in xfs_bmap.c
 		. (9):(misc->compile)
-	[XFS]Ensure maxagi not updated early during growfs, conflicts with
+	[XFS] Ensure maxagi not updated early during growfs, conflicts with
 		. (9):(resize,super):(b:concurrency->inter):(s:corruption):(note:update_after_init) 3 11 7 
 	[XFS] Export sync_page_range to fix O_SYNC in XFS.
 		. (9):(misc->code)
@@ -1638,7 +1638,7 @@ ChangeLog-2.6.23
         . (23):(journal):(b:sem->state->inode):(s:corruption):(note:wrong_state_update_inode) 3  54   3 
     [XFS] Ensure file size updates have been completed before writing inode to disk.
         . (23):(file,super,vfs):(b:sem->io):(s:corruption):(r:fail):(rep:meta_data_order)  3  16   9 
-    [XFS] On-demand reaping of the MRU ca(che
+    [XFS] On-demand reaping of the MRU cache
         . (23):(balloc):(p:acce):(s:performance->cpu):(rep:check_before_work)  3  31   50 
     [XFS] fix nasty quota hashtable allocation bug
         . (23):(quota):(b:sem->gene):(s:crash):(ff):(rep:simple_typo)  1  2   1 
@@ -3413,7 +3413,7 @@ ChangeLog-2.6.34
         . (34):(super,journal):(p:sche):(s:performance->cpu)  2  14   12 
     xfs: Use list_heads for log recovery item lists
         . (34):(misc->code)  2  81   147 
-    xfs: mke several more functions static
+    xfs: make several more functions static
         . (34):(misc->api)
     xfs: clean up inconsistent variable naming in xfs_swap_extent
         . (34):(misc->code)  2  22   19 
