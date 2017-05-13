@@ -8,12 +8,12 @@
 Download and install Python: <https://www.python.org/downloads/>
 Note: Python 3.5+ is required.
 
-Install packages lxml networkx numpy scipy gitpython openpyxl: <https://packaging.python.org/installing/>
+Install packages lxml networkx numpy scipy gitpython openpyxl dicttoxml: <https://packaging.python.org/installing/>
 
 E.g., Ubuntu:
 ```
 sudo apt install -y python3 python3-pip
-sudo -H pip3 install lxml networkx numpy scipy gitpython openpyxl
+sudo -H pip3 install lxml networkx numpy scipy gitpython openpyxl dicttoxml
 ```
 
 (Try to) apply a patch to gitpython 2.1.x:
