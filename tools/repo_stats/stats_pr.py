@@ -5,6 +5,7 @@ import argparse
 from sh.contrib import git
 import os
 import re
+import sys
 from sh import wc
 
 def jira_issue(commit_message, key):
@@ -16,32 +17,33 @@ def jira_issue(commit_message, key):
 def parse_pr(commit_message):
     matches = re.findall("(?:close[ds]*|"
                          "pull\s*request|"
-                         "fix(e[ds]){0,1}|"
+                         "fix(?:e[ds]){0,1}|"
                          "merge[ds]*)"
                          "\s*#\d+",
                          commit_message, re.IGNORECASE)
     return [m.split('#')[-1] for m in matches]
 
 def num_commits(repo_dir):
-    git_repo = git.bake("-C", os.path.expanduser(repo_dir))
+    git_repo = git.bake('-C', os.path.expanduser(repo_dir))
     logs = git_repo.log('--oneline', '--first-parent')
     n = wc(logs, '-l')
     return int(n)
 
-def stats_pr(repo_dir, key, num_groups, n):
-    """Lists the number of commits through pull requests/issues every n commits
+def stats_pr(repo_dir, key, begin, end):
+    """Lists the number of PR/issue-based commits in the range
     """
-    git_repo = git.bake("-C", os.path.expanduser(repo_dir))
-    num_prs = []
-    for g in range(num_groups):
-        p = 0
-        for i in range(g * n, (g + 1) * n):
-            message = str(git_repo.log("-1", "HEAD~" + str(i)))
-            if jira_issue(message, key) or parse_pr(message):
-                p += 1
-        num_prs.append(p)
-    num_prs.reverse()
-    return num_prs
+    git_repo = git.bake('-C', os.path.expanduser(repo_dir))
+    num = 0
+    prs = []
+    for i in range(begin, end):
+        message = str(git_repo.log('--first-parent', '-1', 'HEAD~' + str(i)))
+        pi = []
+        pi += jira_issue(message, key)
+        pi += parse_pr(message)
+        if pi:
+            num += 1
+            prs += pi
+    return num, prs
 
 def main():
     parser = argparse.ArgumentParser(
@@ -51,21 +53,28 @@ def main():
     parser.add_argument('-d', '--dir', required=True,
         help='dir of the git repo')
     parser.add_argument('-k', '--key', help='key of JIRA issue')
+    parser.add_argument('-t', '--tag', help='tag to check out of the repo')
     parser.add_argument('-m', '--max', type=int,
         help='max number of commits to process')
     args = parser.parse_args()
 
-    if os.path.isdir(args.dir):
-        n = num_commits(args.dir)
-        if args.max < n:
-            n = args.max
-        n //= args.num_groups
-        num_prs = stats_pr(args.dir, args.key, args.num_groups, n)
-        print(os.path.basename(os.path.normpath(args.dir)))
-        for np in num_prs:
-            print(np / n)
-    else:
-        print('Error: ' + args.dir + ' is not a valid dir!')
+    if not os.path.isdir(args.dir):
+        sys.exit('Error: ' + args.dir + ' is not a valid dir!')
+
+    if args.tag:
+        git_repo = git.bake('-C', os.path.expanduser(args.dir))
+        git_repo.checkout(args.tag)
+
+    print(os.path.basename(os.path.normpath(args.dir)))
+    n = num_commits(args.dir)
+    if args.max < n:
+        n = args.max
+    n //= args.num_groups
+    num_prs = []
+    for i in reversed(range(args.num_groups)):
+        np, prs = stats_pr(args.dir, args.key, i * n, (i + 1) * n)
+        print(np / n, end=',')
+        print('"{0}"'.format(','.join(prs)))
 
 if __name__ == '__main__':
     main()
