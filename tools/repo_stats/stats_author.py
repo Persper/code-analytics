@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+from sh import awk
+from sh import git
 import os
 import subprocess
 import sys
 
-from sh import git
-from sh import awk
 
 def stats(repo_dir):
     print(repo_dir + ":")
