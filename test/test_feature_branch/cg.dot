@@ -1,0 +1,6 @@
+digraph test_feature_branch {
+	A -> B -> C -> D ->           E -> F;
+	     B -> G -> D 							      ;
+								 D -> H -> I -> E     ;
+	A -> J -> 										     F;
+}
