@@ -26,133 +26,80 @@ class CallCommitGraph(Processor):
         self.history[commit.hexsha] = {}
 
     def on_add(self, diff, commit):
-        fname = diff.b_blob.path
-        if self.fname_filter(fname):
-            file_contents = get_contents(self.repo, commit, fname)
-            root = transform_src_to_tree(file_contents)
-            if root == None:
-                return -1 
-
-            # update call graph
-            new_func = update_call_graph(self.G, [root], {}) 
-
-            # update self.history
-            for func_name in new_func:
-                self.history[commit.hexsha][func_name] = new_func[func_name]
-
-        return 0 
+        old_fname = None
+        new_fname = diff.b_blob.path
+        return self._process_helper(diff, commit, old_fname, new_fname)
 
     def on_delete(self, diff, commit):
-        fname = diff.a_blob.path
-        if self.fname_filter(fname):
-
-            # parse patch
-            additions, deletions = self.parse_patch(diff.diff)
-            if additions == None or deletions == None:
-                return -1
-            else:
-                assert(len(additions) == 0)
-                
-            # detect which functions are changed
-            last_commit = commit.parents[0]
-            file_contents = get_contents(self.repo, last_commit, fname)
-            root = transform_src_to_tree(file_contents)
-            if root == None:
-                return -1
-            func_names, func_ranges = get_func_ranges_c(root)
-
-            modified_func = get_changed_functions(func_names, func_ranges, 
-                additions, deletions)
-
-            # update call graph
-            update_call_graph(self.G, [], modified_func)
-
-            # update self.history
-            for func_name in modified_func:
-                self.history[commit.hexsha][func_name] = modified_func[func_name]
-        return 0
+        old_fname = diff.a_blob.path
+        new_fname = None
+        return self._process_helper(diff, commit, old_fname, new_fname)
 
     def on_rename(self, diff, commit):
         new_fname = diff.rename_to
         old_fname = diff.rename_from
-        if self.fname_filter(new_fname) or self.fname_filter(old_fname):
-
-            # parse patch
-            additions, deletions = self.parse_patch(diff.diff)
-            if additions == None or deletions == None:
-                return -1
-                
-            # parse new contents to tree
-            new_contents = get_contents(self.repo, commit, new_fname)
-            new_root = transform_src_to_tree(new_contents)
-            if new_root == None:
-                return -1 
-
-            # detect which functions are changed
-            last_commit = commit.parents[0]
-            old_contents = get_contents(self.repo, last_commit, old_fname)
-            old_root = transform_src_to_tree(old_contents)
-            if old_root == None:
-                return -1 
-            func_names, func_ranges = get_func_ranges_c(old_root)
-
-            modified_func = get_changed_functions(func_names, func_ranges, 
-                additions, deletions)
-
-            # update call graph
-            new_func = update_call_graph(self.G, [new_root], modified_func) 
-
-            # update self.history
-            for func_name in new_func:
-                self.history[commit.hexsha][func_name] = new_func[func_name] 
-
-            for func_name in modified_func:
-                self.history[commit.hexsha][func_name] = modified_func[func_name]
-
-        return 0
+        return self._process_helper(diff, commit, old_fname, new_fname)
 
     def on_modify(self, diff, commit):
         fname = diff.b_blob.path
-        if self.fname_filter(fname):
-
-            # parse patch
-            additions, deletions = self.parse_patch(diff.diff)
-            if additions == None or deletions == None:
-                return -1 
-
-            # parse new contents to tree
-            new_contents = get_contents(self.repo, commit, fname)
-            new_root = transform_src_to_tree(new_contents)
-            if new_root == None:
-                return -1 
-
-            # detect which functions are changed
-            last_commit = commit.parents[0]
-            old_contents = get_contents(self.repo, last_commit, fname)
-            old_root = transform_src_to_tree(old_contents)
-            if old_root == None:
-                return -1 
-            func_names, func_ranges = get_func_ranges_c(old_root)
-
-            modified_func = get_changed_functions(func_names, func_ranges, additions, deletions)
-                
-            # update call graph
-            new_func = update_call_graph(self.G, [new_root], modified_func)
-
-            # update self.history
-            for func_name in new_func:
-                self.history[commit.hexsha][func_name] = new_func[func_name] 
-
-            for func_name in modified_func:
-                self.history[commit.hexsha][func_name] = modified_func[func_name]
-
-        return 0
+        return self._process_helper(diff, commit, fname, fname)
 
     def fname_filter(self, fname):
         for ext in self.exts:
             if not fname.endswith(ext):
                 return False
         return True
+
+    def _get_xml_root(self, commit, fname):
+        return transform_src_to_tree(get_contents(self.repo, commit, fname))
+
+    def _process_helper(self, diff, commit, 
+        old_fname=None, new_fname=None):
+
+        if ((old_fname and self.fname_filter(old_fname)) or 
+            (new_fname and self.fname_filter(new_fname))):
+
+            # on add, rename, modify: update_roots = [new_root]
+            # on delete: update_roots = []
+            update_roots = []
+
+            # on add: modified_func = {}
+            # on rename, modify, delete: modified_func is computed by
+            #   parsing patch and call get_changed_functions 
+            modified_func = {}
+
+            # do not need to parse patch if on add
+            if old_fname != None:
+                additions, deletions = self.parse_patch(diff.diff)
+                if additions == None or deletions == None:
+                    return -1
+
+                old_root = self._get_xml_root(commit.parents[0], old_fname)
+                if old_root == None:
+                    return -1
+
+                modified_func = get_changed_functions(
+                    *get_func_ranges_c(old_root), additions, deletions)
+                
+            # parse new src to tree
+            if new_fname != None:
+                new_root = self._get_xml_root(commit, new_fname)
+                if new_root == None:
+                    return -1 
+                update_roots.append(new_root)
+
+            # update call graph
+            # if on delete, then new_func is expected to be an empty dict
+            new_func = update_call_graph(self.G, update_roots, modified_func) 
+
+            # update self.history
+            for func_name in new_func:
+                self.history[commit.hexsha][func_name] = new_func[func_name] 
+
+            for func_name in modified_func:
+                self.history[commit.hexsha][func_name] = modified_func[func_name]
+
+        return 0
 
     def parse_patch(self, patch):
         additions, deletions = None, None
