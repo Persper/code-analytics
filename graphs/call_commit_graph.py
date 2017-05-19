@@ -7,6 +7,17 @@ from graphs.call_graph.c import update_call_graph, get_func_ranges_c
 from graphs.devrank import devrank
 from graphs.git import get_contents
 
+def _inverse_diff_result(adds, dels):
+    inv_adds, inv_dels = [], []
+
+    for add_p in adds:
+        inv_dels.append((add_p[0], add_p[0] + add_p[1] - 1))
+
+    for del_p in dels: 
+        inv_adds.append((del_p[0], del_p[1] - del_p[0] + 1))
+
+    return inv_adds, inv_dels
+
 class CallCommitGraph(Processor):
 
     def __init__(self, repo_path):
@@ -18,31 +29,71 @@ class CallCommitGraph(Processor):
         self.share = {}
         self.patch_parser = PatchParser()
 
-    def start_process(self):
+    def _reset_state(self):
+        super()._reset_state()
         self.G = nx.DiGraph()
         self.history = {}
 
-    def start_process_commit(self, commit):
+    def _start_process_commit(self, commit):
         self.history[commit.hexsha] = {}
 
-    def on_add(self, diff, commit):
+    def on_add(self, diff, commit, is_merge_commit):
         old_fname = None
         new_fname = diff.b_blob.path
-        return self._process_helper(diff, commit, old_fname, new_fname)
+        return self._first_phase(diff, commit, 
+                                 is_merge_commit,
+                                 old_fname=old_fname, 
+                                 new_fname=new_fname)
 
-    def on_delete(self, diff, commit):
+    def on_delete(self, diff, commit, is_merge_commit):
         old_fname = diff.a_blob.path
         new_fname = None
-        return self._process_helper(diff, commit, old_fname, new_fname)
+        return self._first_phase(diff, commit, 
+                                 is_merge_commit,
+                                 old_fname=old_fname, 
+                                 new_fname=new_fname)
 
-    def on_rename(self, diff, commit):
+    def on_rename(self, diff, commit, is_merge_commit):
         new_fname = diff.rename_to
         old_fname = diff.rename_from
-        return self._process_helper(diff, commit, old_fname, new_fname)
+        return self._first_phase(diff, commit, 
+                                 is_merge_commit,
+                                 old_fname=old_fname, 
+                                 new_fname=new_fname)
 
-    def on_modify(self, diff, commit):
+    def on_modify(self, diff, commit, is_merge_commit):
         fname = diff.b_blob.path
-        return self._process_helper(diff, commit, fname, fname)
+        return self._first_phase(diff, commit, 
+                                 is_merge_commit,
+                                 old_fname=fname, 
+                                 new_fname=fname)
+
+    def on_add2(self, diff, commit):
+        old_fname = None
+        new_fname = diff.b_blob.path
+        return self._second_phase(diff, commit,
+                                  old_fname=old_fname,
+                                  new_fname=new_fname)
+
+    def on_delete2(self, diff, commit):
+        old_fname = diff.a_blob.path
+        new_fname = None
+        return self._second_phase(diff, commit, 
+                                 old_fname=old_fname, 
+                                 new_fname=new_fname)
+
+    def on_rename2(self, diff, commit):
+        new_fname = diff.rename_to
+        old_fname = diff.rename_from
+        return self._second_phase(diff, commit, 
+                                 old_fname=old_fname, 
+                                 new_fname=new_fname)
+
+    def on_modify2(self, diff, commit):
+        fname = diff.b_blob.path
+        return self._second_phase(diff, commit, 
+                                 old_fname=fname, 
+                                 new_fname=fname)
 
     def fname_filter(self, fname):
         for ext in self.exts:
@@ -53,7 +104,7 @@ class CallCommitGraph(Processor):
     def _get_xml_root(self, commit, fname):
         return transform_src_to_tree(get_contents(self.repo, commit, fname))
 
-    def _process_helper(self, diff, commit, 
+    def _first_phase(self, diff, commit, is_merge_commit, 
         old_fname=None, new_fname=None):
 
         if ((old_fname and self.fname_filter(old_fname)) or 
@@ -92,14 +143,48 @@ class CallCommitGraph(Processor):
             # if on delete, then new_func is expected to be an empty dict
             new_func = update_call_graph(self.G, update_roots, modified_func) 
 
-            # update self.history
-            for func_name in new_func:
-                self.history[commit.hexsha][func_name] = new_func[func_name] 
+            # only update self.history for non-merge commit
+            if not is_merge_commit:
+                for func_name in new_func:
+                    self.history[commit.hexsha][func_name] = new_func[func_name] 
 
-            for func_name in modified_func:
-                self.history[commit.hexsha][func_name] = modified_func[func_name]
+                for func_name in modified_func:
+                    self.history[commit.hexsha][func_name] = modified_func[func_name]
 
         return 0
+
+    def _second_phase(self, diff, commit, old_fname=None, new_fname=None):
+
+        if ((old_fname and self.fname_filter(old_fname)) or
+            (new_fname and self.fname_filter(new_fname))):
+
+            adds, dels = self.parse_patch(diff.diff)
+            modified_func, inv_modified_func = {}, {}
+
+            if old_fname != None:
+                old_root = self._get_xml_root(commit.parents[0], old_fname)
+                if old_root == None:
+                    return -1
+
+                modified_func = get_changed_functions(
+                    *get_func_ranges_c(old_root), adds, dels)
+
+            if new_fname != None:
+                inv_adds, inv_dels = _inverse_diff_result(adds, dels)
+                new_root = self._get_xml_root(commit, new_fname)
+                if new_root == None:
+                    return -1
+
+                inv_modified_func = get_changed_functions(
+                    *get_func_ranges_c(new_root), inv_adds, inv_dels)
+
+            for func_name in modified_func:
+                if func_name in self.G:
+                    self.history[commit.hexsha][func_name] = modified_func[func_name]
+
+            for func_name in inv_modified_func:
+                if func_name in self.G and func_name not in modified_func:
+                    self.history[commit.hexsha][func_name] = inv_modified_func[func_name]
 
     def parse_patch(self, patch):
         additions, deletions = None, None
