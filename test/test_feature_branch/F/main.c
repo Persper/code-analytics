@@ -1,4 +1,4 @@
-/* String Length */
+/* added in A */
 int str_len(char *string)
 {
     char *count = string;
@@ -6,16 +6,44 @@ int str_len(char *string)
     return count - string;
 }
 
-/* String Append Char */
+/* str_append is deleted in B */
+
+/* added in B, edited in C */
 char* str_append_chr(char* string, char append) {
-    char* newstring = NULL;
-    size_t needed = snprintf(NULL, 0, "%s%c", string, append);
-    newstring = malloc(needed);
-    sprintf(newstring, "%s%c", string, append);
+    char* newstring = "";
+    int i = 0;
+    for(i = 0; i < str_len(subject); i++) {
+        if (subject[i] == search[0]) {
+            int e = 0;
+            char* calc = "";
+            for(e = 0; e < str_len(search); e++) {
+                if(subject[i+e] == search[e]) {
+                    calc = str_append_chr(calc, search[e]);
+                }
+            }
+            if (str_equals(search, calc) == 0) {
+                if(count > 0) {
+                    newstring = str_append(newstring, replace);
+                    i = i + str_len (search)-1;
+                    count = count - 1;
+                }
+                else {
+                    newstring = str_append_chr(newstring, subject[i]);
+                }
+                 
+            }
+            else {
+                newstring = str_append_chr(newstring, subject[i]);
+            }
+        }
+        else {
+            newstring = str_append_chr(newstring, subject[i]);
+        }
+    }
     return newstring;
 }
 
-/* String Equals */
+/* added in B */
 int str_equals(char *equal1, char *eqaul2)
 {
    while(*equal1==*eqaul2)

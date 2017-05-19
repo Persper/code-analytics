@@ -1,4 +1,4 @@
-/* String Replace */
+/* added in G */
 char* str_replace(char* search, char* replace, char* subject) {
     char* newstring = "";
     int i = 0;
