@@ -159,6 +159,8 @@ class CallCommitGraph(Processor):
             (new_fname and self.fname_filter(new_fname))):
 
             adds, dels = self.parse_patch(diff.diff)
+            if adds == None or dels == None:
+                return -1
             modified_func, inv_modified_func = {}, {}
 
             if old_fname != None:
