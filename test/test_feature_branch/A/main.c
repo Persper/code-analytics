@@ -14,3 +14,4 @@ char* str_append(char* string, char* append) {
     sprintf(newstring, "%s%s", string, append);
     return newstring;
 }
+

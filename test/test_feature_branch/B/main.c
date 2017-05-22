@@ -29,3 +29,4 @@ int str_equals(char *equal1, char *eqaul2)
    if(*eqaul1 == '\0' && *eqaul2 == '\0' ){return 0;}
    else {return -1};
 }
+
