@@ -1,7 +1,10 @@
+import os
 from graphs.patch_parser import PatchParser 
 from graphs.detect_change import get_changed_functions
 from graphs.call_graph.cpp import get_func_ranges_cpp
 from graphs.srcml import transform_src_to_tree
+
+dir_path = os.path.dirname(os.path.abspath(__file__))
 
 # view parsing ground truth here
 # https://github.com/basicthinker/Sexain-MemController/commit/f050c6f6dd4b1d3626574b0d23bb41125f7b75ca
@@ -32,12 +35,12 @@ changed_result = {
 def test_detect_change():
     parser = PatchParser()
 
-    with open('example.patch', 'r') as f:
+    with open(os.path.join(dir_path, 'example.patch'), 'r') as f:
         example_patch = f.read()
         parsing_result = parser.parse(example_patch)
         assert(parsing_result == parsing_truth)
 
-    with open('example.cc', 'r') as f:
+    with open(os.path.join(dir_path, 'example.cc'), 'r') as f:
         root = transform_src_to_tree(f.read(), ext='.cc')
         func_ranges_result = get_func_ranges_cpp(root)
         assert(func_ranges_result == func_ranges_truth)
@@ -51,7 +54,7 @@ def test_patch_parser():
         []
     )
     parser = PatchParser()
-    with open('example2.patch', 'r') as f:
+    with open(os.path.join(dir_path, 'example2.patch'), 'r') as f:
         example2_patch = f.read()
         parsing_result = parser.parse(example2_patch)
         assert(parsing_result == patch2_truth)
