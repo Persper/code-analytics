@@ -44,6 +44,7 @@ def calc_stats(worksheet):
     alphas = [['alpha']]
     stats = [[worksheet.title + ' rank distance',
               worksheet.title + ' value distance',
+              worksheet.title + ' pair changes',
               worksheet.title + ' gini']]
 
     map1 = None
@@ -55,6 +56,7 @@ def calc_stats(worksheet):
         values = []
         for cell in worksheet[get_column_letter(3 * i + 1)][1:]:
             rank = cell.row - 1
+            #TODO: epsilon=1e-5
             value = worksheet.cell(row=cell.row, column=cell.col_idx + 1).value
             map2[cell.value] = [rank, float(value)]
             values.append(float(value))
@@ -64,8 +66,9 @@ def calc_stats(worksheet):
             alphas.append([a])
             rank_d = distance.deviation(map1, map2, 0)
             value_d = distance.deviation(map1, map2, 1)
+            pc = distance.pair_changes(map1, map2, 0)
             gc = gini(numpy.array(values))
-            stats.append([rank_d, value_d, gc])
+            stats.append([rank_d, value_d, pc, gc])
             map1 = map2
         i += 1
     return alphas, stats 
