@@ -69,8 +69,18 @@ def test_patch_parser():
     with open(os.path.join(dir_path, 'example3.patch'), 'r') as f:
         example3_patch = f.read()
         parsing_result = parser.parse(example3_patch)
-        print(parsing_result)
         assert(parsing_result == patch3_truth)
+
+    # view patch4_truth here
+    # https://github.com/UltimateBeaver/test_feature_branch/commit/364d5cc49aeb2e354da458924ce84c0ab731ac77
+    patch4_truth = (
+        [[0, 27]],
+        []
+    )
+    with open(os.path.join(dir_path, 'example4.patch'), 'r') as f:
+        example4_patch = f.read()
+        parsing_result = parser.parse(example4_patch)
+        assert(parsing_result == patch4_truth)
 
 
 
