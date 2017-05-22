@@ -47,7 +47,7 @@ def transform_dir(input_dir, output_dir, extensions=('.c', '.h')):
             counter += 1
     print("Tranformation completed, {} processed.".format(counter))
 
-def transform_src_to_tree(source_code):
+def transform_src_to_tree(source_code, ext='.c'):
     root = None
     try:
         f = tempfile.NamedTemporaryFile(mode='wb+', delete=False)
@@ -61,7 +61,7 @@ def transform_src_to_tree(source_code):
         return None
 
     # rename so that srcml can open it
-    new_fname = f.name + ".c"
+    new_fname = f.name + ext 
     os.rename(f.name, new_fname)
     xml_path = f.name + ".xml"
     subprocess.call('srcml {} --position -o {}'.format(new_fname, xml_path), shell=True)
