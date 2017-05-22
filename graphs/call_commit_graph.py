@@ -97,9 +97,9 @@ class CallCommitGraph(Processor):
 
     def fname_filter(self, fname):
         for ext in self.exts:
-            if not fname.endswith(ext):
-                return False
-        return True
+            if fname.endswith(ext):
+                return True 
+        return False 
 
     def _get_xml_root(self, commit, fname):
         return transform_src_to_tree(get_contents(self.repo, commit, fname))
