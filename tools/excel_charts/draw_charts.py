@@ -4,9 +4,11 @@ import argparse
 import distance
 import excel
 from openpyxl.utils import get_column_letter
+from gini.gini import gini
 from openpyxl import load_workbook
 from openpyxl.chart import LineChart
 import math
+import numpy
 from openpyxl.chart import Reference
 from openpyxl.chart import Series
 from openpyxl import Workbook
@@ -41,28 +43,30 @@ def draw_ordered_ranks(worksheet):
 def calc_stats(worksheet):
     alphas = [['alpha']]
     stats = [[worksheet.title + ' rank distance',
-              worksheet.title + ' value distance']]
+              worksheet.title + ' value distance',
+              worksheet.title + ' gini']]
 
     map1 = None
-    map2 = {}
     i = 0
     while True:
         a = alpha(worksheet, i)
-        if a is None: break
+        if a is None: break    
+        map2 = {}
+        values = []
         for cell in worksheet[get_column_letter(3 * i + 1)][1:]:
             rank = cell.row - 1
             value = worksheet.cell(row=cell.row, column=cell.col_idx + 1).value
             map2[cell.value] = [rank, float(value)]
+            values.append(float(value))
         if map1 is None:
             map1 = map2
-            map2 = {}
         else:
             alphas.append([a])
             rank_d = distance.deviation(map1, map2, 0)
             value_d = distance.deviation(map1, map2, 1)
-            stats.append([rank_d, value_d])
+            gc = gini(numpy.array(values))
+            stats.append([rank_d, value_d, gc])
             map1 = map2
-            map2 = {}
         i += 1
     return alphas, stats 
 
