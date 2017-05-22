@@ -78,4 +78,9 @@ class PatchParser():
                     pass
                 self.cur += 1 # always increment in blank
 
+        if self.in_add:
+            self.finish_add()
+        elif self.in_del:
+            self.finish_del()
+
         return self.additions, self.deletions 
