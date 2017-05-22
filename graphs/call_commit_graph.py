@@ -20,11 +20,11 @@ def _inverse_diff_result(adds, dels):
 
 class CallCommitGraph(Processor):
 
-    def __init__(self, repo_path):
+    def __init__(self, repo_path, exts=('.c', '.h')):
         super().__init__(repo_path)
         self.commits = None
         self.G = None
-        self.exts = ('.c', )
+        self.exts = exts 
         self.history = {}
         self.share = {}
         self.patch_parser = PatchParser()
