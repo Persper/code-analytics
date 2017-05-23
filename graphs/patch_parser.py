@@ -48,7 +48,7 @@ class PatchParser():
 
             if line.startswith('@@'):
                 m = self.re_chunk_header.search(line)
-                self.cur = int(m.groups()[0])
+                self.cur = max(int(m.groups()[0]), 1)
             elif line.startswith('-'):
                 # print("in minus")
                 if self.in_add:
