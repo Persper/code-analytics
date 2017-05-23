@@ -6,34 +6,32 @@ from graphs.srcml import transform_src_to_tree
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 
-# view parsing ground truth here
-# https://github.com/basicthinker/Sexain-MemController/commit/f050c6f6dd4b1d3626574b0d23bb41125f7b75ca
-
-parsing_truth = (
-    [[7, 31], [27, 3], [44, 1], [50, 2], [70, 1], [77, 2], [99, 2]],
-    [[32, 44], [56, 70]]
-)
-
-# view function ranges ground truth here
-# https://github.com/basicthinker/Sexain-MemController/blob/5b8886d9da3bb07140bfb1ff2d2b215b2dff584b/migration_controller.cc
-
-func_ranges_truth = (
-    ['MigrationController::InputBlocks',
-     'MigrationController::ExtractNVMPage',
-     'MigrationController::ExtractDRAMPage',
-     'MigrationController::Clear'],
-    [[8, 28], [30, 52], [54, 79], [81, 100]]
-)
-
-changed_result = {
-    'MigrationController::Clear': 2,
-    'MigrationController::ExtractDRAMPage': 18,
-    'MigrationController::ExtractNVMPage': 16,
-    'MigrationController::InputBlocks': 3
-}
-
 def test_detect_change():
     parser = PatchParser()
+
+    # view parsing ground truth here
+    # https://github.com/basicthinker/Sexain-MemController/commit/f050c6f6dd4b1d3626574b0d23bb41125f7b75ca
+    parsing_truth = (
+        [[7, 31], [27, 3], [44, 1], [50, 2], [70, 1], [77, 2], [99, 2]],
+        [[32, 44], [56, 70]]
+    )
+
+    # view function ranges ground truth here
+    # https://github.com/basicthinker/Sexain-MemController/blob/5b8886d9da3bb07140bfb1ff2d2b215b2dff584b/migration_controller.cc
+    func_ranges_truth = (
+        ['MigrationController::InputBlocks',
+         'MigrationController::ExtractNVMPage',
+         'MigrationController::ExtractDRAMPage',
+         'MigrationController::Clear'],
+        [[8, 28], [30, 52], [54, 79], [81, 100]]
+    )
+
+    changed_result = {
+        'MigrationController::Clear': 2,
+        'MigrationController::ExtractDRAMPage': 18,
+        'MigrationController::ExtractNVMPage': 16,
+        'MigrationController::InputBlocks': 3
+    }
 
     with open(os.path.join(dir_path, 'example.patch'), 'r') as f:
         example_patch = f.read()
