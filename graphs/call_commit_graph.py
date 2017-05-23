@@ -5,7 +5,7 @@ from graphs.srcml import transform_src_to_tree
 from graphs.detect_change import get_changed_functions
 from graphs.call_graph.c import update_call_graph, get_func_ranges_c
 from graphs.devrank import devrank
-from graphs.git import get_contents
+from graphs.git_tools import get_contents
 
 def _inverse_diff_result(adds, dels):
     inv_adds, inv_dels = [], []

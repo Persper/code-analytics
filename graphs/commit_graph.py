@@ -7,7 +7,7 @@ import subprocess
 from graphs.parse_patch import parse_patch
 from graphs.cpp_tools import get_func_ranges_cpp, fname_filter_cpp
 from graphs.ruby_tools import get_func_ranges_ruby, fname_filter_ruby
-from graphs.git import initialize_repo, get_contents
+from graphs.git_tools import initialize_repo, get_contents
 from graphs.processor import Processor
 from graphs.write_graph_to_dot import write_G_to_dot_with_pr
 

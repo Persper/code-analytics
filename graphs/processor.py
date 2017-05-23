@@ -1,5 +1,5 @@
 import time
-from graphs.git import initialize_repo
+from graphs.git_tools import initialize_repo
 import functools
 print = functools.partial(print, flush=True)
 
