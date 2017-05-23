@@ -16,6 +16,14 @@ sudo apt install -y python3 python3-pip
 sudo -H pip3 install dicttoxml gitpython lxml networkx numpy openpyxl statistics scipy
 ```
 
+In order to uset the `--indent-heuristic` option of `git diff`, we require git version >= 2.11. Use the following commands to upgrade:
+```
+sudo add-apt-repository ppa:git-core/ppa -y
+sudo apt-get update
+sudo apt-get install git -y
+git --version
+```
+
 (Try to) apply a patch to gitpython 2.1.x:
 ```
 cd misc/
