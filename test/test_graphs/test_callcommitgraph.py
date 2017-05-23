@@ -1,5 +1,5 @@
 import os
-from graphs.call_commit_graph import CallCommitGraph
+from graphs.call_commit_graph import CallCommitGraph, _inverse_diff_result
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -43,4 +43,20 @@ def test_callcommitgraph():
         ('add', 'malloc')
     ]
     assert(set(g.G.edges()) == set(edges_truth))
+
+def test_inverse_diff():
+    # view parsing ground truth here
+    # https://github.com/basicthinker/Sexain-MemController/commit/f050c6f6dd4b1d3626574b0d23bb41125f7b75ca
+    adds_dels = (
+        [[7, 31], [27, 3], [44, 1], [50, 2], [70, 1], [77, 2], [99, 2]],
+        [[32, 44], [56, 70]]
+    )
+    inv_truth = (
+        [[65, 13], [79, 15]],
+        [[8, 38], [59, 61], [66, 66], [73, 74], [80, 80], [88, 89], [112, 113]]
+    )
+
+    inv_result = _inverse_diff_result(*adds_dels)
+    assert(inv_truth == inv_result)
+
 
