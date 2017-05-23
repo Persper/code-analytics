@@ -11,7 +11,8 @@ def _diff_with_first_parent(commit):
     else:
         prev_commit = commit.parents[0]
     # commit.diff automatically detect renames
-    return commit.diff(prev_commit, create_patch=True, R=True)
+    return commit.diff(prev_commit, 
+        create_patch=True, R=True, indent_heuristic=True)
 
 def _fill_change_type(diff_index):
     for diff in diff_index:
