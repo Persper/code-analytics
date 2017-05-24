@@ -222,11 +222,10 @@ class CallCommitGraph(Processor):
         additions, deletions = None, None
         try:
             additions, deletions = self.patch_parser.parse(
-                patch.decode("utf-8"))
+                patch.decode('utf-8', 'replace'))
         except UnicodeDecodeError:
             print("UnicodeDecodeError in function parse_patch!")
         except:
-            pdb.set_trace()
             print("Unknown error in function parse_patch!")
         return additions, deletions
         
