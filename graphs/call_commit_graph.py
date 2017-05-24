@@ -1,11 +1,12 @@
 import networkx as nx
+import pickle
 from graphs.processor import Processor
 from graphs.patch_parser import PatchParser
 from graphs.srcml import transform_src_to_tree
 from graphs.detect_change import get_changed_functions
 from graphs.call_graph.c import update_call_graph, get_func_ranges_c
 from graphs.devrank import devrank
-from graphs.git_tools import get_contents
+from graphs.git_tools import get_contents, initialize_repo
 
 def _inverse_diff_result(adds, dels):
     """
@@ -258,6 +259,29 @@ class CallCommitGraph(Processor):
             for func_name in self.history[sha]:
                 self.loc[sha] += self.history[sha][func_name]
         return sorted(self.loc.items(), key=lambda x: x[1], reverse=True)
+
+    def __getstate__(self):
+        state = {
+            'G': self.G,
+            'history': self.history,
+            'visited': self.visited,
+            'exts': self.exts,
+            'repo_path': self.repo_path,
+        }
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.repo = initialize_repo(state['repo_path'])
+        self.git = self.repo.git
+        self.commits = None
+        self.share = {}
+        self.patch_parser = PatchParser()
+
+    def save(self, fname):
+        with open(fname, 'wb+') as f:
+            pickle.dump(self, f)
+
 
 if __name__ == "__main__":
     import doctest
