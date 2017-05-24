@@ -40,30 +40,45 @@ class Processor():
         self.repo_path = repo_path
         self.repo = initialize_repo(repo_path)
         self.git = self.repo.git
+        self.visited = set()
+        self.branches = []
+        self.last_processed_commit = None
 
-    def process(self, from_beginning=False, num_commits=None, rev=None, 
-        into_branches=False, verbose=False, max_branch_length=100):
+    def process(self, from_beginning=False, from_last_processed=False, 
+        num_commits=None, rev=None, into_branches=False, verbose=False, 
+        max_branch_length=100, end_commit_sha=None):
         """
-        This function supports two ways of specifying the
+        This function supports four ways of specifying the
         range of commits to process: 
 
-        Method 1: Set from_beginning to True and 
-            pass num_commits parameter. Using this
+        Method 1: Pass `rev` parameter and set both
+            `from_beginning` and `from_last_processed` to False. 
+            `rev` is the revision specifier which follows
+            an extended SHA-1 syntax. Please refer to git-rev-parse
+            for viable options. `rev' should only include commits 
+            on the master branch.
+
+        Method 2: Set `from_beginning` to True and 
+            pass `num_commits` parameter. Using this
             method, the function will start from the
             very first commit on the master branch and
-            process the following num_commits commits
+            process the following `num_commits` commits
             (also on the master branch).
 
-        Method 2: Set from_beginning to False and
-            pass rev parameter. rev is the revision
-            parameter which follows an extended SHA-1 syntax.
-            Please refer to git-rev-parse for viable options.
-            rev should only include commits on the master branch.
+        Method 3: Set `from_last_processed` to True and pass 
+            `num_commits` parameter. Using this method, the 
+            function will resume processing from succeeding commit of 
+            `self.last_processed_commit` for `num_commits` commits. 
+
+        Method 4: Set `from_last_processed` to True and pass 
+            `end_commit_sha` parameter. The range of continued processing 
+            will be `self.last_processed_commit.hexsha..end_commit_sha`.
 
         Args:
             rev: A string, see above.
             num_commits: An int, see above.
             from_beginning: A boolean flag, see above.
+            continue: A boolean flag, see above.
             into_branches: A boolean flag, if True, the process function
                 will operate in two phases. 
 
@@ -81,20 +96,48 @@ class Processor():
 
             max_branch_length: An int, the maximum number of commits
                 to trace back before abortion.
+            end_commit_sha: A string, see above.
         """
         if from_beginning:
             if num_commits == None:
                 num_commits = 0
             self.commits = list(
                 self.repo.iter_commits(first_parent=True))[-num_commits:]
-        else:
-            self.commits = list(self.repo.iter_commits(
-                rev, max_count=num_commits, first_parent=True))
 
-        self._reset_state()
+        elif from_last_processed:
+            if not self.last_processed_commit:
+                print("No history exists yet, terminated.")
+                return
+
+            if end_commit_sha:
+                rev = (self.last_processed_commit.hexsha + '..'
+                       + end_commit_sha)
+                self.commits = list(self.repo.iter_commits(
+                    rev, first_parent=True))
+            elif num_commits:
+                rev = self.last_processed_commit.hexsha + '..master'
+                self.commits = list(self.repo.iter_commits(
+                    rev, first_parent=True))[-num_commits:]
+            else:
+                print("Both end_commit_sha and num_commits are None, terminated.")
+                return
+
+        else:
+            self.commits = list(self.repo.iter_commits(rev, first_parent=True))
+
+        if len(self.commits) > 0:
+            self.last_processed_commit = self.commits[0]
+        else:
+            print("The range specified is empty, terminated.")
+            return
+
+        if not from_last_processed:
+            self._reset_state()
 
         counter = 1
         start = time.time()
+        # self.branches will be updated in 1st phase and used in 2nd phase
+        self.branches = []
 
         # 1st phase
         for commit in reversed(self.commits):
@@ -200,7 +243,6 @@ class Processor():
 
     def _reset_state(self):
         self.visited = set()
-        self.branches = []
 
     def _start_process_commit(self, commit):
         pass
