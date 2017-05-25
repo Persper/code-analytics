@@ -1,3 +1,4 @@
+import os
 import time
 from graphs.git_tools import initialize_repo
 import functools
@@ -46,7 +47,7 @@ class Processor():
 
     def process(self, from_beginning=False, from_last_processed=False, 
         num_commits=None, rev=None, into_branches=False, verbose=False, 
-        max_branch_length=100, end_commit_sha=None):
+        max_branch_length=100, end_commit_sha=None, checkpoint_interval=100):
         """
         This function supports four ways of specifying the
         range of commits to process: 
@@ -97,6 +98,7 @@ class Processor():
             max_branch_length: An int, the maximum number of commits
                 to trace back before abortion.
             end_commit_sha: A string, see above.
+            checkpoint_interval: An int.
         """
         if not from_last_processed:
             self._reset_state()
@@ -153,6 +155,10 @@ class Processor():
             if counter % 100 == 0:
                 print('------ Used time: {} ------'.format(
                     time.time() - start))
+
+            if counter % checkpoint_interval == 0:
+                repo_name = os.path.basename(self.repo_path.rstrip('/'))
+                self.save(repo_name + '-1st-' + str(counter) + '.pickle')
 
             # generate diff_index by diff commit with its first parent
             diff_index = _diff_with_first_parent(commit)
@@ -212,6 +218,10 @@ class Processor():
                         print('------ Used time: {} ------'.format(
                             time.time() - start))
 
+                    if counter % checkpoint_interval == 0:
+                        repo_name = os.path.basename(self.repo_path.rstrip('/'))
+                        self.save(repo_name + '-2nd-' + str(counter) + '.pickle')
+
                     # generate diff_index by diff commit with its first parent
                     diff_index = _diff_with_first_parent(commit)
 
@@ -240,6 +250,9 @@ class Processor():
 
                     counter += 1
                 branch_cnt += 1
+
+        repo_name = os.path.basename(self.repo_path.rstrip('/'))
+        self.save(repo_name + '-finished.pickle')
 
     def _reset_state(self):
         self.visited = set()
