@@ -8,6 +8,7 @@ import shutil
 import networkx as nx
 
 from git import Repo
+from util.path import root_path
 
 def make_new_dir(dir_path):
 	"""delete old directory first if exists"""
@@ -83,7 +84,7 @@ def create_repo(src_dir):
 	Assumes that merge only happens on master branch.
 	"""
 	repo_name = os.path.basename(src_dir.rstrip('/'))
-	repo_path = os.path.join("../../repos", repo_name)
+	repo_path = os.path.join(root_path, 'repos', repo_name)
 	make_new_dir(repo_path)
 	git_init_cmd = ['git', 'init', repo_path]
 	subprocess.call(git_init_cmd)

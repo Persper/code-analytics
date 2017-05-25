@@ -1,10 +1,7 @@
 import os
+import subprocess
 from graphs.call_commit_graph import CallCommitGraph, _inverse_diff_result
-
-dir_path = os.path.dirname(os.path.abspath(__file__))
-
-def get_parent_dir(path):
-    return os.path.abspath(os.path.join(path, os.pardir))
+from util.path import root_path
 
 def test_callcommitgraph():
     history_truth = {
@@ -20,11 +17,16 @@ def test_callcommitgraph():
         'C': {'str_append_chr': 34, 'str_equals': 1},
         'B': {'str_append': 9, 'str_append_chr': 7, 'str_equals': 11}
     } 
-    # build the repo first by running
-    # `cd tools/repo_creater`
-    # `./create_repo.py ../../test/test_feature_branch` 
-    root_path = get_parent_dir(get_parent_dir(dir_path)) 
-    g = CallCommitGraph(os.path.join(root_path, 'repos/test_feature_branch'))
+
+    # build the repo first if not exists yet 
+    repo_path = os.path.join(root_path, 'repos/test_feature_branch') 
+    script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
+    test_src_path = os.path.join(root_path, 'test/test_feature_branch')
+    if not os.path.isdir(repo_path):
+        cmd = '{} {}'.format(script_path, test_src_path)
+        subprocess.call(cmd, shell=True)
+
+    g = CallCommitGraph(repo_path)
     g.process(from_beginning=True, verbose=True, into_branches=True)
     for commit in g.repo.iter_commits():
         assert(g.history[commit.hexsha] == history_truth[commit.message.strip()])
