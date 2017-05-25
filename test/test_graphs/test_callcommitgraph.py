@@ -1,9 +1,24 @@
 import os
+import pytest
 import subprocess
 from graphs.call_commit_graph import CallCommitGraph, _inverse_diff_result
 from util.path import root_path
 
-def test_callcommitgraph():
+@pytest.fixture(scope='module')
+def g():
+    # build the repo first if not exists yet 
+    repo_path = os.path.join(root_path, 'repos/test_feature_branch')
+    script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
+    test_src_path = os.path.join(root_path, 'test/test_feature_branch')
+    if not os.path.isdir(repo_path):
+        cmd = '{} {}'.format(script_path, test_src_path)
+        subprocess.call(cmd, shell=True)
+    
+    g = CallCommitGraph(repo_path)
+    g.process(from_beginning=True, verbose=True, into_branches=True)
+    return g
+
+def test_callcommitgraph(g):
     history_truth = {
         'J': {'count': 12, 'display': 14},
         'I': {'add': 5, 'append': 35},
@@ -18,16 +33,6 @@ def test_callcommitgraph():
         'B': {'str_append': 9, 'str_append_chr': 7, 'str_equals': 11}
     } 
 
-    # build the repo first if not exists yet 
-    repo_path = os.path.join(root_path, 'repos/test_feature_branch') 
-    script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
-    test_src_path = os.path.join(root_path, 'test/test_feature_branch')
-    if not os.path.isdir(repo_path):
-        cmd = '{} {}'.format(script_path, test_src_path)
-        subprocess.call(cmd, shell=True)
-
-    g = CallCommitGraph(repo_path)
-    g.process(from_beginning=True, verbose=True, into_branches=True)
     for commit in g.repo.iter_commits():
         assert(g.history[commit.hexsha] == history_truth[commit.message.strip()])
 
@@ -60,5 +65,50 @@ def test_inverse_diff():
 
     inv_result = _inverse_diff_result(*adds_dels)
     assert(inv_truth == inv_result)
+
+def assert_graphs_equal(G1, G2):
+    assert(set(G1.nodes()) == set(G2.nodes()))
+    assert(set(G1.edges()) == set(G2.edges()))
+    for n in G1:
+        assert(G1.node[n] == G2.node[n])
+
+def assert_callcommitgraphs_equal(g1, g2):
+    assert_graphs_equal(g1.G, g2.G)
+    assert(g1.history == g2.history)
+
+def test_process_interface(g):
+    """test various ways to invoke process function"""
+    repo_path = os.path.join(root_path, 'repos/test_feature_branch')
+    g1 = CallCommitGraph(repo_path)
+    # A B
+    g1.process(from_beginning=True, into_branches=True, num_commits=2)
+    # C D
+    g1.process(from_last_processed=True, into_branches=True, num_commits=2) 
+    # E F K
+    g1.process(from_last_processed=True, into_branches=True, num_commits=3)
+    # should see "The range specified is empty, terminated."
+    g1.process(from_last_processed=True, into_branches=True, num_commits=1)
+    assert_callcommitgraphs_equal(g1, g)
+
+    g2 = CallCommitGraph(repo_path)
+    # should see "No history exists yet, terminated."
+    g2.process(from_last_processed=True, into_branches=True, num_commits=1)
+    # A B C
+    g2.process(from_beginning=True, into_branches=True, num_commits=3)
+    # D E F
+    g2.process(from_beginning=True,
+               into_branches=True,
+               end_commit_sha=g.commits[5].hexsha)
+    # K
+    g2.process(from_beginning=True,
+               into_branches=True,
+               end_commit_sha=g.commits[6].hexsha)
+    assert_callcommitgraphs_equal(g2, g)
+
+
+
+
+
+
 
 
