@@ -98,6 +98,9 @@ class Processor():
                 to trace back before abortion.
             end_commit_sha: A string, see above.
         """
+        if not from_last_processed:
+            self._reset_state()
+
         if from_beginning:
             if num_commits == None:
                 num_commits = 0
@@ -130,9 +133,6 @@ class Processor():
         else:
             print("The range specified is empty, terminated.")
             return
-
-        if not from_last_processed:
-            self._reset_state()
 
         counter = 1
         start = time.time()
@@ -243,6 +243,7 @@ class Processor():
 
     def _reset_state(self):
         self.visited = set()
+        self.last_processed_commit = None
 
     def _start_process_commit(self, commit):
         pass

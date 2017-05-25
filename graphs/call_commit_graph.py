@@ -267,6 +267,7 @@ class CallCommitGraph(Processor):
             'visited': self.visited,
             'exts': self.exts,
             'repo_path': self.repo_path,
+            'last_processed_commit': self.last_processed_commit
         }
         return state
 
