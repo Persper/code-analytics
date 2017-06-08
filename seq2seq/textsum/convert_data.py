@@ -13,6 +13,8 @@ PARAGRAPH_START = '<p>'
 PARAGRAPH_END = '</p>'
 SENTENCE_START = '<s>'
 SENTENCE_END = '</s>'
+UNKNOWN_TOKEN = '<UNK>'
+PAD_TOKEN = '<PAD>'
 DOCUMENT_START = '<d>'
 DOCUMENT_END = '</d>'
 
@@ -40,7 +42,7 @@ def adjust(token):
     return token.lower()
 
 def get_tokens(string, counter):
-    string = string.encode('ASCII', errors='ignore')
+    string = string.encode('ASCII', errors='ignore').encode('UTF-8')
     tokens = [adjust(t) for t in nltk.word_tokenize(string) if not to_skip(t)]
     if not counter is None:
         counter.update(tokens)
@@ -62,12 +64,7 @@ def to_keep(line):
                          line)
 
 def generate_line(abstract, sentences, counter=None):
-    line = 'abstract='
-    line += ' '.join([DOCUMENT_START, PARAGRAPH_START, SENTENCE_START]) + ' '
-    line += ' '.join(get_tokens(abstract, counter)) + ' '
-    line += ' '.join([SENTENCE_END, PARAGRAPH_END, DOCUMENT_END])
-
-    line += '\tarticle='
+    line = 'article='
     line += ' '.join([DOCUMENT_START, PARAGRAPH_START]) + ' '
 
     line += make_sentence(sentences[0], counter)
@@ -76,6 +73,11 @@ def generate_line(abstract, sentences, counter=None):
         if len(content) > 0:
             line += make_sentence(' '.join(content), counter)
     line += ' '.join([PARAGRAPH_END, DOCUMENT_END])
+
+    line += '\tabstract='
+    line += ' '.join([DOCUMENT_START, PARAGRAPH_START, SENTENCE_START]) + ' '
+    line += ' '.join(get_tokens(abstract, counter)) + ' '
+    line += ' '.join([SENTENCE_END, PARAGRAPH_END, DOCUMENT_END])
 
     return line
 
@@ -104,8 +106,12 @@ def main():
                    data.write(line + '\n')
 
     with open(path.join(args.output_dir, 'vocab'), 'w') as vocab:
-        for word, count in counter.most_common(20000):
+        for word, count in counter.most_common(20000 - 4):
             vocab.write(word + ' ' + str(count) + '\n') 
+        vocab.write(SENTENCE_START + ' 1\n')
+        vocab.write(SENTENCE_END + ' 1\n')
+        vocab.write(UNKNOWN_TOKEN + ' 1\n')
+        vocab.write(PAD_TOKEN + ' 1\n')
 
 if __name__ == '__main__':
     main()
