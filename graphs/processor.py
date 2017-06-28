@@ -1,5 +1,6 @@
 import os
 import time
+import pickle
 from graphs.git_tools import initialize_repo
 import functools
 print = functools.partial(print, flush=True)
@@ -42,7 +43,6 @@ class Processor():
         self.repo = initialize_repo(repo_path)
         self.git = self.repo.git
         self.visited = set()
-        self.branches = []
         self.last_processed_commit = None
 
     def process(self, from_beginning=False, from_last_processed=False, 
@@ -102,7 +102,10 @@ class Processor():
         """
         if not from_last_processed:
             self._reset_state()
+        # self.branches will be updated in 1st phase and used in 2nd phase
+        self.branches = []
 
+        # Method 2
         if from_beginning:
             if num_commits == None:
                 num_commits = 0
@@ -114,11 +117,13 @@ class Processor():
                 print("No history exists yet, terminated.")
                 return
 
+            # Method 4
             if end_commit_sha:
                 rev = (self.last_processed_commit.hexsha + '..'
                        + end_commit_sha)
                 self.commits = list(self.repo.iter_commits(
                     rev, first_parent=True))
+            # Method 3
             elif num_commits:
                 rev = self.last_processed_commit.hexsha + '..master'
                 self.commits = list(self.repo.iter_commits(
@@ -128,6 +133,7 @@ class Processor():
                 return
 
         else:
+            # Method 1
             self.commits = list(self.repo.iter_commits(rev, first_parent=True))
 
         if len(self.commits) > 0:
@@ -138,8 +144,6 @@ class Processor():
 
         counter = 1
         start = time.time()
-        # self.branches will be updated in 1st phase and used in 2nd phase
-        self.branches = []
 
         # 1st phase
         for commit in reversed(self.commits):
@@ -306,4 +310,19 @@ class Processor():
                 self.branches.append(list(reversed(branch)))
         return found
 
+    def __getstate__(self):
+        state = {
+            'visited': self.visited,
+            'repo_path': self.repo_path,
+            'last_processed_commit': self.last_processed_commit
+        }
+        return state
 
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.repo = initialize_repo(state['repo_path'])
+        self.git = self.repo.git
+
+    def save(self, fname):
+        with open(fname, 'wb+') as f:
+            pickle.dump(self, f)
