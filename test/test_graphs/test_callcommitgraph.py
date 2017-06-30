@@ -1,5 +1,6 @@
 import os
 import pytest
+import pickle
 import subprocess
 from graphs.call_commit_graph import CallCommitGraph, _inverse_diff_result
 from util.path import root_path
@@ -75,6 +76,7 @@ def assert_graphs_equal(G1, G2):
 def assert_callcommitgraphs_equal(g1, g2):
     assert_graphs_equal(g1.G, g2.G)
     assert(g1.history == g2.history)
+    assert(g1.exts == g2.exts)
 
 def test_process_interface(g):
     """test various ways to invoke process function"""
@@ -104,6 +106,14 @@ def test_process_interface(g):
                into_branches=True,
                end_commit_sha=g.commits[6].hexsha)
     assert_callcommitgraphs_equal(g2, g)
+
+def test_save(g):
+    fname = "test_save_g.pickle"
+    g.save(fname)
+    with open(fname, 'rb') as f:
+        gp = pickle.load(f)
+    os.remove(fname)
+    assert_callcommitgraphs_equal(g, gp)
 
 
 
