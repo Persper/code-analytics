@@ -10,48 +10,15 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, Tf
 from sklearn.feature_selection import SelectKBest, mutual_info_classif
 from sklearn.pipeline import Pipeline, FeatureUnion, make_pipeline, make_union
 import functools
-import nltk
-from nltk.stem.porter import PorterStemmer
 from scipy.stats import norm
 from scipy.sparse import csr_matrix, csc_matrix
 from joblib import Parallel, delayed
 from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score, confusion_matrix, classification_report
 
-import spacy
-nlp = spacy.load('en')
-
-# import the labeler lib
-import sys
-sys.path.append('../lib')
-from labeler import apache_labeler
-
-# Jira issue type classification
-def binary_bug(issue):
-    if issue['type'] == 'Bug':
-        return 1
-    else:
-        return 0
-    
-def multi_patch_type(issue):
-    return issue['type']
-
-def limited_patch_type(issue):
-    return apache_labeler[issue['type']]
-
-def only_bug_filter(issue):
-    return issue['type'] == 'Bug'
-
+# Stemmer language processing - http://qinxuye.me/article/porter-stemmer/
+import nltk
+from nltk.stem.porter import PorterStemmer
 stemmer = PorterStemmer()
-rf = functools.partial(sklearn.ensemble.RandomForestClassifier, n_estimators=300)
-
-# The classifier options
-def lemmatize(text):
-    lemmatized = []
-    doc = nlp(text)
-    for token in doc:
-        if token.pos_ != 'PUNCT':
-            lemmatized.append(token.lemma_)
-    return lemmatized
 
 def stem(text):
     stemmed = []
@@ -60,6 +27,57 @@ def stem(text):
         stemmed.append(stemmer.stem(token))
     return stemmed
 
+# Spacy language processing - https://spacy.io/
+import spacy
+nlp = spacy.load('en')
+
+def lemmatize(text):
+    lemmatized = []
+    doc = nlp(text)
+    for token in doc:
+        if token.pos_ != 'PUNCT':
+            lemmatized.append(token.lemma_)
+    return lemmatized
+
+# The random forest classifier
+import functools
+rf = functools.partial(sklearn.ensemble.RandomForestClassifier, n_estimators=300)
+
+# import the labeler lib 0 
+import sys
+sys.path.append('../lib')
+from labeler import apache_labeler
+from labeler import fs_labeler
+
+# issue/patch type classification
+def binary_bug(issue, is_jira):
+    if is_jira:
+        if issue['type'] == 'Bug':
+            return 1
+        else:
+            return 0
+    else:
+        if issue['type'] == 'b':
+            return 1
+        else:
+            return 0
+
+def multi_patch_type(issue, is_jira):
+    return issue['type']
+
+def limited_patch_type(issue, is_jira):
+    if is_jira:
+        return apache_labeler[issue['type']]
+    else:
+        return fs_labeler[issue['cons_type']]
+
+def only_bug_filter(issue, is_jira):
+    if is_jira:
+        return issue['type'] == 'Bug'
+    else:
+        return issue['type'] == 'b'
+    
+# BNS
 def bns(tprs, fprs):
     """
     Args:
@@ -87,6 +105,7 @@ def tfbns(tfs, bns):
         cols.append(j)
     return csr_matrix((data, (rows, cols)), shape=tfs.shape)
 
+# Text Preprocessing using tfidf or bns
 class TextTransformer(BaseEstimator, TransformerMixin):
     
     def __init__(self, use_bns):
@@ -104,8 +123,9 @@ class TextTransformer(BaseEstimator, TransformerMixin):
 
             pos = np.sum(y)
             neg = np.size(y) - pos
-
+            
             tps = np.sum(binary_counts[np.nonzero(y)[0]], axis=0)
+            
             fps = np.sum(binary_counts[np.argwhere(y == 0)[:, 0]], axis=0)
 
             tprs = np.clip(tps / pos, 0.0005, 0.9995)
@@ -122,21 +142,23 @@ class TextTransformer(BaseEstimator, TransformerMixin):
         else:
             return tfs
         
+# Extract the title/descrption/comments/priority/type for jira issues and 'text'/'frc' for fs patches
 class FeatureLabelExtractor(BaseEstimator, TransformerMixin):
     """Cannot be used in Pipeline"""
     
-    def __init__(self, datasets, text_feature, label_func, issue_filter):
+    def __init__(self, datasets, text_feature, label_func, file_filter, is_jira):
         self.datasets = datasets
         self.text_feature = text_feature
         self.label_func = label_func
-        self.issue_filter = issue_filter
+        self.file_filter = file_filter
+        self.is_jira = is_jira
     
     def fit(self, X, y=None):
         return self
     
-    def transform(self, project_list, use_description, use_comment):
+    def jira_issue_transform(self, project_list, use_description, use_comment):
         num_samples = sum([
-            sum([1 for issue in self.datasets[fs] if self.issue_filter(issue)]) 
+            sum([1 for issue in self.datasets[fs] if self.file_filter(issue)]) 
             for fs in project_list])
         
         features = {}
@@ -145,7 +167,7 @@ class FeatureLabelExtractor(BaseEstimator, TransformerMixin):
         ind = 0
         for project in project_list:
             for issue_id, issue in self.datasets[project].items():
-                if self.issue_filter(issue):
+                if self.file_filter(issue):
                     features['text'][ind] = issue[self.text_feature]
                     if use_description and  'description' not in self.text_feature:
                         features['text'][ind] = issue[self.text_feature] + issue['description'].strip()
@@ -153,10 +175,31 @@ class FeatureLabelExtractor(BaseEstimator, TransformerMixin):
                         features['text'][ind] = issue[self.text_feature] + issue['comment'].strip()
                     if use_description and use_comment:
                         features['text'][ind] = issue[self.text_feature] + issue['description'].strip() + issue['comment'].strip()
-                    labels[ind] = self.label_func(issue)
+                    labels[ind] = self.label_func(issue, self.is_jira)
                     ind += 1
         return features, labels
 
+    def fs_patch_transform(self, fs_list):
+        num_samples = sum([
+            sum([1 for dp in self.datasets[fs] if self.file_filter(dp)]) 
+            for fs in fs_list])
+        
+        features = {}
+        features['text'] = [None] * num_samples
+        features['frc'] = np.zeros((num_samples, 3))
+        labels = [None] * num_samples
+        ind = 0
+        for fs in fs_list:
+            for dp in self.datasets[fs]:
+                if self.file_filter(dp):
+                    features['text'][ind] = dp[self.text_feature]
+                    features['frc'][ind] = np.array([dp['num_files'],
+                                          dp['num_adds'],
+                                          dp['num_dels']])
+                    labels[ind] = self.label_func(dp, self.is_jira)
+                    ind += 1
+        return features, labels
+    
 class ItemSelector(BaseEstimator, TransformerMixin):
     
     def __init__(self, key):
@@ -168,8 +211,7 @@ class ItemSelector(BaseEstimator, TransformerMixin):
     def transform(self, data_dict):
         return data_dict[self.key]
 
-def _fit_binary(estimator, use_bns,
-                use_text, use_frc, k, X, y):
+def _fit_binary(estimator, use_bns, use_text, use_frc, k, X, y):
     estimator = clone(estimator)
     text = make_pipeline(
         ItemSelector(key='count'), TextTransformer(use_bns=use_bns))
@@ -184,9 +226,7 @@ def _fit_binary(estimator, use_bns,
         union = text
         
     if k:
-        pipeline = make_pipeline(union,
-                                 SelectKBest(mutual_info_classif, k=k),
-                                 estimator)
+        pipeline = make_pipeline(union, SelectKBest(mutual_info_classif, k=k), estimator)
     else:
         pipeline = make_pipeline(union, estimator)
     
@@ -257,27 +297,28 @@ class BNSClassifier(BaseEstimator, ClassifierMixin):
 
 class Classifier():
     
-    def __init__(self, datasets, issue_list):
+    def __init__(self, datasets, file_list):
         """
         Args:
             datasets: A dictionary, keys are dataset names, each dataset
                 is a list of data points (also dictionaries).
-            issue_list: A list of jira issue names.
+            file_list: A list of jira issue names.
         """
         self.datasets = datasets
-        self.issue_list = issue_list
+        self.file_list = file_list
 
     def _clean(self):
         self.feature_labels = {}
         self.classifiers = {}
 
     def run(self, label_func, estimator, ngram_range=(1, 1),
-            text_feature='title', use_text=True, use_frc=False,
+            text_feature='', use_text=True, use_frc=False,
             dp_filter=lambda dp: True, tokenizer=None, 
             max_features=None, min_df=1, use_bns=False, k=None,
             n_jobs=1, use_description=False, use_comment=False, 
             use_svm=False, svm_type='linear', 
-            use_rf=False, num_estimators = 100, val_max_features=0.5):
+            use_rf=False, num_estimators = 100, val_max_features=0.5, 
+             is_jira=False):
         """Perform experiment in a leave-one-out style
         
         Args:
@@ -287,8 +328,9 @@ class Classifier():
                 'fit' and 'predict' method
             ngram_range: A tuple of two integers, specify what range of 
                 ngram to use
-            text_feature: A string, can be either 'title' or 'description'
-                or 'comment' or 'type' or 'priority'.
+            text_feature: A string, 
+                can be either 'title' or 'description' or 'comment' for jira issue, 
+                and can be either 'message' or 'subject' for fs patch.
                 If set to None, then texts will not be used.
             use_text: A boolean flag, whether to use text feature
             use_frc: A boolean flag, whether to use frc
@@ -303,13 +345,23 @@ class Classifier():
         """
         self._clean()
         
-        iss = FeatureLabelExtractor(self.datasets, text_feature, label_func, dp_filter)
+        if text_feature == '': 
+            if is_jira:
+                text_feature = 'title'
+            else:
+                text_feature = 'message'
         
-        for jr in self.issue_list:
-            ojr_list = [ojr for ojr in self.issue_list if ojr != jr]
+        iss = FeatureLabelExtractor(self.datasets, text_feature, label_func, dp_filter, is_jira)
+        
+        for jr in self.file_list:
+            ofs_list = [ojr for ojr in self.file_list if ojr != jr]
 
-            train_X, train_y = iss.transform(ojr_list, use_description, use_comment)
-            test_X, test_y = iss.transform([jr], use_description, use_comment)
+            if is_jira:
+                train_X, train_y = iss.jira_issue_transform(ofs_list, use_description, use_comment)
+                test_X, test_y = iss.jira_issue_transform([jr], use_description, use_comment)
+            else:
+                train_X, train_y = iss.fs_patch_transform(ofs_list)
+                test_X, test_y = iss.fs_patch_transform([jr])
 
             cv = CountVectorizer(tokenizer=tokenizer,
                                  ngram_range=ngram_range,
@@ -341,7 +393,6 @@ class Classifier():
                                 use_frc=use_frc,
                                 k=k,
                                 n_jobs=n_jobs)
-                
             clf.fit(train_X, train_y)
 
             print('----------  Test Accuracy for %s ---------- ' % jr)

@@ -5,7 +5,7 @@ import os
 import sys
 import pickle
 
-class IssueDataExtractor():
+class JiraIssueExtractor():
     def __init__(self):
         self.datasets = {}
         
@@ -50,7 +50,7 @@ class IssueDataExtractor():
         return data
 
     # Read the useful information from a Jira issue file (Title, Description, Comments, Type, Priority)
-    def read_info_from_jira_file(self, parseFile, issueId):
+    def read_data_from_jira_file(self, parseFile, issueId):
         """return dataset, a list of dict data points"""
         dp = {}
         dp['issue'] = issueId
@@ -88,7 +88,7 @@ class IssueDataExtractor():
 
     # Read all useful information from all files under a jira issues dir
     # Each issue data structure : (issue id) -> (title, description, comments, priority, type)
-    def get_info_from_jira_dir(self, filepath):
+    def generate_dataset(self, filepath):
         dataset = {}
         allFiles =  os.listdir(filepath)
         invalidName = "invalid"
@@ -101,7 +101,7 @@ class IssueDataExtractor():
                 fromFile = os.path.join('%s%s' % (filepath, eachFile))
                 dom = xml.dom.minidom.parse(fromFile)
                 parseFile = dom.documentElement
-                dp = self.read_info_from_jira_file(parseFile, arr[2])
+                dp = self.read_data_from_jira_file(parseFile, arr[2])
 
                 if arr[2] in dataset.keys():
                     dataset[arr[2]]['title'] = dataset[arr[2]]['title'] + dp['title'] 
@@ -136,5 +136,67 @@ class IssueDataExtractor():
 
 
 
+class FSPatchExtractor():
+    def __init__(self):
+        self.datasets = {}
 
+    def generate_dataset(self, files):
+        """return dataset, a list of dict data points"""
+        dataset = []
+        attributes = ('type', 'sub_type', 'sub_sub_type', 
+                      'cons_type', 'sub_cons_type')
 
+        re_patch_bp = re.compile("""\((?P<type>[bp]):
+                                    (?P<sub_type>[^(->)]*)
+                                    (->(?P<sub_sub_type>[^(->)\)]*))?
+                                    (->[^(->)\)]*)*\):
+                                    \(s:(?P<cons_type>[^(->)]*)
+                                    (->(?P<sub_cons_type>[^\)]*))?\)""", re.VERBOSE)
+        re_patch_c = re.compile("""\((?P<type>c):
+                                    (?P<sub_type>[^(->)]*)
+                                    (->(?P<sub_sub_type>[^(->)\)]*))?\)""", re.VERBOSE)
+        re_patch_misc = re.compile("""\((?P<type>misc)->
+                                        (?P<sub_type>[^\)]*)\)""", re.VERBOSE)
+        re_patch_f = re.compile("\((?P<type>f)\)")
+
+        for fname in files:
+            with open(fname, 'r') as f:
+                lines = f.readlines()
+
+            ptr = 0
+            while ptr <= len(lines) - 2:
+                line = lines[ptr]
+                next_line = lines[ptr + 1]
+                if line.startswith(' ') or line.startswith('\t'):
+                    try:
+                        assert(next_line.lstrip().startswith('.'))
+                    except:
+                        """
+                        print('-------- Error line ---------')
+                        print('line:%s' % line)
+                        print('next:%s' % next_line)
+                        print('-----------------------------')
+                        """
+                        ptr += 1
+                        continue
+                    dp = {}
+                    dp['subject'] = line.lstrip().rstrip()
+
+                    m = re_patch_bp.search(next_line) or \
+                        re_patch_c.search(next_line) or \
+                        re_patch_misc.search(next_line) or \
+                        re_patch_f.search(next_line)
+                    if m != None:
+                        gd = m.groupdict()
+                        for attr in attributes:
+                            if attr in gd:
+                                dp[attr] = gd[attr]
+                        dataset.append(dp)
+                        ptr += 2
+                    else:
+                        # skip lines with multiple sub_types and consequences
+                        ptr += 1
+                else:
+                    ptr += 1
+
+        return dataset
