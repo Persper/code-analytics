@@ -16,32 +16,47 @@ def get_intersected_length(a, b):
     else:
         return end - start + 1
 
-def get_changed_functions(func_names, func_ranges, additions, deletions):
-    """func_names and func_ranges are extracted from old src file,
-    so new functions are not included. 
-    This function assumes func_names and func_ranges are in same order.
-    Also func_ranges are sorted.
+def get_changed_functions(func_names, func_ranges, additions, deletions,
+    separate=False):
+    """
+    Args:
+        func_names: A list of function names, usually extracted from old src file,
+            so new functions aren't included.
+        func_ranges: A sorted list of function ranges in the same order of func_names.
+        additions: A list of pair of integers,
+        deletions: A list of pair of integers, 
+        separate: A boolean flag, if set to True, additions and deletions are
+            reported separately. 
+
+    Returns:
+        A dictionary where keys are function names and values are number of lines edited. 
     """
     info = {}
     
-    def update_info(fn, num_lines):
+    def update_info(fn, num_lines, key):
+        """key should be one of 'adds' or 'dels'."""
         if fn in info:
-            info[fn] += num_lines
+            info[fn][key] += num_lines
         else:
-            info[fn] = num_lines
+            info[fn] = {'adds': 0, 'dels': 0}
+            info[fn][key] = num_lines
     
     add_ptr, del_ptr = 0, 0
     num_adds, num_dels = len(additions), len(deletions)
     for fn, fr in zip(func_names, func_ranges):
         for i in range(add_ptr, num_adds):
             if fr[0] <= additions[i][0] <= fr[1]:
-                update_info(fn, additions[i][1])
+                update_info(fn, additions[i][1], 'adds')
                 add_ptr = i + 1
     
         for j in range(del_ptr, num_dels):
             inter_length = get_intersected_length(fr, deletions[j])
             if inter_length > 0:
-                update_info(fn, inter_length)
+                update_info(fn, inter_length, 'dels')
                 del_ptr = j
+
+    if not separate:
+        for fn in info:
+            info[fn] = info[fn]['adds'] + info[fn]['dels']
                 
     return info
