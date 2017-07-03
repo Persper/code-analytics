@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import argparse
 import dicttoxml
 import github3
@@ -46,8 +43,8 @@ class GitHubComments:
             comments.append(ET.fromstring(snippet))
         for comment in pr.review_comments():
             snippet = dicttoxml.dicttoxml(comment.as_dict(),
-                                              attr_type=False,
-                                              custom_root='comment')
+                                          attr_type=False,
+                                          custom_root='comment')
             snippet = ''.join(x for x in snippet if x in string.printable)
             comments.append(ET.fromstring(snippet))
         return ET.ElementTree(comments).write(file_path, encoding="utf-8")
