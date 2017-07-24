@@ -50,34 +50,42 @@ class Processor():
         self.visited = set()
         self.last_processed_commit = None
 
-    def process(self, from_beginning=False, from_last_processed=False,
-                num_commits=None, rev=None, into_branches=False, verbose=False,
-                max_branch_length=100, end_commit_sha=None,
-                checkpoint_interval=100):
+    def process(self, rev=None,
+                from_beginning=False, num_commits=None,
+                from_last_processed=False, end_commit_sha=None,
+                into_branches=False,
+                max_branch_length=100,
+                min_branch_date=None,
+                checkpoint_interval=100,
+                verbose=True):
         """
         This function supports four ways of specifying the
         range of commits to process:
 
-        Method 1: Pass `rev` parameter and set both
+        Method 1: rev
+            Pass `rev` parameter and set both
             `from_beginning` and `from_last_processed` to False.
             `rev` is the revision specifier which follows
             an extended SHA-1 syntax. Please refer to git-rev-parse
             for viable options. `rev' should only include commits
             on the master branch.
 
-        Method 2: Set `from_beginning` to True and
+        Method 2: from_beginning & num_commits
+            Set `from_beginning` to True and
             pass `num_commits` parameter. Using this
             method, the function will start from the
             very first commit on the master branch and
             process the following `num_commits` commits
             (also on the master branch).
 
-        Method 3: Set `from_last_processed` to True and pass
+        Method 3: from_last_processed & num_commits
+            Set `from_last_processed` to True and pass
             `num_commits` parameter. Using this method, the
             function will resume processing from succeeding commit of
             `self.last_processed_commit` for `num_commits` commits.
 
-        Method 4: Set `from_last_processed` to True and pass
+        Method 4: from_last_processed & end_commit_sha
+            Set `from_last_processed` to True and pass
             `end_commit_sha` parameter. The range of continued processing
             will be `self.last_processed_commit.hexsha..end_commit_sha`.
 
@@ -85,7 +93,8 @@ class Processor():
             rev: A string, see above.
             num_commits: An int, see above.
             from_beginning: A boolean flag, see above.
-            continue: A boolean flag, see above.
+            from_last_processed: A boolean flag, see above.
+            end_commit_sha: A string, see above.
             into_branches: A boolean flag, if True, the process function
                 will operate in two phases.
 
@@ -103,7 +112,8 @@ class Processor():
 
             max_branch_length: An int, the maximum number of commits
                 to trace back before abortion.
-            end_commit_sha: A string, see above.
+            min_branch_date: A python time object, stop backtracing if
+                a commit is authored before this time.
             checkpoint_interval: An int.
         """
         if not from_last_processed:
@@ -157,8 +167,12 @@ class Processor():
             self._start_process_commit(commit)
 
             if verbose:
-                print('------ No.{} {} {} ------'.format(
-                    counter, sha, _subject(commit.message)))
+                print('------ No.{} {} {} {} ------'.format(
+                    counter, sha, _subject(commit.message),
+                    time.strftime(
+                        "%b %d %Y", time.gmtime(commit.authored_date)
+                    ))
+                )
             else:
                 print('------ No.{} {} ------'.format(counter, sha))
             if counter % 100 == 0:
@@ -180,7 +194,7 @@ class Processor():
 
             if into_branches:
                 is_merge_commit = self._detect_branch(
-                    commit, max_branch_length)
+                    commit, max_branch_length, min_branch_date)
             else:
                 is_merge_commit = False
 
@@ -217,9 +231,16 @@ class Processor():
 
                     if verbose:
                         print('------ Commit No.{} '.format(counter),
-                              'Branch No.{} {} {}------'.format(
-                                branch_cnt, commit.hexsha,
-                                _subject(commit.message)))
+                              'Branch No.{} {} {} {} ------'.format(
+                                branch_cnt,
+                                commit.hexsha,
+                                _subject(commit.message),
+                                time.strftime(
+                                    "%b %d %Y",
+                                    time.gmtime(commit.authored_date)
+                                )
+                            )
+                        )
                     else:
                         print('------ Commit No.{} '.format(counter),
                               'Branch No.{} {}------'.format(
@@ -297,7 +318,7 @@ class Processor():
     def on_modify2(self, diff, commit):
         return 0
 
-    def _detect_branch(self, commit, max_branch_length):
+    def _detect_branch(self, commit, max_branch_length, min_branch_date):
         found = False
         if len(commit.parents) == 2:
             branch_length = 1
@@ -306,6 +327,13 @@ class Processor():
 
             while(branch_length <= max_branch_length):
                 prev_commit = cur_commit.parents[0]
+
+                # stop if this commit is authored before min_branch_date
+                authored_date = time.gmtime(prev_commit.authored_date)
+                if min_branch_date and min_branch_date > authored_date:
+                    found = True
+                    break
+
                 if (prev_commit.hexsha in self.visited or
                    len(prev_commit.parents) == 0):
                     found = True
