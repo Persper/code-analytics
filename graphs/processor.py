@@ -2,6 +2,7 @@ import os
 import time
 import pickle
 from graphs.git_tools import initialize_repo
+from collections import deque
 import functools
 print = functools.partial(print, flush=True)
 
@@ -70,7 +71,7 @@ class Processor():
             for viable options. `rev' should only include commits
             on the master branch.
 
-        Method 2: from_beginning & num_commits
+        Method 2: from_beginning & num_commits (optional)
             Set `from_beginning` to True and
             pass `num_commits` parameter. Using this
             method, the function will start from the
@@ -118,8 +119,7 @@ class Processor():
         """
         if not from_last_processed:
             self._reset_state()
-        # self.branches will be updated in 1st phase and used in 2nd phase
-        self.branches = []
+        self.merge_commits = deque()
 
         # Method 2
         if from_beginning:
@@ -193,8 +193,13 @@ class Processor():
                 _print_diff_index(diff_index)
 
             if into_branches:
+                is_merge_commit = len(commit.parents) > 1
+                if is_merge_commit:
+                    self.merge_commits.append(commit)
+                """
                 is_merge_commit = self._detect_branch(
                     commit, max_branch_length, min_branch_date)
+                """
             else:
                 is_merge_commit = False
 
@@ -220,68 +225,92 @@ class Processor():
         # 2nd phase
         if into_branches:
 
-            counter = 1
+            commit_cnt = 1
             branch_cnt = 1
             start = time.time()
 
             print('\n-------  2nd phase -------\n')
-            for branch in self.branches:
-                for commit in branch:
-                    self._start_process_commit(commit)
 
+            while len(self.merge_commits) > 0:
+                mc = self.merge_commits.popleft()
+                cur_commit = mc.parents[1]
+                branch_length = 1
+
+                while True:
+                    # process this commit
                     if verbose:
-                        print('------ Commit No.{} '.format(counter),
+                        print('------ Commit No.{} '.format(commit_cnt),
                               'Branch No.{} {} {} {} ------'.format(
                                 branch_cnt,
-                                commit.hexsha,
-                                _subject(commit.message),
+                                cur_commit.hexsha,
+                                _subject(cur_commit.message),
                                 time.strftime(
                                     "%b %d %Y",
-                                    time.gmtime(commit.authored_date)
+                                    time.gmtime(cur_commit.authored_date)
                                 )
                             )
                         )
                     else:
-                        print('------ Commit No.{} '.format(counter),
+                        print('------ Commit No.{} '.format(commit_cnt),
                               'Branch No.{} {}------'.format(
-                                branch_cnt, commit.hexsha))
-                    if counter % 100 == 0:
+                                branch_cnt, cur_commit.hexsha))
+
+                    if commit_cnt % 100 == 0:
                         print('------ Used time: {} ------'.format(
                             time.time() - start))
 
-                    if counter % checkpoint_interval == 0:
+                    if commit_cnt % checkpoint_interval == 0:
                         repo_name = os.path.basename(
                             self.repo_path.rstrip('/'))
                         self.save(
                             repo_name + '-2nd-' + str(counter) + '.pickle')
 
-                    # generate diff_index by diff commit with its first parent
-                    diff_index = _diff_with_first_parent(commit)
+                    self.visited.add(cur_commit.hexsha)
+                    # add to queue if prev_commit is a merge commit
+                    if len(cur_commit.parents) == 2:
+                        self.merge_commits.append(cur_commit)
 
-                    # figure out the change type of each entry in diff_index
+                    self._start_process_commit(cur_commit)
+                    diff_index = _diff_with_first_parent(cur_commit)
                     _fill_change_type(diff_index)
-
-                    if verbose:
-                        _print_diff_index(diff_index)
-
                     for diff in diff_index:
                         if diff.change_type == 'U':
                             print('Unknown change type encountered.')
                             continue
-
                         if diff.change_type == 'A':
-                            self.on_add2(diff, commit)
-
+                            self.on_add2(diff, cur_commit)
                         elif diff.change_type == 'D':
-                            self.on_delete2(diff, commit)
-
+                            self.on_delete2(diff, cur_commit)
                         elif diff.change_type == 'R':
-                            self.on_rename2(diff, commit)
-
+                            self.on_rename2(diff, cur_commit)
                         else:
-                            self.on_modify2(diff, commit)
+                            self.on_modify2(diff, cur_commit)
 
-                    counter += 1
+                    # get next commit
+                    prev_commit = cur_commit.parents[0]
+
+                    # stop tracing back along this branch
+                    # if prev_commit has been visited
+                    if prev_commit.hexsha in self.visited:
+                        break
+
+                    # stop if we have reached the very first commit
+                    if len(prev_commit.parents) == 0:
+                        break
+
+                    # stop if we have reached max_branch_length
+                    if branch_length >= max_branch_length:
+                        break
+
+                    # stop if we have reached time boundary
+                    authored_date = time.gmtime(prev_commit.authored_date)
+                    if min_branch_date and min_branch_date > authored_date:
+                        break
+
+                    cur_commit = prev_commit
+                    branch_length += 1
+                    commit_cnt += 1
+
                 branch_cnt += 1
 
         repo_name = os.path.basename(self.repo_path.rstrip('/'))
@@ -317,34 +346,6 @@ class Processor():
 
     def on_modify2(self, diff, commit):
         return 0
-
-    def _detect_branch(self, commit, max_branch_length, min_branch_date):
-        found = False
-        if len(commit.parents) == 2:
-            branch_length = 1
-            cur_commit = commit.parents[1]
-            branch = [cur_commit]
-
-            while(branch_length <= max_branch_length):
-                prev_commit = cur_commit.parents[0]
-
-                # stop if this commit is authored before min_branch_date
-                authored_date = time.gmtime(prev_commit.authored_date)
-                if min_branch_date and min_branch_date > authored_date:
-                    found = True
-                    break
-
-                if (prev_commit.hexsha in self.visited or
-                   len(prev_commit.parents) == 0):
-                    found = True
-                    break
-                branch.append(prev_commit)
-                cur_commit = prev_commit
-                branch_length += 1
-
-            if found:
-                self.branches.append(list(reversed(branch)))
-        return found
 
     def __getstate__(self):
         state = {
