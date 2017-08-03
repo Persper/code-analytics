@@ -58,6 +58,7 @@ class Processor():
                 max_branch_length=100,
                 min_branch_date=None,
                 checkpoint_interval=100,
+                skip_work=False,
                 verbose=True):
         """
         This function supports four ways of specifying the
@@ -183,15 +184,6 @@ class Processor():
                 repo_name = os.path.basename(self.repo_path.rstrip('/'))
                 self.save(repo_name + '-1st-' + str(counter) + '.pickle')
 
-            # generate diff_index by diff commit with its first parent
-            diff_index = _diff_with_first_parent(commit)
-
-            # figure out the change type of each entry in diff_index
-            _fill_change_type(diff_index)
-
-            if verbose:
-                _print_diff_index(diff_index)
-
             if into_branches:
                 is_merge_commit = len(commit.parents) > 1
                 if is_merge_commit:
@@ -203,22 +195,32 @@ class Processor():
             else:
                 is_merge_commit = False
 
-            for diff in diff_index:
-                if diff.change_type == 'U':
-                    print('Unknown change type encountered.')
-                    continue
+            if not skip_work:
+                # generate diff_index by diff commit with its first parent
+                diff_index = _diff_with_first_parent(commit)
 
-                if diff.change_type == 'A':
-                    self.on_add(diff, commit, is_merge_commit)
+                # figure out the change type of each entry in diff_index
+                _fill_change_type(diff_index)
 
-                elif diff.change_type == 'D':
-                    self.on_delete(diff, commit, is_merge_commit)
+                if verbose:
+                    _print_diff_index(diff_index)
 
-                elif diff.change_type == 'R':
-                    self.on_rename(diff, commit, is_merge_commit)
+                for diff in diff_index:
+                    if diff.change_type == 'U':
+                        print('Unknown change type encountered.')
+                        continue
 
-                else:
-                    self.on_modify(diff, commit, is_merge_commit)
+                    if diff.change_type == 'A':
+                        self.on_add(diff, commit, is_merge_commit)
+
+                    elif diff.change_type == 'D':
+                        self.on_delete(diff, commit, is_merge_commit)
+
+                    elif diff.change_type == 'R':
+                        self.on_rename(diff, commit, is_merge_commit)
+
+                    else:
+                        self.on_modify(diff, commit, is_merge_commit)
 
             counter += 1
 
@@ -293,21 +295,22 @@ class Processor():
                     if len(cur_commit.parents) == 2:
                         self.merge_commits.append(cur_commit)
 
-                    self._start_process_commit(cur_commit)
-                    diff_index = _diff_with_first_parent(cur_commit)
-                    _fill_change_type(diff_index)
-                    for diff in diff_index:
-                        if diff.change_type == 'U':
-                            print('Unknown change type encountered.')
-                            continue
-                        if diff.change_type == 'A':
-                            self.on_add2(diff, cur_commit)
-                        elif diff.change_type == 'D':
-                            self.on_delete2(diff, cur_commit)
-                        elif diff.change_type == 'R':
-                            self.on_rename2(diff, cur_commit)
-                        else:
-                            self.on_modify2(diff, cur_commit)
+                    if not skip_work:
+                        self._start_process_commit(cur_commit)
+                        diff_index = _diff_with_first_parent(cur_commit)
+                        _fill_change_type(diff_index)
+                        for diff in diff_index:
+                            if diff.change_type == 'U':
+                                print('Unknown change type encountered.')
+                                continue
+                            if diff.change_type == 'A':
+                                self.on_add2(diff, cur_commit)
+                            elif diff.change_type == 'D':
+                                self.on_delete2(diff, cur_commit)
+                            elif diff.change_type == 'R':
+                                self.on_rename2(diff, cur_commit)
+                            else:
+                                self.on_modify2(diff, cur_commit)
 
                     # get next commit
                     prev_commit = cur_commit.parents[0]
