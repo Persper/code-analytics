@@ -23,4 +23,5 @@ def test_processor(capsys):
     # from A to L
     assert(len(p.visited) == 12)
     out, _ = capsys.readouterr()
-    assert("Commit No.6  Branch No.3" in out)
+    print(out)
+    assert("Commit No.8  Branch No.3" in out)
