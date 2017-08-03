@@ -234,9 +234,32 @@ class Processor():
             while len(self.merge_commits) > 0:
                 mc = self.merge_commits.popleft()
                 cur_commit = mc.parents[1]
-                branch_length = 1
+                branch_length = 0
+                valid_branch = False
 
                 while True:
+
+                    # stop tracing back along this branch
+                    # if cur_commit has been visited
+                    if cur_commit.hexsha in self.visited:
+                        break
+
+                    # stop if we have reached time boundary
+                    authored_date = time.gmtime(cur_commit.authored_date)
+                    if min_branch_date and min_branch_date > authored_date:
+                        break
+
+                    # stop if we have reached max_branch_length
+                    if branch_length >= max_branch_length:
+                        break
+
+                    # stop if we have reached the very first commit
+                    if len(cur_commit.parents) == 0:
+                        break
+
+                    # will process at least one commit for this branch
+                    valid_branch = True
+
                     # process this commit
                     if verbose:
                         print('------ Commit No.{} '.format(commit_cnt),
@@ -289,29 +312,12 @@ class Processor():
                     # get next commit
                     prev_commit = cur_commit.parents[0]
 
-                    # stop tracing back along this branch
-                    # if prev_commit has been visited
-                    if prev_commit.hexsha in self.visited:
-                        break
-
-                    # stop if we have reached the very first commit
-                    if len(prev_commit.parents) == 0:
-                        break
-
-                    # stop if we have reached max_branch_length
-                    if branch_length >= max_branch_length:
-                        break
-
-                    # stop if we have reached time boundary
-                    authored_date = time.gmtime(prev_commit.authored_date)
-                    if min_branch_date and min_branch_date > authored_date:
-                        break
-
                     cur_commit = prev_commit
                     branch_length += 1
                     commit_cnt += 1
 
-                branch_cnt += 1
+                if valid_branch:
+                    branch_cnt += 1
 
         repo_name = os.path.basename(self.repo_path.rstrip('/'))
         self.save(repo_name + '-finished.pickle')
