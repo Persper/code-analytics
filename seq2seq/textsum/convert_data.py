@@ -8,6 +8,10 @@ import os.path as path
 import pickle
 import re
 
+import sys
+sys.path.append('../../lib')
+import labeler
+
 # Special tokens
 PARAGRAPH_START = '<p>'
 PARAGRAPH_END = '</p>'
@@ -17,21 +21,6 @@ UNKNOWN_TOKEN = '<UNK>'
 PAD_TOKEN = '<PAD>'
 DOCUMENT_START = '<d>'
 DOCUMENT_END = '</d>'
-
-# Labels
-BUG = 'bug'
-FEATURE = 'feature'
-PERFORMANCE = 'performance'
-RELIABILITY = 'reliability'
-MAINTENANCE = 'maintenance'
-
-fs_labeler = {
-    'b':BUG,
-    'f':FEATURE,
-    'p':PERFORMANCE,
-    'c':RELIABILITY,
-    'misc':MAINTENANCE,
-}
 
 def to_skip(token):
     return token in '={}<>()[]--' or '=' in token
@@ -49,7 +38,7 @@ def get_tokens(string, counter):
     return tokens
 
 def parse_patch(patch):
-    label = fs_labeler[patch['type']]
+    label = FS_LABELER[patch['type']]
     lines = patch['message'].splitlines()
     assert patch['subject'] == lines[0].strip()
     return label, lines
