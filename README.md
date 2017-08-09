@@ -30,23 +30,7 @@ cd misc/
 ./apply_patch.py
 ```
 
-2. Generate XML representations of repos
-
-Download and install srcML: <http://www.srcml.org/>.
-
-Download target repos into `./repos` (the assumed default path).
-E.g.:
-```
-git clone https://github.com/torvalds/linux.git ./repos/linux
-git -C ./repos/linux checkout v4.10
-```
-
-Run graphs/srcml. E.g.:
-```
-./graphs/srcml.py ./repos/linux ./repos/linux-4.10-xml/
-```
-
-3. Install Jupyter
+2. Install Jupyter
 
 Reference <http://jupyter.org/install.html>.
 
@@ -55,6 +39,20 @@ E.g., Ubuntu:
 sudo -H pip3 install --upgrade pip
 sudo -H pip3 install jupyter
 ```
+
+3. Install TensorFlow
+
+Follow this tutorial: https://www.tensorflow.org/install/install_sources.
+
+An example build:
+
+```
+bazel build --config=opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-msse4.1 --copt=-msse4.2 //tensorflow/tools/pip_package:build_pip_package
+```
+
+When running TensorFlow, get out of the tensorflow source dir. Otherwise,
+python would prompt an error message "No module named
+pywrap_tensorflow_internal".
 
 4. Run a notebook
 
