@@ -50,5 +50,5 @@ apache_priority = { # For Apache JIRA projects.
     'Major': MID,
     'Minor': LOW,
     'Trivial': LOW,
+    'No priority': SKIP,
 }
-
