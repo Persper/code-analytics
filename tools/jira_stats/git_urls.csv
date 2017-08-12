@@ -1,0 +1,861 @@
+Apache Abdera,git://git.apache.org/abdera.git,https://github.com/apache/abdera
+Apache Accumulo BSP,git://git.apache.org/accumulo-bsp.git,https://github.com/apache/accumulo-bsp
+Apache Accumulo Examples,git://git.apache.org/accumulo-examples.git,https://github.com/apache/accumulo-examples
+Apache Accumulo Instamo Archetype,git://git.apache.org/accumulo-instamo-archetype.git,https://github.com/apache/accumulo-instamo-archetype
+Apache Accumulo Pig,git://git.apache.org/accumulo-pig.git,https://github.com/apache/accumulo-pig
+Apache Accumulo Testing Suites,git://git.apache.org/accumulo-testing.git,https://github.com/apache/accumulo-testing
+Apache Accumulo Website (https://accumulo.apache.org),git://git.apache.org/accumulo-website.git,https://github.com/apache/accumulo-website
+Apache Accumulo Wikisearch,git://git.apache.org/accumulo-wikisearch.git,https://github.com/apache/accumulo-wikisearch
+Apache Accumulo,git://git.apache.org/accumulo.git,https://github.com/apache/accumulo
+Apache Ace,git://git.apache.org/ace.git,https://github.com/apache/ace
+Apache ActiveMQ Active IO,git://git.apache.org/activemq-activeio.git,https://github.com/apache/activemq-activeio
+Apache ActiveMQ Apollo,git://git.apache.org/activemq-apollo.git,https://github.com/apache/activemq-apollo
+Apache ActiveMQ Artemis,git://git.apache.org/activemq-artemis.git,https://github.com/apache/activemq-artemis
+Apache ActiveMQ CLI Tools,git://git.apache.org/activemq-cli-tools.git,https://github.com/apache/activemq-cli-tools
+Apache ActiveMQ CPP,git://git.apache.org/activemq-cpp.git,https://github.com/apache/activemq-cpp
+Apache ActiveMQ NMS.AMQP Client,git://git.apache.org/activemq-nms-amqp.git,https://github.com/apache/activemq-nms-amqp
+Apache ActiveMQ NMS API,git://git.apache.org/activemq-nms-api.git,https://github.com/apache/activemq-nms-api
+Apache ActiveMQ NMS.EMS Client Library,git://git.apache.org/activemq-nms-ems.git,https://github.com/apache/activemq-nms-ems
+Apache ActiveMQ NMS.MSMQ Client Library,git://git.apache.org/activemq-nms-msmq.git,https://github.com/apache/activemq-nms-msmq
+Apache ActiveMQ NMS OpenWire protocol generator tool,git://git.apache.org/activemq-nms-openwire-generator.git,https://github.com/apache/activemq-nms-openwire-generator
+Apache ActiveMQ NMS OpenWire client library,git://git.apache.org/activemq-nms-openwire.git,https://github.com/apache/activemq-nms-openwire
+Apache ActiveMQ NMS.Stomp Client,git://git.apache.org/activemq-nms-stomp.git,https://github.com/apache/activemq-nms-stomp
+Apache ActiveMQ NMS.XMS Client Library,git://git.apache.org/activemq-nms-xms.git,https://github.com/apache/activemq-nms-xms
+Apache ActiveMQ NMS.ZMQ Client Library,git://git.apache.org/activemq-nms-zmq.git,https://github.com/apache/activemq-nms-zmq
+Apache ActiveMQ OpenWire,git://git.apache.org/activemq-openwire.git,https://github.com/apache/activemq-openwire
+Apache ActiveMQ Protobuf,git://git.apache.org/activemq-protobuf.git,https://github.com/apache/activemq-protobuf
+Apache ActiveMQ Stomp,git://git.apache.org/activemq-stomp.git,https://github.com/apache/activemq-stomp
+Apache ActiveMQ,git://git.apache.org/activemq.git,https://github.com/apache/activemq
+Apache Aravata Docs,git://git.apache.org/airavata-docs.git,https://github.com/apache/airavata-docs
+Apache Airavata Labs,git://git.apache.org/airavata-labs.git,https://github.com/apache/airavata-labs
+Apache Airavata PHP Gateway,git://git.apache.org/airavata-php-gateway.git,https://github.com/apache/airavata-php-gateway
+Apache Airavata,git://git.apache.org/airavata-sandbox.git,https://github.com/apache/airavata-sandbox
+Apache Airavata Web Site,git://git.apache.org/airavata-site.git,https://github.com/apache/airavata-site
+Apache Airavata,git://git.apache.org/airavata.git,https://github.com/apache/airavata
+Apache Allura,git://git.apache.org/allura.git,https://github.com/apache/allura
+Apache Ambari,git://git.apache.org/ambari.git,https://github.com/apache/ambari
+Apache AntUnit - Unit Test Framework for Ant Tasks ,git://git.apache.org/ant-antlibs-antunit.git,https://github.com/apache/ant-antlibs-antunit
+Antlib common files,git://git.apache.org/ant-antlibs-common.git,https://github.com/apache/ant-antlibs-common
+Apache Compress Antlib,git://git.apache.org/ant-antlibs-compress.git,https://github.com/apache/ant-antlibs-compress
+Apache DotNet Antlib,git://git.apache.org/ant-antlibs-dotnet.git,https://github.com/apache/ant-antlibs-dotnet
+Apache Props Antlib,git://git.apache.org/ant-antlibs-props.git,https://github.com/apache/ant-antlibs-props
+Apache SVN Antlib,git://git.apache.org/ant-antlibs-svn.git,https://github.com/apache/ant-antlibs-svn
+Apache VSS Antlib,git://git.apache.org/ant-antlibs-vss.git,https://github.com/apache/ant-antlibs-vss
+Apache EasyAnt build types,git://git.apache.org/ant-easyant-buildtypes.git,https://github.com/apache/ant-easyant-buildtypes
+Apache EasyAnt core,git://git.apache.org/ant-easyant-core.git,https://github.com/apache/ant-easyant-core
+Apache EasyAnt for Eclipse,git://git.apache.org/ant-easyant-easyant4e.git,https://github.com/apache/ant-easyant-easyant4e
+Apache EasyAnt plugins,git://git.apache.org/ant-easyant-plugins.git,https://github.com/apache/ant-easyant-plugins
+Apache EasyAnt skeletons,git://git.apache.org/ant-easyant-skeletons.git,https://github.com/apache/ant-easyant-skeletons
+Apache EasyAnt tasks,git://git.apache.org/ant-easyant-tasks.git,https://github.com/apache/ant-easyant-tasks
+Apache Ant Ivy,git://git.apache.org/ant-ivy.git,https://github.com/apache/ant-ivy
+Apache Ivy Eclipse Plugin,git://git.apache.org/ant-ivyde.git,https://github.com/apache/ant-ivyde
+Apache Ant Xooki,git://git.apache.org/ant-xooki.git,https://github.com/apache/ant-xooki
+Apache Ant,git://git.apache.org/ant.git,https://github.com/apache/ant
+Apache Any23,git://git.apache.org/any23.git,https://github.com/apache/any23
+Apache Website Template,git://git.apache.org/apache-website-template.git,https://github.com/apache/apache-website-template
+Apache Portable Runtime iconv,git://git.apache.org/apr-iconv.git,https://github.com/apache/apr-iconv
+Apache Portable Runtime util,git://git.apache.org/apr-util.git,https://github.com/apache/apr-util
+Apache APR,git://git.apache.org/apr.git,https://github.com/apache/apr
+Apache HTTP Request Library,git://git.apache.org/apreq.git,https://github.com/apache/apreq
+Apache Archiva,git://git.apache.org/archiva-redback-core.git,https://github.com/apache/archiva-redback-core
+Apache Archiva sandbox,git://git.apache.org/archiva-sandbox.git,https://github.com/apache/archiva-sandbox
+Apache Archiva,git://git.apache.org/archiva-site.git,https://github.com/apache/archiva-site
+Apache Archiva,git://git.apache.org/archiva.git,https://github.com/apache/archiva
+Apache Aries Container management subproject,git://git.apache.org/aries-containers.git,https://github.com/apache/aries-containers
+Apache Aries JAX RS Whiteboard,git://git.apache.org/aries-jax-rs-whiteboard.git,https://github.com/apache/aries-jax-rs-whiteboard
+Apache Aries JPA,git://git.apache.org/aries-jpa.git,https://github.com/apache/aries-jpa
+Apache Aries Remote Services Admin,git://git.apache.org/aries-rsa.git,https://github.com/apache/aries-rsa
+Apache Aries,git://git.apache.org/aries.git,https://github.com/apache/aries
+Apache Arrow site,git://git.apache.org/arrow-site.git,https://github.com/apache/arrow-site
+Apache Arrow,git://git.apache.org/arrow.git,https://github.com/apache/arrow
+BAD project,git://git.apache.org/asterixdb-bad.git,https://github.com/apache/asterixdb-bad
+Apache Asterix Site,git://git.apache.org/asterixdb-site.git,https://github.com/apache/asterixdb-site
+Apache AsterixDB (Incubating),git://git.apache.org/asterixdb.git,https://github.com/apache/asterixdb
+Apache Atlas Website,git://git.apache.org/atlas-website.git,https://github.com/apache/atlas-website
+Apache Atlas,git://git.apache.org/atlas.git,https://github.com/apache/atlas
+Apache Aurora,git://git.apache.org/aurora-packaging.git,https://github.com/apache/aurora-packaging
+Apache Aurora,git://git.apache.org/aurora-website.git,https://github.com/apache/aurora-website
+Apache Aurora,git://git.apache.org/aurora.git,https://github.com/apache/aurora
+Apache Avro,git://git.apache.org/avro.git,https://github.com/apache/avro
+Axis1 Java,git://git.apache.org/axis1-java.git,https://github.com/apache/axis1-java
+Apache Axis1,git://git.apache.org/axis1.git,https://github.com/apache/axis1
+Apache Axis2/C,git://git.apache.org/axis2-c.git,https://github.com/apache/axis2-c
+Apache Axis2/Java,git://git.apache.org/axis2-java.git,https://github.com/apache/axis2-java
+Apache Axis2 transports,git://git.apache.org/axis2-transports.git,https://github.com/apache/axis2-transports
+Apache Bahir Flink,git://git.apache.org/bahir-flink.git,https://github.com/apache/bahir-flink
+Apache Bahir Website,git://git.apache.org/bahir-website.git,https://github.com/apache/bahir-website
+Apache Bahir,git://git.apache.org/bahir.git,https://github.com/apache/bahir
+Apache Batik,git://git.apache.org/batik.git,https://github.com/apache/batik
+Apache Beam,git://git.apache.org/beam.git,https://github.com/apache/beam
+Apache Bigtop,git://git.apache.org/bigtop.git,https://github.com/apache/bigtop
+Apache Bloodhound,git://git.apache.org/bloodhound.git,https://github.com/apache/bloodhound
+Apache Brooklyn client,git://git.apache.org/brooklyn-client.git,https://github.com/apache/brooklyn-client
+Apache Brooklyn dist,git://git.apache.org/brooklyn-dist.git,https://github.com/apache/brooklyn-dist
+Apache Brooklyn docs,git://git.apache.org/brooklyn-docs.git,https://github.com/apache/brooklyn-docs
+Apache Brooklyn library,git://git.apache.org/brooklyn-library.git,https://github.com/apache/brooklyn-library
+Apache Brooklyn server,git://git.apache.org/brooklyn-server.git,https://github.com/apache/brooklyn-server
+Apache Brooklyn ui,git://git.apache.org/brooklyn-ui.git,https://github.com/apache/brooklyn-ui
+Apache Brooklyn,git://git.apache.org/brooklyn.git,https://github.com/apache/brooklyn
+Apache Buildr,git://git.apache.org/buildr.git,https://github.com/apache/buildr
+Apache BVal,git://git.apache.org/bval.git,https://github.com/apache/bval
+Apache calcite,git://git.apache.org/calcite-avatica-go.git,https://github.com/apache/calcite-avatica-go
+Apache Calcite - Avatica,git://git.apache.org/calcite-avatica.git,https://github.com/apache/calcite-avatica
+Apache Calcite,git://git.apache.org/calcite.git,https://github.com/apache/calcite
+Apache Camel,git://git.apache.org/camel.git,https://github.com/apache/camel
+Apache CarbonData Site,git://git.apache.org/carbondata-site.git,https://github.com/apache/carbondata-site
+Apache CarbonData,git://git.apache.org/carbondata.git,https://github.com/apache/carbondata
+Apache Cassandra Builds,git://git.apache.org/cassandra-builds.git,https://github.com/apache/cassandra-builds
+Distributed test suite for Apache Cassandra,git://git.apache.org/cassandra-dtest.git,https://github.com/apache/cassandra-dtest
+Apache Cassandra,git://git.apache.org/cassandra.git,https://github.com/apache/cassandra
+Apache Cayenne Modeler UI,git://git.apache.org/cayenne-modeler.git,https://github.com/apache/cayenne-modeler
+Apache cayenne website,git://git.apache.org/cayenne-website.git,https://github.com/apache/cayenne-website
+Apache Cayenne,git://git.apache.org/cayenne.git,https://github.com/apache/cayenne
+Apache Celix,git://git.apache.org/celix.git,https://github.com/apache/celix
+Apache Chainsaw,git://git.apache.org/chainsaw.git,https://github.com/apache/chainsaw
+Apache Chemistry CMISLib,git://git.apache.org/chemistry-cmislib.git,https://github.com/apache/chemistry-cmislib
+Apache Chemistry DotCMIS,git://git.apache.org/chemistry-dotcmis.git,https://github.com/apache/chemistry-dotcmis
+Apache Chemistry ObjectiveCMIS,git://git.apache.org/chemistry-objectivecmis.git,https://github.com/apache/chemistry-objectivecmis
+Apache Chemistry OpenCMIS,git://git.apache.org/chemistry-opencmis.git,https://github.com/apache/chemistry-opencmis
+Apache Chemistry PHPClient,git://git.apache.org/chemistry-phpclient.git,https://github.com/apache/chemistry-phpclient
+Apache Chemistry PortCMIS,git://git.apache.org/chemistry-portcmis.git,https://github.com/apache/chemistry-portcmis
+Apache Chukwa,git://git.apache.org/chukwa.git,https://github.com/apache/chukwa
+Apache Clerezza rdf.core,git://git.apache.org/clerezza-rdf-core.git,https://github.com/apache/clerezza-rdf-core
+Apache Clerezza,git://git.apache.org/clerezza.git,https://github.com/apache/clerezza
+Apache Click,git://git.apache.org/click.git,https://github.com/apache/click
+Apache Open Climate Workbench,git://git.apache.org/climate.git,https://github.com/apache/climate
+Apache Cocoon,git://git.apache.org/cocoon.git,https://github.com/apache/cocoon
+Apache Commons BCEL,git://git.apache.org/commons-bcel.git,https://github.com/apache/commons-bcel
+Apache Commons Beanutils,git://git.apache.org/commons-beanutils.git,https://github.com/apache/commons-beanutils
+Apache Commons BSF,git://git.apache.org/commons-bsf.git,https://github.com/apache/commons-bsf
+Apache Commons Build Plugin,git://git.apache.org/commons-build-plugin.git,https://github.com/apache/commons-build-plugin
+Apache Commons Chain,git://git.apache.org/commons-chain.git,https://github.com/apache/commons-chain
+Apache Commons CLI,git://git.apache.org/commons-cli.git,https://github.com/apache/commons-cli
+Apache Commons Codec,git://git.apache.org/commons-codec.git,https://github.com/apache/commons-codec
+Apache Commons Collections,git://git.apache.org/commons-collections.git,https://github.com/apache/commons-collections
+Apache Commons Compress,git://git.apache.org/commons-compress.git,https://github.com/apache/commons-compress
+Apache Commons Configuration,git://git.apache.org/commons-configuration.git,https://github.com/apache/commons-configuration
+Apache Commons Crypto,git://git.apache.org/commons-crypto.git,https://github.com/apache/commons-crypto
+Apache Commons CSV,git://git.apache.org/commons-csv.git,https://github.com/apache/commons-csv
+Apache Commons Daemon,git://git.apache.org/commons-daemon.git,https://github.com/apache/commons-daemon
+Apache Commons DBCP,git://git.apache.org/commons-dbcp.git,https://github.com/apache/commons-dbcp
+Apache Commons DbUtils,git://git.apache.org/commons-dbutils.git,https://github.com/apache/commons-dbutils
+Apache Commons Digester,git://git.apache.org/commons-digester.git,https://github.com/apache/commons-digester
+Apache Commons Discovery,git://git.apache.org/commons-discovery.git,https://github.com/apache/commons-discovery
+Apache Commons Email,git://git.apache.org/commons-email.git,https://github.com/apache/commons-email
+Apache Commons Exec,git://git.apache.org/commons-exec.git,https://github.com/apache/commons-exec
+Apache FileUpload,git://git.apache.org/commons-fileupload.git,https://github.com/apache/commons-fileupload
+Apache Commons Functor,git://git.apache.org/commons-functor.git,https://github.com/apache/commons-functor
+Apache Commons Imaging,git://git.apache.org/commons-imaging.git,https://github.com/apache/commons-imaging
+Apache Commons IO,git://git.apache.org/commons-io.git,https://github.com/apache/commons-io
+Apache Commons JCI,git://git.apache.org/commons-jci.git,https://github.com/apache/commons-jci
+Apache Commons JCS,git://git.apache.org/commons-jcs.git,https://github.com/apache/commons-jcs
+Apache Commons Jelly,git://git.apache.org/commons-jelly.git,https://github.com/apache/commons-jelly
+Apache Commons Jexl,git://git.apache.org/commons-jexl.git,https://github.com/apache/commons-jexl
+Apache Commons JXPath,git://git.apache.org/commons-jxpath.git,https://github.com/apache/commons-jxpath
+Apache Commons Lang,git://git.apache.org/commons-lang.git,https://github.com/apache/commons-lang
+Apache Commons Launcher,git://git.apache.org/commons-launcher.git,https://github.com/apache/commons-launcher
+Apache Commons Logging,git://git.apache.org/commons-logging.git,https://github.com/apache/commons-logging
+Apache Commons Math,git://git.apache.org/commons-math.git,https://github.com/apache/commons-math
+Apache Commons Net,git://git.apache.org/commons-net.git,https://github.com/apache/commons-net
+Apache Commons Complex Numbers,git://git.apache.org/commons-numbers.git,https://github.com/apache/commons-numbers
+Apache Commons OGNL,git://git.apache.org/commons-ognl.git,https://github.com/apache/commons-ognl
+Apache Commons Pool,git://git.apache.org/commons-pool.git,https://github.com/apache/commons-pool
+Apache Commons Proxy,git://git.apache.org/commons-proxy.git,https://github.com/apache/commons-proxy
+Apache Commons RDF,git://git.apache.org/commons-rdf.git,https://github.com/apache/commons-rdf
+Apache Commons RNG,git://git.apache.org/commons-rng.git,https://github.com/apache/commons-rng
+Apache Commons SCXML,git://git.apache.org/commons-scxml.git,https://github.com/apache/commons-scxml
+Apache Commons Text,git://git.apache.org/commons-text.git,https://github.com/apache/commons-text
+Apache Commons Transaction,git://git.apache.org/commons-transaction.git,https://github.com/apache/commons-transaction
+Apache Commons Validator,git://git.apache.org/commons-validator.git,https://github.com/apache/commons-validator
+Apache Commons VFS,git://git.apache.org/commons-vfs.git,https://github.com/apache/commons-vfs
+Apache Commons Weaver,git://git.apache.org/commons-weaver.git,https://github.com/apache/commons-weaver
+Apache Continuum,git://git.apache.org/continuum.git,https://github.com/apache/continuum
+Apache Cordova,git://git.apache.org/cordova-amazon-fireos.git,https://github.com/apache/cordova-amazon-fireos
+Apache Cordova app harness,git://git.apache.org/cordova-app-harness.git,https://github.com/apache/cordova-app-harness
+Apache Cordova hello world,git://git.apache.org/cordova-app-hello-world.git,https://github.com/apache/cordova-app-hello-world
+Apache Cordova bada wac,git://git.apache.org/cordova-bada-wac.git,https://github.com/apache/cordova-bada-wac
+Apache Cordova bada,git://git.apache.org/cordova-bada.git,https://github.com/apache/cordova-bada
+Apache Cordova blackberry,git://git.apache.org/cordova-blackberry.git,https://github.com/apache/cordova-blackberry
+Apache Cordova CLI,git://git.apache.org/cordova-cli.git,https://github.com/apache/cordova-cli
+Apache Cordova coho,git://git.apache.org/cordova-coho.git,https://github.com/apache/cordova-coho
+Apache cordova,git://git.apache.org/cordova-common.git,https://github.com/apache/cordova-common
+Apache Cordova Create,git://git.apache.org/cordova-create.git,https://github.com/apache/cordova-create
+Apache Cordova docs,git://git.apache.org/cordova-docs.git,https://github.com/apache/cordova-docs
+Apache Cordova Electron,git://git.apache.org/cordova-electron.git,https://github.com/apache/cordova-electron
+Apache Cordova Fauxton Server,git://git.apache.org/cordova-fauxton-server.git,https://github.com/apache/cordova-fauxton-server
+Apache cordova fetch,git://git.apache.org/cordova-fetch.git,https://github.com/apache/cordova-fetch
+Apache Cordova firefoxos,git://git.apache.org/cordova-firefoxos.git,https://github.com/apache/cordova-firefoxos
+Apache Cordova js,git://git.apache.org/cordova-js.git,https://github.com/apache/cordova-js
+Apache Cordova labs,git://git.apache.org/cordova-labs.git,https://github.com/apache/cordova-labs
+Apache Cordova,git://git.apache.org/cordova-lib.git,https://github.com/apache/cordova-lib
+Apache Cordova Medic,git://git.apache.org/cordova-medic.git,https://github.com/apache/cordova-medic
+Apache Cordova mobile-spec,git://git.apache.org/cordova-mobile-spec.git,https://github.com/apache/cordova-mobile-spec
+Apache cordova,git://git.apache.org/cordova-node-xcode.git,https://github.com/apache/cordova-node-xcode
+Apache Cordova mac,git://git.apache.org/cordova-osx.git,https://github.com/apache/cordova-osx
+Apache Cordova Paramedic,git://git.apache.org/cordova-paramedic.git,https://github.com/apache/cordova-paramedic
+Apache Cordova Plugin battery-status,git://git.apache.org/cordova-plugin-battery-status.git,https://github.com/apache/cordova-plugin-battery-status
+Apache Cordova Plugin camera,git://git.apache.org/cordova-plugin-camera.git,https://github.com/apache/cordova-plugin-camera
+Apache Cordova Plugin Compatibility,git://git.apache.org/cordova-plugin-compat.git,https://github.com/apache/cordova-plugin-compat
+Apache Cordova Plugin console,git://git.apache.org/cordova-plugin-console.git,https://github.com/apache/cordova-plugin-console
+Apache Cordova Plugin contacts,git://git.apache.org/cordova-plugin-contacts.git,https://github.com/apache/cordova-plugin-contacts
+Apache Cordova Plugin device-motion,git://git.apache.org/cordova-plugin-device-motion.git,https://github.com/apache/cordova-plugin-device-motion
+Apache Cordova Plugin device-orientation,git://git.apache.org/cordova-plugin-device-orientation.git,https://github.com/apache/cordova-plugin-device-orientation
+Apache Cordova Plugin device,git://git.apache.org/cordova-plugin-device.git,https://github.com/apache/cordova-plugin-device
+Apache Cordova Plugin dialogs,git://git.apache.org/cordova-plugin-dialogs.git,https://github.com/apache/cordova-plugin-dialogs
+Apache Cordova Plugin file-transfer,git://git.apache.org/cordova-plugin-file-transfer.git,https://github.com/apache/cordova-plugin-file-transfer
+Apache Cordova Plugin file,git://git.apache.org/cordova-plugin-file.git,https://github.com/apache/cordova-plugin-file
+Apache Cordova Plugin geolocation,git://git.apache.org/cordova-plugin-geolocation.git,https://github.com/apache/cordova-plugin-geolocation
+Apache Cordova Plugin globalization,git://git.apache.org/cordova-plugin-globalization.git,https://github.com/apache/cordova-plugin-globalization
+Apache Cordova Plugin inappbrowser,git://git.apache.org/cordova-plugin-inappbrowser.git,https://github.com/apache/cordova-plugin-inappbrowser
+Apache Cordova plugin legacy whitelist,git://git.apache.org/cordova-plugin-legacy-whitelist.git,https://github.com/apache/cordova-plugin-legacy-whitelist
+Apache Cordova Plugin media-capture,git://git.apache.org/cordova-plugin-media-capture.git,https://github.com/apache/cordova-plugin-media-capture
+Apache Cordova Plugin media,git://git.apache.org/cordova-plugin-media.git,https://github.com/apache/cordova-plugin-media
+Apache Cordova Plugin network-information,git://git.apache.org/cordova-plugin-network-information.git,https://github.com/apache/cordova-plugin-network-information
+Cordova Plugin Screen Orientation,git://git.apache.org/cordova-plugin-screen-orientation.git,https://github.com/apache/cordova-plugin-screen-orientation
+Apache Cordova Plugin splashscreen,git://git.apache.org/cordova-plugin-splashscreen.git,https://github.com/apache/cordova-plugin-splashscreen
+Apache Cordova,git://git.apache.org/cordova-plugin-statusbar.git,https://github.com/apache/cordova-plugin-statusbar
+Apache Cordova,git://git.apache.org/cordova-plugin-test-framework.git,https://github.com/apache/cordova-plugin-test-framework
+Apache Cordova Plugin vibration,git://git.apache.org/cordova-plugin-vibration.git,https://github.com/apache/cordova-plugin-vibration
+Apache Cordova plugin whitelist,git://git.apache.org/cordova-plugin-whitelist.git,https://github.com/apache/cordova-plugin-whitelist
+Apache Cordova wkwebview engine plugin,git://git.apache.org/cordova-plugin-wkwebview-engine.git,https://github.com/apache/cordova-plugin-wkwebview-engine
+Apache Cordova,git://git.apache.org/cordova-plugins.git,https://github.com/apache/cordova-plugins
+Apache Cordova Plugman,git://git.apache.org/cordova-plugman.git,https://github.com/apache/cordova-plugman
+Apache Cordova Qt,git://git.apache.org/cordova-qt.git,https://github.com/apache/cordova-qt
+Apache Cordova Registry Web,git://git.apache.org/cordova-registry-web.git,https://github.com/apache/cordova-registry-web
+Apache Cordova Registry,git://git.apache.org/cordova-registry.git,https://github.com/apache/cordova-registry
+Apache cordova serve,git://git.apache.org/cordova-serve.git,https://github.com/apache/cordova-serve
+Apache cordova template reference repo,git://git.apache.org/cordova-template-reference.git,https://github.com/apache/cordova-template-reference
+Apache cordova,git://git.apache.org/cordova-test-platform.git,https://github.com/apache/cordova-test-platform
+Apache Cordova Tizen,git://git.apache.org/cordova-tizen.git,https://github.com/apache/cordova-tizen
+Apache Cordova,git://git.apache.org/cordova-ubuntu.git,https://github.com/apache/cordova-ubuntu
+Apache Cordova webos,git://git.apache.org/cordova-webos.git,https://github.com/apache/cordova-webos
+Apache Weinre,git://git.apache.org/cordova-weinre.git,https://github.com/apache/cordova-weinre
+Apache Cordova wp7,git://git.apache.org/cordova-wp7.git,https://github.com/apache/cordova-wp7
+Apache Cordova WP8,git://git.apache.org/cordova-wp8.git,https://github.com/apache/cordova-wp8
+Apache CouchDB Project Admin,git://git.apache.org/couchdb-admin.git,https://github.com/apache/couchdb-admin
+Apache CouchDB,git://git.apache.org/couchdb-b64url.git,https://github.com/apache/couchdb-b64url
+Apache CouchDB,git://git.apache.org/couchdb-bear.git,https://github.com/apache/couchdb-bear
+Apache CouchDB,git://git.apache.org/couchdb-cassim.git,https://github.com/apache/couchdb-cassim
+Apache CouchDB,git://git.apache.org/couchdb-chttpd.git,https://github.com/apache/couchdb-chttpd
+Apache CouchDB CI,git://git.apache.org/couchdb-ci.git,https://github.com/apache/couchdb-ci
+Apache CouchDB,git://git.apache.org/couchdb-config.git,https://github.com/apache/couchdb-config
+Apache CouchDB,git://git.apache.org/couchdb-couch-collate.git,https://github.com/apache/couchdb-couch-collate
+Apache CouchDB,git://git.apache.org/couchdb-couch-dbupdates.git,https://github.com/apache/couchdb-couch-dbupdates
+Apache CouchDB Couch EPI,git://git.apache.org/couchdb-couch-epi.git,https://github.com/apache/couchdb-couch-epi
+Apache CouchDB,git://git.apache.org/couchdb-couch-event.git,https://github.com/apache/couchdb-couch-event
+Apache CouchDB,git://git.apache.org/couchdb-couch-httpd.git,https://github.com/apache/couchdb-couch-httpd
+Apache CouchDB,git://git.apache.org/couchdb-couch-index.git,https://github.com/apache/couchdb-couch-index
+Apache CouchDB - couch_log backend using Lager,git://git.apache.org/couchdb-couch-log-lager.git,https://github.com/apache/couchdb-couch-log-lager
+Apache CouchDB,git://git.apache.org/couchdb-couch-log.git,https://github.com/apache/couchdb-couch-log
+Apache CouchDB,git://git.apache.org/couchdb-couch-mrview.git,https://github.com/apache/couchdb-couch-mrview
+Apache CouchDB,git://git.apache.org/couchdb-couch-plugins.git,https://github.com/apache/couchdb-couch-plugins
+Apache CouchDB,git://git.apache.org/couchdb-couch-replicator.git,https://github.com/apache/couchdb-couch-replicator
+Apache CouchDB,git://git.apache.org/couchdb-couch-stats.git,https://github.com/apache/couchdb-couch-stats
+Apache CouchDB,git://git.apache.org/couchdb-couch.git,https://github.com/apache/couchdb-couch
+Apache CouchDB,git://git.apache.org/couchdb-ddoc-cache.git,https://github.com/apache/couchdb-ddoc-cache
+Apache CouchDB Erlang Tests,git://git.apache.org/couchdb-erlang-tests.git,https://github.com/apache/couchdb-erlang-tests
+Apache CouchDB,git://git.apache.org/couchdb-ets-lru.git,https://github.com/apache/couchdb-ets-lru
+Apache CouchDB,git://git.apache.org/couchdb-examples.git,https://github.com/apache/couchdb-examples
+Apache CouchDB,git://git.apache.org/couchdb-fabric.git,https://github.com/apache/couchdb-fabric
+Apache CouchDB Fauxton Server,git://git.apache.org/couchdb-fauxton-server.git,https://github.com/apache/couchdb-fauxton-server
+Apache CouchDB,git://git.apache.org/couchdb-folsom.git,https://github.com/apache/couchdb-folsom
+Apache CouchDB,git://git.apache.org/couchdb-futon.git,https://github.com/apache/couchdb-futon
+Apache CouchDB Glazier,git://git.apache.org/couchdb-glazier.git,https://github.com/apache/couchdb-glazier
+Apache CouchDB,git://git.apache.org/couchdb-global-changes.git,https://github.com/apache/couchdb-global-changes
+Apache CouchDB,git://git.apache.org/couchdb-goldrush.git,https://github.com/apache/couchdb-goldrush
+Apache CouchDB,git://git.apache.org/couchdb-ibrowse.git,https://github.com/apache/couchdb-ibrowse
+Apache CouchDB,git://git.apache.org/couchdb-ioq.git,https://github.com/apache/couchdb-ioq
+Apache CouchDB Javascript Tests,git://git.apache.org/couchdb-javascript-tests.git,https://github.com/apache/couchdb-javascript-tests
+Apache CouchDB,git://git.apache.org/couchdb-jiffy.git,https://github.com/apache/couchdb-jiffy
+Apache CouchDB,git://git.apache.org/couchdb-jquery-couch.git,https://github.com/apache/couchdb-jquery-couch
+Apache CouchDB,git://git.apache.org/couchdb-khash.git,https://github.com/apache/couchdb-khash
+Apache CouchDB,git://git.apache.org/couchdb-lager.git,https://github.com/apache/couchdb-lager
+Apache CouchDB Mango,git://git.apache.org/couchdb-mango.git,https://github.com/apache/couchdb-mango
+Apache CouchDB,git://git.apache.org/couchdb-meck.git,https://github.com/apache/couchdb-meck
+Apache CouchDB,git://git.apache.org/couchdb-mem3.git,https://github.com/apache/couchdb-mem3
+Apache CouchDB,git://git.apache.org/couchdb-mochiweb.git,https://github.com/apache/couchdb-mochiweb
+Apache CouchDB NMO,git://git.apache.org/couchdb-nmo.git,https://github.com/apache/couchdb-nmo
+Apache CouchDB,git://git.apache.org/couchdb-oauth.git,https://github.com/apache/couchdb-oauth
+Apache CouchDB peruser,git://git.apache.org/couchdb-peruser.git,https://github.com/apache/couchdb-peruser
+Apache CouchDB,git://git.apache.org/couchdb-query-server-node.git,https://github.com/apache/couchdb-query-server-node
+Apache CouchDB,git://git.apache.org/couchdb-query-server-spidermonkey.git,https://github.com/apache/couchdb-query-server-spidermonkey
+Apache CouchDB,git://git.apache.org/couchdb-rebar.git,https://github.com/apache/couchdb-rebar
+Apache CouchDB,git://git.apache.org/couchdb-rexi.git,https://github.com/apache/couchdb-rexi
+Apache CouchDB Setup,git://git.apache.org/couchdb-setup.git,https://github.com/apache/couchdb-setup
+Apache CouchDB,git://git.apache.org/couchdb-snappy.git,https://github.com/apache/couchdb-snappy
+Apache CouchDB,git://git.apache.org/couchdb-twig.git,https://github.com/apache/couchdb-twig
+Apache CouchDB Web Site,git://git.apache.org/couchdb-www.git,https://github.com/apache/couchdb-www
+Apache Creadur - RAT,git://git.apache.org/creadur-rat.git,https://github.com/apache/creadur-rat
+Apache creadur Site,git://git.apache.org/creadur-site.git,https://github.com/apache/creadur-site
+Apache Tentacles,git://git.apache.org/creadur-tentacles.git,https://github.com/apache/creadur-tentacles
+Apache Whisker,git://git.apache.org/creadur-whisker.git,https://github.com/apache/creadur-whisker
+Apache Crunch,git://git.apache.org/crunch.git,https://github.com/apache/crunch
+Apache Curator,git://git.apache.org/curator.git,https://github.com/apache/curator
+Apache CXF,git://git.apache.org/cxf-build-utils.git,https://github.com/apache/cxf-build-utils
+Apache CXF,git://git.apache.org/cxf-dosgi.git,https://github.com/apache/cxf-dosgi
+Apache CXF,git://git.apache.org/cxf-fediz.git,https://github.com/apache/cxf-fediz
+Apache CXF,git://git.apache.org/cxf-xjc-utils.git,https://github.com/apache/cxf-xjc-utils
+Apache CXF,git://git.apache.org/cxf.git,https://github.com/apache/cxf
+Apache DB DdlUtils,git://git.apache.org/ddlutils.git,https://github.com/apache/ddlutils
+Apache DeltaCloud,git://git.apache.org/deltacloud.git,https://github.com/apache/deltacloud
+Apache Deltaspike,git://git.apache.org/deltaspike.git,https://github.com/apache/deltaspike
+Apache Derby,git://git.apache.org/derby.git,https://github.com/apache/derby
+Apache Devicemap Browsermap,git://git.apache.org/devicemap-browsermap.git,https://github.com/apache/devicemap-browsermap
+Apache Directmemory - Lightning,git://git.apache.org/directmemory-lightning.git,https://github.com/apache/directmemory-lightning
+Apache DirectMemory,git://git.apache.org/directmemory.git,https://github.com/apache/directmemory
+Apache Directory Clients,git://git.apache.org/directory-clients.git,https://github.com/apache/directory-clients
+Apache Directory Daemon,git://git.apache.org/directory-daemon.git,https://github.com/apache/directory-daemon
+Apache Directory Fortress Commander,git://git.apache.org/directory-fortress-commander.git,https://github.com/apache/directory-fortress-commander
+Apache Directory Fortress Core,git://git.apache.org/directory-fortress-core.git,https://github.com/apache/directory-fortress-core
+Apache Directory Fortress Enmasse,git://git.apache.org/directory-fortress-enmasse.git,https://github.com/apache/directory-fortress-enmasse
+Apache Directory Fortress Realm,git://git.apache.org/directory-fortress-realm.git,https://github.com/apache/directory-fortress-realm
+Apache Directory Installers,git://git.apache.org/directory-installers.git,https://github.com/apache/directory-installers
+Apache Directory Kerby,git://git.apache.org/directory-kerby.git,https://github.com/apache/directory-kerby
+Apache Directory Project,git://git.apache.org/directory-project.git,https://github.com/apache/directory-project
+Apache Directory Samples,git://git.apache.org/directory-samples.git,https://github.com/apache/directory-samples
+Apache Directory Server,git://git.apache.org/directory-server.git,https://github.com/apache/directory-server
+Apache Directory Shared,git://git.apache.org/directory-shared.git,https://github.com/apache/directory-shared
+Apache Directory Skins,git://git.apache.org/directory-skins.git,https://github.com/apache/directory-skins
+Apache Directory Studio Plugin,git://git.apache.org/directory-studio-plugin.git,https://github.com/apache/directory-studio-plugin
+Apache Directory Studio,git://git.apache.org/directory-studio.git,https://github.com/apache/directory-studio
+Apache Drill Site,git://git.apache.org/drill-site.git,https://github.com/apache/drill-site
+Apache Drill (Incubating),git://git.apache.org/drill.git,https://github.com/apache/drill
+Apache Eagle,git://git.apache.org/eagle.git,https://github.com/apache/eagle
+Apache Empire-db,git://git.apache.org/empire-db.git,https://github.com/apache/empire-db
+Apache ESME (incubating),git://git.apache.org/esme.git,https://github.com/apache/esme
+Apache Etch (incubating),git://git.apache.org/etch.git,https://github.com/apache/etch
+Apache Falcon,git://git.apache.org/falcon.git,https://github.com/apache/falcon
+Apache Felix,git://git.apache.org/felix.git,https://github.com/apache/felix
+Apache Fineract Site,git://git.apache.org/fineract-site.git,https://github.com/apache/fineract-site
+Apache Fineract,git://git.apache.org/fineract.git,https://github.com/apache/fineract
+Apache Flex ASJS,git://git.apache.org/flex-asjs.git,https://github.com/apache/flex-asjs
+Apache Flex BlazeDS,git://git.apache.org/flex-blazeds.git,https://github.com/apache/flex-blazeds
+Apache Flex Examples,git://git.apache.org/flex-examples.git,https://github.com/apache/flex-examples
+Apache Flex External,git://git.apache.org/flex-external.git,https://github.com/apache/flex-external
+Apache Flex Falcon,git://git.apache.org/flex-falcon.git,https://github.com/apache/flex-falcon
+Apache Flex Flexunit,git://git.apache.org/flex-flexunit.git,https://github.com/apache/flex-flexunit
+Apache Flex SDK,git://git.apache.org/flex-sdk.git,https://github.com/apache/flex-sdk
+Apache Flex - Site (Incubating),git://git.apache.org/flex-site.git,https://github.com/apache/flex-site
+Apache Flex TLF,git://git.apache.org/flex-tlf.git,https://github.com/apache/flex-tlf
+Apache FlexJS 'Tour de FlexJS',git://git.apache.org/flex-tourjs.git,https://github.com/apache/flex-tourjs
+Apache Flex TypeDefs,git://git.apache.org/flex-typedefs.git,https://github.com/apache/flex-typedefs
+Apache Flex Utilities,git://git.apache.org/flex-utilities.git,https://github.com/apache/flex-utilities
+Apache Flex - Whiteboard (Incubating),git://git.apache.org/flex-whiteboard.git,https://github.com/apache/flex-whiteboard
+Apache Flink Libraries,git://git.apache.org/flink-libraries.git,https://github.com/apache/flink-libraries
+Apache Flink Website,git://git.apache.org/flink-web.git,https://github.com/apache/flink-web
+Apache Flink,git://git.apache.org/flink.git,https://github.com/apache/flink
+Apache Flood,git://git.apache.org/flood.git,https://github.com/apache/flood
+Apache Flume,git://git.apache.org/flume.git,https://github.com/apache/flume
+Apache FOP PDF Images,git://git.apache.org/fop-pdf-images.git,https://github.com/apache/fop-pdf-images
+Apache FOP,git://git.apache.org/fop.git,https://github.com/apache/fop
+Apache Forrest,git://git.apache.org/forrest.git,https://github.com/apache/forrest
+Apache FtpServer,git://git.apache.org/ftpserver.git,https://github.com/apache/ftpserver
+Apache Geode Examples,git://git.apache.org/geode-examples.git,https://github.com/apache/geode-examples
+Apache Geode native components,git://git.apache.org/geode-native.git,https://github.com/apache/geode-native
+Apache Geode website content,git://git.apache.org/geode-site.git,https://github.com/apache/geode-site
+Apache Geode,git://git.apache.org/geode.git,https://github.com/apache/geode
+Apache Geronimo Config,git://git.apache.org/geronimo-config.git,https://github.com/apache/geronimo-config
+Apache Geronimo Devtools,git://git.apache.org/geronimo-devtools.git,https://github.com/apache/geronimo-devtools
+Apache Geronimo genesis,git://git.apache.org/geronimo-genesis.git,https://github.com/apache/geronimo-genesis
+Apache Geronimo gshell,git://git.apache.org/geronimo-gshell.git,https://github.com/apache/geronimo-gshell
+Apache Geronimo jaspi,git://git.apache.org/geronimo-jaspi.git,https://github.com/apache/geronimo-jaspi
+Apache Geronimo javamail,git://git.apache.org/geronimo-javamail.git,https://github.com/apache/geronimo-javamail
+Apache Geronimo Schema j2ee 1.4,git://git.apache.org/geronimo-schema-14.git,https://github.com/apache/geronimo-schema-14
+Apache Geronimo Schema Java EE 5,git://git.apache.org/geronimo-schema-5.git,https://github.com/apache/geronimo-schema-5
+Apache Geronimo Schema Java EE 6,git://git.apache.org/geronimo-schema-6.git,https://github.com/apache/geronimo-schema-6
+Apache Geronimo specs,git://git.apache.org/geronimo-specs.git,https://github.com/apache/geronimo-specs
+Apache Geronimo txmanager,git://git.apache.org/geronimo-txmanager.git,https://github.com/apache/geronimo-txmanager
+Apache Geronimo xbean,git://git.apache.org/geronimo-xbean.git,https://github.com/apache/geronimo-xbean
+Apache Geronimo Yoko,git://git.apache.org/geronimo-yoko.git,https://github.com/apache/geronimo-yoko
+Apache Geronimo,git://git.apache.org/geronimo.git,https://github.com/apache/geronimo
+Apache Giraph,git://git.apache.org/giraph.git,https://github.com/apache/giraph
+Apache Gora,git://git.apache.org/gora.git,https://github.com/apache/gora
+Apache Groovy developer documentation and project site,git://git.apache.org/groovy-dev-site.git,https://github.com/apache/groovy-dev-site
+Apache groovy,git://git.apache.org/groovy-release.git,https://github.com/apache/groovy-release
+Apache Groovy user documentation,git://git.apache.org/groovy-user-site.git,https://github.com/apache/groovy-user-site
+Apache Groovy,git://git.apache.org/groovy.git,https://github.com/apache/groovy
+Apache Hadoop common,git://git.apache.org/hadoop-common.git,https://github.com/apache/hadoop-common
+Apache Hadoop HDFS,git://git.apache.org/hadoop-hdfs.git,https://github.com/apache/hadoop-hdfs
+Apache Hadoop MapReduce,git://git.apache.org/hadoop-mapreduce.git,https://github.com/apache/hadoop-mapreduce
+Apache Hadoop,git://git.apache.org/hadoop.git,https://github.com/apache/hadoop
+Apache Hama,git://git.apache.org/hama.git,https://github.com/apache/hama
+Apache Harmony,git://git.apache.org/harmony.git,https://github.com/apache/harmony
+Apache HBase Third Party Libs,git://git.apache.org/hbase-thirdparty.git,https://github.com/apache/hbase-thirdparty
+Apache HBase,git://git.apache.org/hbase.git,https://github.com/apache/hbase
+Apache HCatalog,git://git.apache.org/hcatalog.git,https://github.com/apache/hcatalog
+Apache Helix,git://git.apache.org/helix.git,https://github.com/apache/helix
+Apache Hive,git://git.apache.org/hive.git,https://github.com/apache/hive
+Apache HttpComponents HttpAsyncClient,git://git.apache.org/httpasyncclient.git,https://github.com/apache/httpasyncclient
+Apache HttpClient,git://git.apache.org/httpcomponents-client.git,https://github.com/apache/httpcomponents-client
+Apache HttpComponents HttpCore,git://git.apache.org/httpcomponents-core.git,https://github.com/apache/httpcomponents-core
+Apache HttpComponents Parent Project,git://git.apache.org/httpcomponents-parent.git,https://github.com/apache/httpcomponents-parent
+Apache HttpComponents Style Check Resources,git://git.apache.org/httpcomponents-stylecheck.git,https://github.com/apache/httpcomponents-stylecheck
+Apache HttpComponents Website,git://git.apache.org/httpcomponents-website.git,https://github.com/apache/httpcomponents-website
+Apache HTTPD Docs Build,git://git.apache.org/httpd-docs-build.git,https://github.com/apache/httpd-docs-build
+Apache HTTP Server,git://git.apache.org/httpd.git,https://github.com/apache/httpd
+IAM PoC,git://git.apache.org/iampoc.git,https://github.com/apache/iampoc
+Apache Ignite (Incubating),git://git.apache.org/ignite.git,https://github.com/apache/ignite
+Apache Airflow (Incubating),git://git.apache.org/incubator-airflow.git,https://github.com/apache/incubator-airflow
+Apache ariatosca (Incubating),git://git.apache.org/incubator-ariatosca-website.git,https://github.com/apache/incubator-ariatosca-website
+Apache incubator,git://git.apache.org/incubator-ariatosca.git,https://github.com/apache/incubator-ariatosca
+Apache AsterixDB Hyracks (Incubating),git://git.apache.org/incubator-asterixdb-hyracks.git,https://github.com/apache/incubator-asterixdb-hyracks
+Apache BatchEE,git://git.apache.org/incubator-batchee.git,https://github.com/apache/incubator-batchee
+Apache Blur,git://git.apache.org/incubator-blur.git,https://github.com/apache/incubator-blur
+Apache Brooklyn,git://git.apache.org/incubator-brooklyn-site.git,https://github.com/apache/incubator-brooklyn-site
+Apache Brooklyn,git://git.apache.org/incubator-brooklyn.git,https://github.com/apache/incubator-brooklyn
+Apache Concerted (Incubating),git://git.apache.org/incubator-concerted.git,https://github.com/apache/incubator-concerted
+Apache Corinthia (Incubating),git://git.apache.org/incubator-corinthia.git,https://github.com/apache/incubator-corinthia
+Apache Cotton,git://git.apache.org/incubator-cotton.git,https://github.com/apache/incubator-cotton
+Apache DataFu,git://git.apache.org/incubator-datafu.git,https://github.com/apache/incubator-datafu
+Apache Edgent site (Incubating),git://git.apache.org/incubator-edgent-website.git,https://github.com/apache/incubator-edgent-website
+Apache Edgent (Incubating),git://git.apache.org/incubator-edgent.git,https://github.com/apache/incubator-edgent
+Apache Freemarker docgen (Incubating),git://git.apache.org/incubator-freemarker-docgen.git,https://github.com/apache/incubator-freemarker-docgen
+Apache FreeMarker (Incubating) Online Tester,git://git.apache.org/incubator-freemarker-online-tester.git,https://github.com/apache/incubator-freemarker-online-tester
+Apache Freemarker site (Incubating),git://git.apache.org/incubator-freemarker-site.git,https://github.com/apache/incubator-freemarker-site
+Apache Freemarker (Incubating),git://git.apache.org/incubator-freemarker.git,https://github.com/apache/incubator-freemarker
+Apache Gearpump (Incubating) Site,git://git.apache.org/incubator-gearpump-site.git,https://github.com/apache/incubator-gearpump-site
+Apache Gearpump (Incubating),git://git.apache.org/incubator-gearpump.git,https://github.com/apache/incubator-gearpump
+Apache gobblin (Incubating),git://git.apache.org/incubator-gobblin-site.git,https://github.com/apache/incubator-gobblin-site
+Apache Gobblin (Incubating),git://git.apache.org/incubator-gobblin.git,https://github.com/apache/incubator-gobblin
+Apache Gossip Incubator,git://git.apache.org/incubator-gossip.git,https://github.com/apache/incubator-gossip
+Apache griffin (Incubating),git://git.apache.org/incubator-griffin-site.git,https://github.com/apache/incubator-griffin-site
+Apache griffin (Incubating),git://git.apache.org/incubator-griffin.git,https://github.com/apache/incubator-griffin
+Apache Guacamole Client (Incubating),git://git.apache.org/incubator-guacamole-client.git,https://github.com/apache/incubator-guacamole-client
+Apache Guacamole Manual (Incubating),git://git.apache.org/incubator-guacamole-manual.git,https://github.com/apache/incubator-guacamole-manual
+Apache Guacamole Server (Incubating),git://git.apache.org/incubator-guacamole-server.git,https://github.com/apache/incubator-guacamole-server
+Apache Guacamole Website Incubator,git://git.apache.org/incubator-guacamole-website.git,https://github.com/apache/incubator-guacamole-website
+Apache HAWQ Documentation (Incubating),git://git.apache.org/incubator-hawq-docs.git,https://github.com/apache/incubator-hawq-docs
+Apache Hawq site (Incubating),git://git.apache.org/incubator-hawq-site.git,https://github.com/apache/incubator-hawq-site
+Apache HAWQ (Incubating),git://git.apache.org/incubator-hawq.git,https://github.com/apache/incubator-hawq
+Apache HDT (Incubating),git://git.apache.org/incubator-hdt.git,https://github.com/apache/incubator-hdt
+Apache Hivemall (incubating) Website,git://git.apache.org/incubator-hivemall-site.git,https://github.com/apache/incubator-hivemall-site
+Apache Hivemall (incubating),git://git.apache.org/incubator-hivemall.git,https://github.com/apache/incubator-hivemall
+Apache Horn site (Incubating),git://git.apache.org/incubator-horn-site.git,https://github.com/apache/incubator-horn-site
+Apache Horn (Incubating),git://git.apache.org/incubator-horn.git,https://github.com/apache/incubator-horn
+Apache HTrace (Incubating),git://git.apache.org/incubator-htrace.git,https://github.com/apache/incubator-htrace
+Apache Impala Incubator,git://git.apache.org/incubator-impala.git,https://github.com/apache/incubator-impala
+Apache Iota site (Incubating),git://git.apache.org/incubator-iota-site.git,https://github.com/apache/incubator-iota-site
+Apache Iota (Incubating),git://git.apache.org/incubator-iota.git,https://github.com/apache/incubator-iota
+Apache Joshua (Incubating),git://git.apache.org/incubator-joshua.git,https://github.com/apache/incubator-joshua
+Apache Juneau (Incubating) Web Site,git://git.apache.org/incubator-juneau-website.git,https://github.com/apache/incubator-juneau-website
+Apache Juneau (Incubating),git://git.apache.org/incubator-juneau.git,https://github.com/apache/incubator-juneau
+Apache livy (Incubating),git://git.apache.org/incubator-livy-website.git,https://github.com/apache/incubator-livy-website
+Apache livy (Incubating),git://git.apache.org/incubator-livy.git,https://github.com/apache/incubator-livy
+Apache MADlib site (Incubating),git://git.apache.org/incubator-madlib-site.git,https://github.com/apache/incubator-madlib-site
+Apache MADlib (Incubating),git://git.apache.org/incubator-madlib.git,https://github.com/apache/incubator-madlib
+Apache milagro (Incubating),git://git.apache.org/incubator-milagro-crypto-c.git,https://github.com/apache/incubator-milagro-crypto-c
+Apache Milagro Crypto Incubator,git://git.apache.org/incubator-milagro-crypto.git,https://github.com/apache/incubator-milagro-crypto
+Apache Milagro MFA JS Client Incubator,git://git.apache.org/incubator-milagro-mfa-js-client.git,https://github.com/apache/incubator-milagro-mfa-js-client
+Apache Milagro MFA JS Lib Incubator,git://git.apache.org/incubator-milagro-mfa-js-lib.git,https://github.com/apache/incubator-milagro-mfa-js-lib
+Apache Milagro SDK Android Incubator,git://git.apache.org/incubator-milagro-mfa-sdk-android.git,https://github.com/apache/incubator-milagro-mfa-sdk-android
+Apache Milagro MFA SDK Core Incubator,git://git.apache.org/incubator-milagro-mfa-sdk-core.git,https://github.com/apache/incubator-milagro-mfa-sdk-core
+Apache Milagro MFA SDK IOS Incubator,git://git.apache.org/incubator-milagro-mfa-sdk-ios.git,https://github.com/apache/incubator-milagro-mfa-sdk-ios
+Apache Milagro MFA SDK WP Incubator,git://git.apache.org/incubator-milagro-mfa-sdk-wp.git,https://github.com/apache/incubator-milagro-mfa-sdk-wp
+Apache Milagro MFA Server Incubator,git://git.apache.org/incubator-milagro-mfa-server.git,https://github.com/apache/incubator-milagro-mfa-server
+Apache Milagro MFA TLS Incubator,git://git.apache.org/incubator-milagro-tls.git,https://github.com/apache/incubator-milagro-tls
+Apache Milagro (Incubating),git://git.apache.org/incubator-milagro.git,https://github.com/apache/incubator-milagro
+Apache Mnemonic (Incubating),git://git.apache.org/incubator-mnemonic.git,https://github.com/apache/incubator-mnemonic
+Apache MRQL (Incubating),git://git.apache.org/incubator-mrql.git,https://github.com/apache/incubator-mrql
+Apache Myriad (Incubating),git://git.apache.org/incubator-myriad.git,https://github.com/apache/incubator-myriad
+Apache NetBeans (incubating) temporary repository,git://git.apache.org/incubator-netbeans-temp.git,https://github.com/apache/incubator-netbeans-temp
+Apache NetBeans (Incubating) Website,git://git.apache.org/incubator-netbeans-website.git,https://github.com/apache/incubator-netbeans-website
+Apache Omid Incubator,git://git.apache.org/incubator-omid.git,https://github.com/apache/incubator-omid
+Apache OpenAZ (Incubating) Site,git://git.apache.org/incubator-openaz-site.git,https://github.com/apache/incubator-openaz-site
+Apache OpenAZ (Incubating),git://git.apache.org/incubator-openaz.git,https://github.com/apache/incubator-openaz
+Apache Optiq,git://git.apache.org/incubator-optiq-csv.git,https://github.com/apache/incubator-optiq-csv
+Apache Optiq,git://git.apache.org/incubator-optiq-linq4j.git,https://github.com/apache/incubator-optiq-linq4j
+Apache Pirk (Incubating),git://git.apache.org/incubator-pirk.git,https://github.com/apache/incubator-pirk
+Apache Pony Mail (Incubating) Site,git://git.apache.org/incubator-ponymail-site.git,https://github.com/apache/incubator-ponymail-site
+Apache Pony Mail (Incubating),git://git.apache.org/incubator-ponymail.git,https://github.com/apache/incubator-ponymail
+Apache PredictionIO SDK Java Incubator,git://git.apache.org/incubator-predictionio-sdk-java.git,https://github.com/apache/incubator-predictionio-sdk-java
+Apache PredictionIO SDK PHP Incubator,git://git.apache.org/incubator-predictionio-sdk-php.git,https://github.com/apache/incubator-predictionio-sdk-php
+Apache PredictionIO SDK Python Incubator,git://git.apache.org/incubator-predictionio-sdk-python.git,https://github.com/apache/incubator-predictionio-sdk-python
+Apache PredictionIO SDK Ruby Incubator,git://git.apache.org/incubator-predictionio-sdk-ruby.git,https://github.com/apache/incubator-predictionio-sdk-ruby
+Apache PredictionIO SDK Swift Incubator,git://git.apache.org/incubator-predictionio-sdk-swift.git,https://github.com/apache/incubator-predictionio-sdk-swift
+Apache PredictionIO Template Attribute Based Classifier Incubator,git://git.apache.org/incubator-predictionio-template-attribute-based-classifier.git,https://github.com/apache/incubator-predictionio-template-attribute-based-classifier
+Apache PredictionIO Template Ecommerce Recommender Incubator,git://git.apache.org/incubator-predictionio-template-ecom-recommender.git,https://github.com/apache/incubator-predictionio-template-ecom-recommender
+Apache PredictionIO Template Java Ecommerce Recommender Incubator,git://git.apache.org/incubator-predictionio-template-java-ecom-recommender.git,https://github.com/apache/incubator-predictionio-template-java-ecom-recommender
+Apache PredictionIO Template Recommender Incubator,git://git.apache.org/incubator-predictionio-template-recommender.git,https://github.com/apache/incubator-predictionio-template-recommender
+Apache PredictionIO Template Similar Product Incubator,git://git.apache.org/incubator-predictionio-template-similar-product.git,https://github.com/apache/incubator-predictionio-template-similar-product
+Apache PredictionIO Template Skeleton Incubator,git://git.apache.org/incubator-predictionio-template-skeleton.git,https://github.com/apache/incubator-predictionio-template-skeleton
+Apache PredictionIO Template Text Classifier Incubator,git://git.apache.org/incubator-predictionio-template-text-classifier.git,https://github.com/apache/incubator-predictionio-template-text-classifier
+Apache PredictionIO (Incubating),git://git.apache.org/incubator-predictionio.git,https://github.com/apache/incubator-predictionio
+Apache Provisionr (Incubating),git://git.apache.org/incubator-provisionr.git,https://github.com/apache/incubator-provisionr
+Apache Quickstep Site Incubator,git://git.apache.org/incubator-quickstep-site.git,https://github.com/apache/incubator-quickstep-site
+Apache Quickstep Incubator,git://git.apache.org/incubator-quickstep.git,https://github.com/apache/incubator-quickstep
+Apache Ratis (Incubating),git://git.apache.org/incubator-ratis.git,https://github.com/apache/incubator-ratis
+Apache Ripple,git://git.apache.org/incubator-ripple.git,https://github.com/apache/incubator-ripple
+Apache RocketMQ (Incubating),git://git.apache.org/incubator-rocketmq-externals.git,https://github.com/apache/incubator-rocketmq-externals
+RocketMQ site,git://git.apache.org/incubator-rocketmq-site.git,https://github.com/apache/incubator-rocketmq-site
+Apache RocketMQ,git://git.apache.org/incubator-rocketmq.git,https://github.com/apache/incubator-rocketmq
+Apache Rya Site (Incubating),git://git.apache.org/incubator-rya-site.git,https://github.com/apache/incubator-rya-site
+Apache Rya (Incubating),git://git.apache.org/incubator-rya.git,https://github.com/apache/incubator-rya
+Apache S2Graph (Incubating),git://git.apache.org/incubator-s2graph.git,https://github.com/apache/incubator-s2graph
+Apache S4,git://git.apache.org/incubator-s4.git,https://github.com/apache/incubator-s4
+Apache Samoa (Incubating),git://git.apache.org/incubator-samoa.git,https://github.com/apache/incubator-samoa
+Apache SensSoft Distill (Incubating),git://git.apache.org/incubator-senssoft-distill.git,https://github.com/apache/incubator-senssoft-distill
+Apache SensSoft Stout (Incubating),git://git.apache.org/incubator-senssoft-stout.git,https://github.com/apache/incubator-senssoft-stout
+Apache SensSoft Tap (Incubating),git://git.apache.org/incubator-senssoft-tap.git,https://github.com/apache/incubator-senssoft-tap
+Apache SensSoft User Ale (Incubating),git://git.apache.org/incubator-senssoft-user-ale.git,https://github.com/apache/incubator-senssoft-user-ale
+Apache SensSoft User Ale PyQT5 (Incubating),git://git.apache.org/incubator-senssoft-userale-pyqt5.git,https://github.com/apache/incubator-senssoft-userale-pyqt5
+Apache SensSoft User Ale JS (Incubating),git://git.apache.org/incubator-senssoft-useralejs.git,https://github.com/apache/incubator-senssoft-useralejs
+Apache senssoft (Incubating) parent project repos,git://git.apache.org/incubator-senssoft.git,https://github.com/apache/incubator-senssoft
+Apache Sentry,git://git.apache.org/incubator-sentry.git,https://github.com/apache/incubator-sentry
+Apache Singa (Incubating),git://git.apache.org/incubator-singa.git,https://github.com/apache/incubator-singa
+Apache Slider,git://git.apache.org/incubator-slider.git,https://github.com/apache/incubator-slider
+Apache Spot,git://git.apache.org/incubator-spot.git,https://github.com/apache/incubator-spot
+Apache superset (Incubating) website,git://git.apache.org/incubator-superset-site.git,https://github.com/apache/incubator-superset-site
+Apache Superset (Incubating),git://git.apache.org/incubator-superset.git,https://github.com/apache/incubator-superset
+Apache Tamaya (incubating) Extensions,git://git.apache.org/incubator-tamaya-extensions.git,https://github.com/apache/incubator-tamaya-extensions
+Apache Tamaya (incubating) Sandbox,git://git.apache.org/incubator-tamaya-sandbox.git,https://github.com/apache/incubator-tamaya-sandbox
+Apache incubator Tamaya Website,git://git.apache.org/incubator-tamaya-site.git,https://github.com/apache/incubator-tamaya-site
+Apache Tamaya,git://git.apache.org/incubator-tamaya.git,https://github.com/apache/incubator-tamaya
+Apache Taverna Commandline (incubating),git://git.apache.org/incubator-taverna-commandline.git,https://github.com/apache/incubator-taverna-commandline
+Apache Taverna Common Activities (incubating),git://git.apache.org/incubator-taverna-common-activities.git,https://github.com/apache/incubator-taverna-common-activities
+Apache Taverna Databundle Viewer (Incubating),git://git.apache.org/incubator-taverna-databundle-viewer.git,https://github.com/apache/incubator-taverna-databundle-viewer
+Apache Taverna Engine (incubating),git://git.apache.org/incubator-taverna-engine.git,https://github.com/apache/incubator-taverna-engine
+Apache Taverna Language (incubating),git://git.apache.org/incubator-taverna-language.git,https://github.com/apache/incubator-taverna-language
+Apache Taverna Maven Parent (incubating),git://git.apache.org/incubator-taverna-maven-parent.git,https://github.com/apache/incubator-taverna-maven-parent
+Apache Taverna Mobile (Incubating),git://git.apache.org/incubator-taverna-mobile.git,https://github.com/apache/incubator-taverna-mobile
+Apache Taverna Osgi (incubating),git://git.apache.org/incubator-taverna-osgi.git,https://github.com/apache/incubator-taverna-osgi
+Apache Taverna Plugin Bioinformatics (incubating),git://git.apache.org/incubator-taverna-plugin-bioinformatics.git,https://github.com/apache/incubator-taverna-plugin-bioinformatics
+Apache Taverna Plugin Component (incubating),git://git.apache.org/incubator-taverna-plugin-component.git,https://github.com/apache/incubator-taverna-plugin-component
+Apache Taverna Plugin GIS Incubator,git://git.apache.org/incubator-taverna-plugin-gis.git,https://github.com/apache/incubator-taverna-plugin-gis
+Apache Taverna Server (incubating),git://git.apache.org/incubator-taverna-server.git,https://github.com/apache/incubator-taverna-server
+Apache Taverna (Incubating) Web Site,git://git.apache.org/incubator-taverna-site.git,https://github.com/apache/incubator-taverna-site
+Apache Taverna Workbench Common Activities (incubating),git://git.apache.org/incubator-taverna-workbench-common-activities.git,https://github.com/apache/incubator-taverna-workbench-common-activities
+Apache Taverna Workbench Product (incubating),git://git.apache.org/incubator-taverna-workbench-product.git,https://github.com/apache/incubator-taverna-workbench-product
+Apache Taverna Workbench (incubating),git://git.apache.org/incubator-taverna-workbench.git,https://github.com/apache/incubator-taverna-workbench
+Apache Tephra (Incubating),git://git.apache.org/incubator-tephra.git,https://github.com/apache/incubator-tephra
+Apache Toree website (Incubating),git://git.apache.org/incubator-toree-website.git,https://github.com/apache/incubator-toree-website
+Apache Toree (Incubating),git://git.apache.org/incubator-toree.git,https://github.com/apache/incubator-toree
+Apache Traffic Control (incubating),git://git.apache.org/incubator-trafficcontrol.git,https://github.com/apache/incubator-trafficcontrol
+Apache Trafodion (Incubating),git://git.apache.org/incubator-trafodion.git,https://github.com/apache/incubator-trafodion
+Apache Twill,git://git.apache.org/incubator-twill.git,https://github.com/apache/incubator-twill
+Apache Unomi (Incubating),git://git.apache.org/incubator-unomi.git,https://github.com/apache/incubator-unomi
+Apache Wave Android (Incubating),git://git.apache.org/incubator-wave-android.git,https://github.com/apache/incubator-wave-android
+Apache Wave Docs (Incubating),git://git.apache.org/incubator-wave-docs.git,https://github.com/apache/incubator-wave-docs
+Apache Wave,git://git.apache.org/incubator-wave.git,https://github.com/apache/incubator-wave
+Apache Weex (Incubating),git://git.apache.org/incubator-weex-site.git,https://github.com/apache/incubator-weex-site
+Apache Weex,git://git.apache.org/incubator-weex.git,https://github.com/apache/incubator-weex
+Apache incubator,git://git.apache.org/incubator.git,https://github.com/apache/incubator
+Apache Infrastructure Docker,git://git.apache.org/infrastructure-docker.git,https://github.com/apache/infrastructure-docker
+Apache Infrastructure Mergebot Test,git://git.apache.org/infrastructure-mergebot-test.git,https://github.com/apache/infrastructure-mergebot-test
+Apache Infrastructre packer templates,git://git.apache.org/infrastructure-packer.git,https://github.com/apache/infrastructure-packer
+Apache Infrastructure Puppet Kitchen,git://git.apache.org/infrastructure-puppet-kitchen.git,https://github.com/apache/infrastructure-puppet-kitchen
+Apache Infrastructure Whimsy,git://git.apache.org/infrastructure-whimsy.git,https://github.com/apache/infrastructure-whimsy
+Apache Isis,git://git.apache.org/isis.git,https://github.com/apache/isis
+Apache Jackrabbit FileVault,git://git.apache.org/jackrabbit-filevault.git,https://github.com/apache/jackrabbit-filevault
+Apache Jackrabbit Oak,git://git.apache.org/jackrabbit-oak.git,https://github.com/apache/jackrabbit-oak
+Apache Jackrabbit OCM,git://git.apache.org/jackrabbit-ocm.git,https://github.com/apache/jackrabbit-ocm
+Apache Jackrabbit,git://git.apache.org/jackrabbit.git,https://github.com/apache/jackrabbit
+Apache James hupa,git://git.apache.org/james-hupa.git,https://github.com/apache/james-hupa
+Apache James jdkim,git://git.apache.org/james-jdkim.git,https://github.com/apache/james-jdkim
+Apache James jsieve,git://git.apache.org/james-jsieve.git,https://github.com/apache/james-jsieve
+Apache James jspf,git://git.apache.org/james-jspf.git,https://github.com/apache/james-jspf
+Apache James mime4j,git://git.apache.org/james-mime4j.git,https://github.com/apache/james-mime4j
+Apache James postage,git://git.apache.org/james-postage.git,https://github.com/apache/james-postage
+Apache James project,git://git.apache.org/james-project.git,https://github.com/apache/james-project
+Apache jclouds,git://git.apache.org/jclouds.git,https://github.com/apache/jclouds
+Apache Jena,git://git.apache.org/jena.git,https://github.com/apache/jena
+Apache JMeter,git://git.apache.org/jmeter.git,https://github.com/apache/jmeter
+Apache Johnzon,git://git.apache.org/johnzon.git,https://github.com/apache/johnzon
+Apache JSPWiki ASF related docs,git://git.apache.org/jspwiki-asf-docs.git,https://github.com/apache/jspwiki-asf-docs
+Apache JSPWiki CMS site,git://git.apache.org/jspwiki-site.git,https://github.com/apache/jspwiki-site
+Apache JSPWiki,git://git.apache.org/jspwiki.git,https://github.com/apache/jspwiki
+Apache jUDDI,git://git.apache.org/juddi-scout.git,https://github.com/apache/juddi-scout
+Apache jUDDI,git://git.apache.org/juddi-styles.git,https://github.com/apache/juddi-styles
+Apache jUDDI,git://git.apache.org/juddi.git,https://github.com/apache/juddi
+Apache Kafka site,git://git.apache.org/kafka-site.git,https://github.com/apache/kafka-site
+Apache Kafka,git://git.apache.org/kafka.git,https://github.com/apache/kafka
+Apache Kalument (Incubating),git://git.apache.org/kalumet.git,https://github.com/apache/kalumet
+Apache Kandula,git://git.apache.org/kandula.git,https://github.com/apache/kandula
+Apache Karaf Boot,git://git.apache.org/karaf-boot.git,https://github.com/apache/karaf-boot
+Apache Karaf,git://git.apache.org/karaf-cave.git,https://github.com/apache/karaf-cave
+Apache Karaf,git://git.apache.org/karaf-cellar.git,https://github.com/apache/karaf-cellar
+Apache Karaf Decanter,git://git.apache.org/karaf-decanter.git,https://github.com/apache/karaf-decanter
+Apache Karaf,git://git.apache.org/karaf-eik.git,https://github.com/apache/karaf-eik
+Apache Karaf Site,git://git.apache.org/karaf-site.git,https://github.com/apache/karaf-site
+Apache Karaf,git://git.apache.org/karaf-webconsole.git,https://github.com/apache/karaf-webconsole
+Apache Karaf,git://git.apache.org/karaf.git,https://github.com/apache/karaf
+Apache Knox,git://git.apache.org/knox.git,https://github.com/apache/knox
+Apache Kudu,git://git.apache.org/kudu.git,https://github.com/apache/kudu
+Apache Kylin,git://git.apache.org/kylin.git,https://github.com/apache/kylin
+Apache Lens,git://git.apache.org/lens.git,https://github.com/apache/lens
+Apache Lenya,git://git.apache.org/lenya.git,https://github.com/apache/lenya
+Apache Libcloud,git://git.apache.org/libcloud.git,https://github.com/apache/libcloud
+Apache log4j component,git://git.apache.org/log4j-component.git,https://github.com/apache/log4j-component
+Apache log4j extras,git://git.apache.org/log4j-extras.git,https://github.com/apache/log4j-extras
+Apache log4j receivers,git://git.apache.org/log4j-receivers.git,https://github.com/apache/log4j-receivers
+Apache log4j zeroconf,git://git.apache.org/log4j-zeroconf.git,https://github.com/apache/log4j-zeroconf
+Apache log4j,git://git.apache.org/log4j.git,https://github.com/apache/log4j
+Apache Chainsaw,git://git.apache.org/logging-chainsaw.git,https://github.com/apache/logging-chainsaw
+Apache log4cxx,git://git.apache.org/logging-log4cxx.git,https://github.com/apache/logging-log4cxx
+Apache Log4j Audit Logging,git://git.apache.org/logging-log4j-audit.git,https://github.com/apache/logging-log4j-audit
+Apache Log4j Boot,git://git.apache.org/logging-log4j-boot.git,https://github.com/apache/logging-log4j-boot
+Apache Log4j Kotlin,git://git.apache.org/logging-log4j-kotlin.git,https://github.com/apache/logging-log4j-kotlin
+Apache Log4j Extra Plugins,git://git.apache.org/logging-log4j-plugins.git,https://github.com/apache/logging-log4j-plugins
+Apache Log4j Scala support,git://git.apache.org/logging-log4j-scala.git,https://github.com/apache/logging-log4j-scala
+Apache Log4j Tools,git://git.apache.org/logging-log4j-tools.git,https://github.com/apache/logging-log4j-tools
+Apache Logging Log4j2,git://git.apache.org/logging-log4j2.git,https://github.com/apache/logging-log4j2
+This is the Apache log4net logging project git repository.,git://git.apache.org/logging-log4net.git,https://github.com/apache/logging-log4net
+Apache log4php,git://git.apache.org/logging-log4php.git,https://github.com/apache/logging-log4php
+Apache Logging Services Parent POM,git://git.apache.org/logging-parent.git,https://github.com/apache/logging-parent
+Apache Lucene + Solr,git://git.apache.org/lucene-solr.git,https://github.com/apache/lucene-solr
+Apache Lucene.Net,git://git.apache.org/lucenenet.git,https://github.com/apache/lucenenet
+Apache Lucy - Charmonizer,git://git.apache.org/lucy-charmonizer.git,https://github.com/apache/lucy-charmonizer
+Apache Lucy - Clownfish,git://git.apache.org/lucy-clownfish.git,https://github.com/apache/lucy-clownfish
+Apache Lucy,git://git.apache.org/lucy.git,https://github.com/apache/lucy
+Apache Mahout,git://git.apache.org/mahout.git,https://github.com/apache/mahout
+Apache ManifoldCF Sharepoint 2007 Integration,git://git.apache.org/manifoldcf-integration-sharepoint-2007.git,https://github.com/apache/manifoldcf-integration-sharepoint-2007
+Apache ManifoldCF Sharepoint 2010 Integration,git://git.apache.org/manifoldcf-integration-sharepoint-2010.git,https://github.com/apache/manifoldcf-integration-sharepoint-2010
+Apache ManifoldCF solr-3.x Integration,git://git.apache.org/manifoldcf-integration-solr-3.x.git,https://github.com/apache/manifoldcf-integration-solr-3.x
+Apache ManifoldCF solr-4.x Integration,git://git.apache.org/manifoldcf-integration-solr-4.x.git,https://github.com/apache/manifoldcf-integration-solr-4.x
+Apache ManifoldCF,git://git.apache.org/manifoldcf.git,https://github.com/apache/manifoldcf
+Apache Marmotta,git://git.apache.org/marmotta.git,https://github.com/apache/marmotta
+Apache Maven 2,git://git.apache.org/maven-2.git,https://github.com/apache/maven-2
+Apache Maven ant tasks,git://git.apache.org/maven-ant-tasks.git,https://github.com/apache/maven-ant-tasks
+Apache Maven App Engine,git://git.apache.org/maven-app-engine.git,https://github.com/apache/maven-app-engine
+Apache Maven Archetype,git://git.apache.org/maven-archetype.git,https://github.com/apache/maven-archetype
+Apache Maven Doxia sitetools,git://git.apache.org/maven-doxia-sitetools.git,https://github.com/apache/maven-doxia-sitetools
+Apache Maven Doxia tools,git://git.apache.org/maven-doxia-tools.git,https://github.com/apache/maven-doxia-tools
+Apache Maven Doxia,git://git.apache.org/maven-doxia.git,https://github.com/apache/maven-doxia
+Apache Maven enforcer,git://git.apache.org/maven-enforcer.git,https://github.com/apache/maven-enforcer
+Apache Maven Indexer,git://git.apache.org/maven-indexer.git,https://github.com/apache/maven-indexer
+Apache Maven Integration Testing,git://git.apache.org/maven-integration-testing.git,https://github.com/apache/maven-integration-testing
+Apache Maven jxr,git://git.apache.org/maven-jxr.git,https://github.com/apache/maven-jxr
+Apache Maven mercury,git://git.apache.org/maven-mercury.git,https://github.com/apache/maven-mercury
+Apache Maven Plugin Testing,git://git.apache.org/maven-plugin-testing.git,https://github.com/apache/maven-plugin-testing
+Apache Maven plugin tools,git://git.apache.org/maven-plugin-tools.git,https://github.com/apache/maven-plugin-tools
+Apache Maven plugins,git://git.apache.org/maven-plugins.git,https://github.com/apache/maven-plugins
+Apache Maven pom,git://git.apache.org/maven-pom.git,https://github.com/apache/maven-pom
+Apache Maven release,git://git.apache.org/maven-release.git,https://github.com/apache/maven-release
+Apache Maven repository tools,git://git.apache.org/maven-repository-tools.git,https://github.com/apache/maven-repository-tools
+Apache Maven Resolver,git://git.apache.org/maven-resolver.git,https://github.com/apache/maven-resolver
+Apache Maven resources,git://git.apache.org/maven-resources.git,https://github.com/apache/maven-resources
+Apache Maven sandbox,git://git.apache.org/maven-sandbox.git,https://github.com/apache/maven-sandbox
+Apache Maven scm,git://git.apache.org/maven-scm.git,https://github.com/apache/maven-scm
+Apache Maven shared,git://git.apache.org/maven-shared.git,https://github.com/apache/maven-shared
+Apache Maven Site,git://git.apache.org/maven-site.git,https://github.com/apache/maven-site
+Apache Maven skins,git://git.apache.org/maven-skins.git,https://github.com/apache/maven-skins
+Apache Maven Surefire,git://git.apache.org/maven-surefire.git,https://github.com/apache/maven-surefire
+Apache Maven Wagon,git://git.apache.org/maven-wagon.git,https://github.com/apache/maven-wagon
+Apache Maven,git://git.apache.org/maven.git,https://github.com/apache/maven
+Apache OpenWebBeans meecrowave,git://git.apache.org/meecrowave.git,https://github.com/apache/meecrowave
+Apache mesos,git://git.apache.org/mesos-site.git,https://github.com/apache/mesos-site
+Apache Mesos,git://git.apache.org/mesos.git,https://github.com/apache/mesos
+Apache MetaModel Membrane,git://git.apache.org/metamodel-membrane.git,https://github.com/apache/metamodel-membrane
+Apache Metamodel,git://git.apache.org/metamodel.git,https://github.com/apache/metamodel
+Apache Metron,git://git.apache.org/metron-bro-plugin-kafka.git,https://github.com/apache/metron-bro-plugin-kafka
+Apache Metron,git://git.apache.org/metron.git,https://github.com/apache/metron
+Apache Mina - SSHD,git://git.apache.org/mina-sshd.git,https://github.com/apache/mina-sshd
+Apache Mina,git://git.apache.org/mina.git,https://github.com/apache/mina
+Apache mod_perl,git://git.apache.org/mod_perl.git,https://github.com/apache/mod_perl
+Apache MRUnit,git://git.apache.org/mrunit.git,https://github.com/apache/mrunit
+Apache MyFaces ExtCDI (CODI),git://git.apache.org/myfaces-extcdi.git,https://github.com/apache/myfaces-extcdi
+Apache MyFaces ExtVal,git://git.apache.org/myfaces-extval.git,https://github.com/apache/myfaces-extval
+Apache MyFaces Html5 Renderkit,git://git.apache.org/myfaces-html5.git,https://github.com/apache/myfaces-html5
+Apache MyFaces Portlet-Bridge,git://git.apache.org/myfaces-portlet-bridge.git,https://github.com/apache/myfaces-portlet-bridge
+Apache MyFaces Scripting,git://git.apache.org/myfaces-scripting.git,https://github.com/apache/myfaces-scripting
+Apache MyFaces,git://git.apache.org/myfaces.git,https://github.com/apache/myfaces
+Apache Nifi,git://git.apache.org/nifi-maven.git,https://github.com/apache/nifi-maven
+Apache Nifi Minifi CPP,git://git.apache.org/nifi-minifi-cpp.git,https://github.com/apache/nifi-minifi-cpp
+Apache MiNiFi,git://git.apache.org/nifi-minifi.git,https://github.com/apache/nifi-minifi
+Apache NiFi Registry,git://git.apache.org/nifi-registry.git,https://github.com/apache/nifi-registry
+Apache Nifi,git://git.apache.org/nifi-site.git,https://github.com/apache/nifi-site
+Apache NiFi (Incubating),git://git.apache.org/nifi.git,https://github.com/apache/nifi
+Apache NPanday ITs,git://git.apache.org/npanday-its.git,https://github.com/apache/npanday-its
+Apache NPanday,git://git.apache.org/npanday.git,https://github.com/apache/npanday
+Apache Nuvem,git://git.apache.org/nuvem.git,https://github.com/apache/nuvem
+Apache ODE Console,git://git.apache.org/ode-console.git,https://github.com/apache/ode-console
+Apache Ode Jacob,git://git.apache.org/ode-jacob.git,https://github.com/apache/ode-jacob
+Apache Ode,git://git.apache.org/ode.git,https://github.com/apache/ode
+Apache ODF Toolkit (incubating),git://git.apache.org/odftoolkit.git,https://github.com/apache/odftoolkit
+Apache OFBiz Framework,git://git.apache.org/ofbiz-framework.git,https://github.com/apache/ofbiz-framework
+Apache OFBiz Plugins,git://git.apache.org/ofbiz-plugins.git,https://github.com/apache/ofbiz-plugins
+Apache OFBiz,git://git.apache.org/ofbiz.git,https://github.com/apache/ofbiz
+Apache Olingo,git://git.apache.org/olingo-odata2.git,https://github.com/apache/olingo-odata2
+Apache Olingo,git://git.apache.org/olingo-odata4-js.git,https://github.com/apache/olingo-odata4-js
+Apache Olingo,git://git.apache.org/olingo-odata4.git,https://github.com/apache/olingo-odata4
+Apache Oltu,git://git.apache.org/oltu.git,https://github.com/apache/oltu
+Apache OODT,git://git.apache.org/oodt.git,https://github.com/apache/oodt
+Apache Oozie,git://git.apache.org/oozie.git,https://github.com/apache/oozie
+Apache OpenEJB,git://git.apache.org/openejb.git,https://github.com/apache/openejb
+Apache OpenJPA,git://git.apache.org/openjpa.git,https://github.com/apache/openjpa
+Apache openmeetings,git://git.apache.org/openmeetings-site.git,https://github.com/apache/openmeetings-site
+Apache OpenMeetings,git://git.apache.org/openmeetings.git,https://github.com/apache/openmeetings
+Apache OpenOffice,git://git.apache.org/openoffice.git,https://github.com/apache/openoffice
+Apache OpenWebBeans,git://git.apache.org/openwebbeans.git,https://github.com/apache/openwebbeans
+Apache Orc,git://git.apache.org/orc.git,https://github.com/apache/orc
+Apache Parquet,git://git.apache.org/parquet-cpp.git,https://github.com/apache/parquet-cpp
+Apache Parquet,git://git.apache.org/parquet-format.git,https://github.com/apache/parquet-format
+Apache Parquet,git://git.apache.org/parquet-mr.git,https://github.com/apache/parquet-mr
+Apache PDFBox Docs,git://git.apache.org/pdfbox-docs.git,https://github.com/apache/pdfbox-docs
+Apache PDFBox Examples,git://git.apache.org/pdfbox-examples.git,https://github.com/apache/pdfbox-examples
+Apache PDFBox,git://git.apache.org/pdfbox.git,https://github.com/apache/pdfbox
+Apache Phoenix,git://git.apache.org/phoenix.git,https://github.com/apache/phoenix
+Apache Photark - Mobile (Incubating),git://git.apache.org/photark-mobile.git,https://github.com/apache/photark-mobile
+Apache Photark - Server (Incubating),git://git.apache.org/photark.git,https://github.com/apache/photark
+Apache Pig,git://git.apache.org/pig.git,https://github.com/apache/pig
+Apache Pivot,git://git.apache.org/pivot.git,https://github.com/apache/pivot
+Apache Pluto,git://git.apache.org/pluto.git,https://github.com/apache/pluto
+Apache POI,git://git.apache.org/poi.git,https://github.com/apache/poi
+Apache Zest qi4j,git://git.apache.org/polygene-java.git,https://github.com/apache/polygene-java
+Apache Zest sandbox,git://git.apache.org/polygene-sandbox.git,https://github.com/apache/polygene-sandbox
+Apache Polygene Website,git://git.apache.org/polygene-website.git,https://github.com/apache/polygene-website
+Apache Pluto,git://git.apache.org/portals-pluto.git,https://github.com/apache/portals-pluto
+Apache Qpid Broker-J,git://git.apache.org/qpid-broker-j.git,https://github.com/apache/qpid-broker-j
+Apache Qpid C++,git://git.apache.org/qpid-cpp.git,https://github.com/apache/qpid-cpp
+Apache Qpid Dispatch,git://git.apache.org/qpid-dispatch.git,https://github.com/apache/qpid-dispatch
+Apache Qpid Interop Test,git://git.apache.org/qpid-interop-test.git,https://github.com/apache/qpid-interop-test
+Apache Qpid JMS AMQP 0-x,git://git.apache.org/qpid-jms-amqp-0-x.git,https://github.com/apache/qpid-jms-amqp-0-x
+Apache Qpid JMS,git://git.apache.org/qpid-jms.git,https://github.com/apache/qpid-jms
+Apache Qpid Proton J,git://git.apache.org/qpid-proton-j.git,https://github.com/apache/qpid-proton-j
+Apache Qpid Proton,git://git.apache.org/qpid-proton.git,https://github.com/apache/qpid-proton
+Apache Qpid Python,git://git.apache.org/qpid-python.git,https://github.com/apache/qpid-python
+Apache Qpid Site,git://git.apache.org/qpid-site.git,https://github.com/apache/qpid-site
+Apache Qpid,git://git.apache.org/qpid.git,https://github.com/apache/qpid
+Apache Rampart,git://git.apache.org/rampart.git,https://github.com/apache/rampart
+Apache Ranger,git://git.apache.org/ranger.git,https://github.com/apache/ranger
+Apache RAT (incubating),git://git.apache.org/rat.git,https://github.com/apache/rat
+Apache Rave,git://git.apache.org/rave.git,https://github.com/apache/rave
+Apache Redback components,git://git.apache.org/redback-components.git,https://github.com/apache/redback-components
+Apache REEF,git://git.apache.org/reef.git,https://github.com/apache/reef
+Apache River,git://git.apache.org/river-container.git,https://github.com/apache/river-container
+Apache River,git://git.apache.org/river.git,https://github.com/apache/river
+Apache Roller Website,git://git.apache.org/roller-website.git,https://github.com/apache/roller-website
+Apache Roller,git://git.apache.org/roller.git,https://github.com/apache/roller
+Apache Samza,git://git.apache.org/samza-hello-samza.git,https://github.com/apache/samza-hello-samza
+Apache Samza,git://git.apache.org/samza.git,https://github.com/apache/samza
+Apache Sandesha,git://git.apache.org/sandesha.git,https://github.com/apache/sandesha
+Commons Sanselan,git://git.apache.org/sanselan.git,https://github.com/apache/sanselan
+Apache Santuario C++,git://git.apache.org/santuario-cpp.git,https://github.com/apache/santuario-cpp
+Apache Santuario Java,git://git.apache.org/santuario-java.git,https://github.com/apache/santuario-java
+Apache Savan,git://git.apache.org/savan.git,https://github.com/apache/savan
+Apache Sentry,git://git.apache.org/sentry.git,https://github.com/apache/sentry
+Apache Serf,git://git.apache.org/serf.git,https://github.com/apache/serf
+Apache ServiceMix archetypes,git://git.apache.org/servicemix-archetypes.git,https://github.com/apache/servicemix-archetypes
+Apache ServiceMix Bundles,git://git.apache.org/servicemix-bundles.git,https://github.com/apache/servicemix-bundles
+Apache ServiceMix components,git://git.apache.org/servicemix-components.git,https://github.com/apache/servicemix-components
+Apache ServiceMix Documentation,git://git.apache.org/servicemix-documentation.git,https://github.com/apache/servicemix-documentation
+Apache Servicemix-Features,git://git.apache.org/servicemix-features.git,https://github.com/apache/servicemix-features
+Apache ServiceMix maven-plugins,git://git.apache.org/servicemix-maven-plugins.git,https://github.com/apache/servicemix-maven-plugins
+Apache ServiceMix POM,git://git.apache.org/servicemix-pom.git,https://github.com/apache/servicemix-pom
+Apache ServiceMix Specs,git://git.apache.org/servicemix-specs.git,https://github.com/apache/servicemix-specs
+Apache ServiceMix utils,git://git.apache.org/servicemix-utils.git,https://github.com/apache/servicemix-utils
+Apache ServiceMix website,git://git.apache.org/servicemix-website.git,https://github.com/apache/servicemix-website
+Apache ServiceMix,git://git.apache.org/servicemix.git,https://github.com/apache/servicemix
+Apache ServiceMix 3,git://git.apache.org/servicemix3.git,https://github.com/apache/servicemix3
+Apache ServiceMix 4 bundles,git://git.apache.org/servicemix4-bundles.git,https://github.com/apache/servicemix4-bundles
+Apache ServiceMix 4 features,git://git.apache.org/servicemix4-features.git,https://github.com/apache/servicemix4-features
+Apache ServiceMix 4 kernel,git://git.apache.org/servicemix4-kernel.git,https://github.com/apache/servicemix4-kernel
+Apache ServiceMix 4 legal,git://git.apache.org/servicemix4-legal.git,https://github.com/apache/servicemix4-legal
+Apache ServiceMix 4 NMR,git://git.apache.org/servicemix4-nmr.git,https://github.com/apache/servicemix4-nmr
+Apache ServiceMix 4 specs,git://git.apache.org/servicemix4-specs.git,https://github.com/apache/servicemix4-specs
+Apache ServiceMix 5,git://git.apache.org/servicemix5.git,https://github.com/apache/servicemix5
+Apache Shindig,git://git.apache.org/shindig.git,https://github.com/apache/shindig
+Apache Shiro Site,git://git.apache.org/shiro-site.git,https://github.com/apache/shiro-site
+Apache Shiro,git://git.apache.org/shiro.git,https://github.com/apache/shiro
+Apache Sirona (Incubating),git://git.apache.org/sirona.git,https://github.com/apache/sirona
+Apache SIS,git://git.apache.org/sis.git,https://github.com/apache/sis
+Apache Sling Website,git://git.apache.org/sling-site.git,https://github.com/apache/sling-site
+Apache Sling,git://git.apache.org/sling.git,https://github.com/apache/sling
+Apache SpamAssassin,git://git.apache.org/spamassassin.git,https://github.com/apache/spamassassin
+Apache Spark Website,git://git.apache.org/spark-website.git,https://github.com/apache/spark-website
+Apache Spark,git://git.apache.org/spark.git,https://github.com/apache/spark
+Apache Sqoop,git://git.apache.org/sqoop.git,https://github.com/apache/sqoop
+Apache Stanbol,git://git.apache.org/stanbol.git,https://github.com/apache/stanbol
+Apache C++ Standard Library,git://git.apache.org/stdcxx.git,https://github.com/apache/stdcxx
+Apache STeVe,git://git.apache.org/steve.git,https://github.com/apache/steve
+Apache storm website Git repo,git://git.apache.org/storm-site.git,https://github.com/apache/storm-site
+Apache Storm,git://git.apache.org/storm.git,https://github.com/apache/storm
+Apache Stratos,git://git.apache.org/stratos.git,https://github.com/apache/stratos
+Apache Streams (Incubating) Examples,git://git.apache.org/streams-examples.git,https://github.com/apache/streams-examples
+Apache Streams Master (Incubating),git://git.apache.org/streams-master.git,https://github.com/apache/streams-master
+Apache Streams,git://git.apache.org/streams.git,https://github.com/apache/streams
+Apache Struts Annotations,git://git.apache.org/struts-annotations.git,https://github.com/apache/struts-annotations
+Apache Struts Archetypes,git://git.apache.org/struts-archetypes.git,https://github.com/apache/struts-archetypes
+Apache Struts Archive,git://git.apache.org/struts-archive.git,https://github.com/apache/struts-archive
+Apache Struts,git://git.apache.org/struts-examples.git,https://github.com/apache/struts-examples
+Apache Struts extras,git://git.apache.org/struts-extras.git,https://github.com/apache/struts-extras
+Apache Struts,git://git.apache.org/struts-master.git,https://github.com/apache/struts-master
+Apache Struts Maven,git://git.apache.org/struts-maven.git,https://github.com/apache/struts-maven
+Apache Struts Sandbox,git://git.apache.org/struts-sandbox.git,https://github.com/apache/struts-sandbox
+Apache Struts,git://git.apache.org/struts-site.git,https://github.com/apache/struts-site
+Apache Struts,git://git.apache.org/struts.git,https://github.com/apache/struts
+Apache Subversion,git://git.apache.org/subversion.git,https://github.com/apache/subversion
+Apache Synapse,git://git.apache.org/synapse.git,https://github.com/apache/synapse
+Apache Syncope,git://git.apache.org/syncope.git,https://github.com/apache/syncope
+Apache SystemML site (Incubating),git://git.apache.org/systemml-website.git,https://github.com/apache/systemml-website
+Apache SystemML (Incubating),git://git.apache.org/systemml.git,https://github.com/apache/systemml
+Apache Tajo,git://git.apache.org/tajo.git,https://github.com/apache/tajo
+Apache Tapestry 5,git://git.apache.org/tapestry-5.git,https://github.com/apache/tapestry-5
+Apache Tapestry 3,git://git.apache.org/tapestry3.git,https://github.com/apache/tapestry3
+Apache Tapestry 4,git://git.apache.org/tapestry4.git,https://github.com/apache/tapestry4
+Apache Tashi,git://git.apache.org/tashi.git,https://github.com/apache/tashi
+Apache Tez,git://git.apache.org/tez.git,https://github.com/apache/tez
+Apache Thrift,git://git.apache.org/thrift.git,https://github.com/apache/thrift
+Apache Tiles Autotag,git://git.apache.org/tiles-autotag.git,https://github.com/apache/tiles-autotag
+Apache Tiles Request,git://git.apache.org/tiles-request.git,https://github.com/apache/tiles-request
+Apache Tiles,git://git.apache.org/tiles.git,https://github.com/apache/tiles
+Apache TinkerPop,git://git.apache.org/tinkerpop.git,https://github.com/apache/tinkerpop
+Apache Tomcat Connectors,git://git.apache.org/tomcat-connectors.git,https://github.com/apache/tomcat-connectors
+Apache Tomcat Maven plugin,git://git.apache.org/tomcat-maven-plugin.git,https://github.com/apache/tomcat-maven-plugin
+Apache Tomcat Native,git://git.apache.org/tomcat-native.git,https://github.com/apache/tomcat-native
+Apache Tomcat,git://git.apache.org/tomcat.git,https://github.com/apache/tomcat
+Apache Tomcat 7.0.x,git://git.apache.org/tomcat70.git,https://github.com/apache/tomcat70
+Apache Tomcat 8.0.x,git://git.apache.org/tomcat80.git,https://github.com/apache/tomcat80
+Apache Tomcat 8.5.x,git://git.apache.org/tomcat85.git,https://github.com/apache/tomcat85
+Apache TomEE Site Generator,git://git.apache.org/tomee-site-generator.git,https://github.com/apache/tomee-site-generator
+Apache TomEE Site-NG,git://git.apache.org/tomee-site-ng.git,https://github.com/apache/tomee-site-ng
+Apache TomEE - Site,git://git.apache.org/tomee-site.git,https://github.com/apache/tomee-site
+Apache TomEE,git://git.apache.org/tomee.git,https://github.com/apache/tomee
+Apache Tuscany DAS,git://git.apache.org/tuscany-das.git,https://github.com/apache/tuscany-das
+Apache Tuscany SCA 1.x,git://git.apache.org/tuscany-sca-1.x.git,https://github.com/apache/tuscany-sca-1.x
+Apache Tuscany SCA 2.x,git://git.apache.org/tuscany-sca-2.x.git,https://github.com/apache/tuscany-sca-2.x
+Apache Tuscany SCA C++,git://git.apache.org/tuscany-sca-cpp.git,https://github.com/apache/tuscany-sca-cpp
+Apache Tuscany SDO,git://git.apache.org/tuscany-sdo.git,https://github.com/apache/tuscany-sdo
+Apache Twill,git://git.apache.org/twill.git,https://github.com/apache/twill
+Apache UIMA addons,git://git.apache.org/uima-addons.git,https://github.com/apache/uima-addons
+Apache UIMA uima-as,git://git.apache.org/uima-as.git,https://github.com/apache/uima-as
+Apache UIMA build,git://git.apache.org/uima-build.git,https://github.com/apache/uima-build
+Apache UIMA uima-ducc,git://git.apache.org/uima-ducc.git,https://github.com/apache/uima-ducc
+Apache UIMA ruta,git://git.apache.org/uima-ruta.git,https://github.com/apache/uima-ruta
+Apache UIMA sandbox,git://git.apache.org/uima-sandbox.git,https://github.com/apache/uima-sandbox
+Apache UIMA uimacpp,git://git.apache.org/uima-uimacpp.git,https://github.com/apache/uima-uimacpp
+Apache UIMA uimafit,git://git.apache.org/uima-uimafit.git,https://github.com/apache/uima-uimafit
+Apache UIMA,git://git.apache.org/uima-uimaj.git,https://github.com/apache/uima-uimaj
+Apache usergrid Android SDK,git://git.apache.org/usergrid-android.git,https://github.com/apache/usergrid-android
+Apache usergrid .NET SDK,git://git.apache.org/usergrid-dotnet.git,https://github.com/apache/usergrid-dotnet
+Apache usergrid Java SDK,git://git.apache.org/usergrid-java.git,https://github.com/apache/usergrid-java
+Apache usergrid JavaScript SDK,git://git.apache.org/usergrid-javascript.git,https://github.com/apache/usergrid-javascript
+Apache usergrid NodeJS SDK,git://git.apache.org/usergrid-nodejs.git,https://github.com/apache/usergrid-nodejs
+Apache usergrid Python SDK,git://git.apache.org/usergrid-python.git,https://github.com/apache/usergrid-python
+Apache Usergrid - Qakka Queue System ,git://git.apache.org/usergrid-qakka.git,https://github.com/apache/usergrid-qakka
+Apache usergrid Swift SDK,git://git.apache.org/usergrid-swift.git,https://github.com/apache/usergrid-swift
+Apache Usergrid,git://git.apache.org/usergrid.git,https://github.com/apache/usergrid
+Apache Velocity Engine,git://git.apache.org/velocity-engine.git,https://github.com/apache/velocity-engine
+Apache Velocity Tools,git://git.apache.org/velocity-tools.git,https://github.com/apache/velocity-tools
+Apache VXQuery,git://git.apache.org/vxquery.git,https://github.com/apache/vxquery
+Apache Vysper,git://git.apache.org/vysper.git,https://github.com/apache/vysper
+Apache Webservices Axiom,git://git.apache.org/webservices-axiom.git,https://github.com/apache/webservices-axiom
+Apache Web Services Commons XMLSchema,git://git.apache.org/webservices-commons-xmlschema.git,https://github.com/apache/webservices-commons-xmlschema
+Apache Webservices Neethi,git://git.apache.org/webservices-neethi.git,https://github.com/apache/webservices-neethi
+Apache Web Services XmlSchema,git://git.apache.org/webservices-xmlschema.git,https://github.com/apache/webservices-xmlschema
+Apache Whirr,git://git.apache.org/whirr.git,https://github.com/apache/whirr
+Apache Wicket Web Site,git://git.apache.org/wicket-site.git,https://github.com/apache/wicket-site
+Apache Wicket,git://git.apache.org/wicket.git,https://github.com/apache/wicket
+Apache Wink Website,git://git.apache.org/wink-website.git,https://github.com/apache/wink-website
+Apache Wink,git://git.apache.org/wink.git,https://github.com/apache/wink
+Apache Wookie,git://git.apache.org/wookie.git,https://github.com/apache/wookie
+Apache WSS4J,git://git.apache.org/wss4j.git,https://github.com/apache/wss4j
+Apache Xalan C++,git://git.apache.org/xalan-c.git,https://github.com/apache/xalan-c
+Apache Xalan Java,git://git.apache.org/xalan-j.git,https://github.com/apache/xalan-j
+Apache Xerces C++,git://git.apache.org/xerces-c.git,https://github.com/apache/xerces-c
+Apache Xerces2 Java,git://git.apache.org/xerces2-j.git,https://github.com/apache/xerces2-j
+Apache XML Graphics Commons,git://git.apache.org/xml-graphics-commons.git,https://github.com/apache/xml-graphics-commons
+Apache XMLBeans,git://git.apache.org/xmlbeans.git,https://github.com/apache/xmlbeans
+Apache Yetus,git://git.apache.org/yetus.git,https://github.com/apache/yetus
+Apache Zeppelin (Incubating),git://git.apache.org/zeppelin.git,https://github.com/apache/zeppelin
+Apache Zeta Components,git://git.apache.org/zetacomponents.git,https://github.com/apache/zetacomponents
+Apache Hadoop ZooKeeper,git://git.apache.org/zookeeper.git,https://github.com/apache/zookeeper
