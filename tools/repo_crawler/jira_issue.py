@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import urllib
 
 _URL_PREFIX_XML = "https://issues.apache.org/jira/si/jira.issueviews:issue-xml/"
@@ -18,13 +19,20 @@ class JiraIssue:
         invalid_path = os.path.join(dir_path, ".invalid." + file_name)
         if os.path.isfile(file_path) or os.path.isfile(invalid_path):
             return
-        try:
-            print urllib.urlretrieve(url, file_path)[0]
-            if "Oops, you&#39;ve found a dead link" in open(file_path).read():
-                os.rename(file_path, invalid_path)
-                print "Invalid issue ID:", invalid_path
-        except Exception as e:
-            print "[Error] JiraIssue.download: ", type(e), e
+        for i in range(3):
+            try:
+                print urllib.urlretrieve(url, file_path)[0]
+                with open(file_path, 'r') as downloaded:
+                    if "<h1>Oops, you&#39;ve found a dead link.</h1>" in \
+                            downloaded.read():
+                        os.rename(file_path, invalid_path)
+                        print "Invalid issue ID:", invalid_path
+                break
+            except Exception as e:
+                if i == 2:
+                    print "[Error] JiraIssue.download: ", type(e), e
+                else:
+                    time.sleep(10)
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:

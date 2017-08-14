@@ -48,9 +48,24 @@ def process_log(log_message, key, repo_name, url, output_path, jira_only):
 def crawl_repo(repo_dir, key, tag, url, output_dir, jira_only):
     # Prepare the repo dir.
     repo_dir = os.path.normpath(repo_dir)
-    git_repo = git.bake("-C", os.path.expanduser(repo_dir))
-    git_repo.fetch()
-    git_repo.checkout(tag)
+    repo_dir = os.path.expanduser(repo_dir)
+    if not os.path.isdir(repo_dir):
+        try:
+            git.clone(url, repo_dir)
+        except Exception as e:
+            print "[Error] crawl_repo: clone: ", type(e)
+            print >> sys.stderr, repo_dir
+            print >> sys.stderr, e
+            return
+    git_repo = git.bake("-C", repo_dir)
+    try:
+        git_repo.fetch()
+        git_repo.checkout(tag)
+    except Exception as e:
+        print "[Error] crawl_repo: checkout ", type(e)
+        print >> sys.stderr, repo_dir
+        print >> sys.stderr, e
+        return
 
     # Prepare the dir to store issues.
     repo = os.path.basename(repo_dir)
@@ -63,6 +78,14 @@ def crawl_repo(repo_dir, key, tag, url, output_dir, jira_only):
         log_message = git_repo.log("-1", commit_id)
         process_log(log_message, key, repo, url, path, jira_only)
 
+def crawler_thread(index, num_threads, lines, output_dir, jira_only):
+    for i, line in enumerate(lines):
+        if line.startswith("#"):
+            continue
+        if i % num_threads == index:
+            repo_dir, key, tag, url = line.split()
+            crawl_repo(repo_dir, key, tag, url, output_dir, jira_only)
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--config-file", required=True,
@@ -71,7 +94,8 @@ def main():
                         help="dir for downloads")
     parser.add_argument("-j", "--jira-only", action="store_true",
                         help="only download JIRA issues")
-
+    parser.add_argument("-t", "--num-threads", type=int, default=4,
+                        help="number of downloading threads")
     jira_only = "-j" in sys.argv or "--jira-only" in sys.argv
     if not jira_only:
         github_comments.add_args(parser)
@@ -83,16 +107,17 @@ def main():
 
     conf_file = open(args.config_file)
     threads = []
-    for line in conf_file:
-        if line.startswith("#"):
-            continue
-        t = threading.Thread(target=crawl_repo,
-                             args=line.split() + [ args.output_dir, jira_only ])
+    lines = conf_file.readlines()
+    for index in range(args.num_threads):
+        t = threading.Thread(target=crawler_thread,
+            args=(index, args.num_threads, lines, args.output_dir, jira_only))
         threads.append(t)
         t.start()
 
     for t in threads:
         t.join()
+
+    conf_file.close()
 
 if __name__ == "__main__":
     main()
