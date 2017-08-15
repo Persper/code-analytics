@@ -258,14 +258,20 @@ class CallCommitGraph(Processor):
 
     def devrank_developers(self, alpha):
         self.update_shares(alpha)
-        dev_share = {}
+        email_to_share = {}
+        email_to_name = {}
         for sha in self.history:
-            email = self.repo.commit(sha).author.email
-            if email in dev_share:
-                dev_share[email] += self.share[sha]
+            actor = self.repo.commit(sha).author
+            email = actor.email
+            email_to_name[email] = actor.name
+            if email in email_to_share:
+                email_to_share[email] += self.share[sha]
             else:
-                dev_share[email] = self.share[sha]
-        return sorted(dev_share.items(), key=lambda x: x[1], reverse=True)
+                email_to_share[email] = self.share[sha]
+        sorted_shares = sorted(email_to_share.items(),
+                               key=lambda x: x[1],
+                               reverse=True)
+        return sorted_shares, email_to_name
 
     def locrank_commits(self):
         self.loc = {}
