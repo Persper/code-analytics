@@ -8,6 +8,7 @@ import re
 from sets import Set
 import sys
 import threading
+import traceback
 
 import github_comments
 import jira_issue
@@ -16,7 +17,13 @@ _jira_issue = jira_issue.JiraIssue()
 _github_comments = github_comments.GitHubComments()
 
 def process_log(log_message, key, repo_name, url, output_path, jira_only):
-    log_message = str(log_message)
+    try:
+        log_message = str(log_message)
+    except Exception as e:
+        print "[Error] process_log: ", type(e)
+        print >> sys.stderr, repo_name + ": ", e
+        traceback.print_exc()
+        return
     commit = re.match("commit (\w{10})", log_message).group(1)
     file_prefix = commit + "-"
 
@@ -60,12 +67,14 @@ def crawl_repo(repo_dir, key, tag, url, output_dir, jira_only):
     git_repo = git.bake("-C", repo_dir)
     try:
         git_repo.fetch()
+    except Exception as e:
+        print "[Error] crawl_repo: fetch ", type(e)
+        print >> sys.stderr, e
+    try:
         git_repo.checkout(tag)
     except Exception as e:
         print "[Error] crawl_repo: checkout ", type(e)
-        print >> sys.stderr, repo_dir
         print >> sys.stderr, e
-        return
 
     # Prepare the dir to store issues.
     repo = os.path.basename(repo_dir)
@@ -73,7 +82,7 @@ def crawl_repo(repo_dir, key, tag, url, output_dir, jira_only):
     if not os.path.isdir(path):
         os.makedirs(path)
 
-    for log_line in git_repo.log('--oneline'):
+    for log_line in git_repo.log("--oneline"):
         commit_id = log_line.split()[0]
         log_message = git_repo.log("-1", commit_id)
         process_log(log_message, key, repo, url, path, jira_only)
@@ -84,7 +93,11 @@ def crawler_thread(index, num_threads, lines, output_dir, jira_only):
             continue
         if i % num_threads == index:
             repo_dir, key, tag, url = line.split()
-            crawl_repo(repo_dir, key, tag, url, output_dir, jira_only)
+            try:
+                crawl_repo(repo_dir, key, tag, url, output_dir, jira_only)
+            except Exception as e:
+                print >> sys.stderr, repo_dir, e
+                traceback.print_exc()
 
 def main():
     parser = argparse.ArgumentParser()
@@ -111,6 +124,7 @@ def main():
     for index in range(args.num_threads):
         t = threading.Thread(target=crawler_thread,
             args=(index, args.num_threads, lines, args.output_dir, jira_only))
+        t.daemon = True
         threads.append(t)
         t.start()
 
