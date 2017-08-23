@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 from lxml import etree
 
+
 def copy_dir(src, dst, *, follow_sym=True):
     if os.path.isdir(dst):
         dst = os.path.join(dst, os.path.basename(src))
@@ -16,7 +17,8 @@ def copy_dir(src, dst, *, follow_sym=True):
         shutil.copystat(src, dst, follow_symlinks=follow_sym)
     return dst
 
-def transform_dir(input_dir, output_dir, extensions=('.c', '.h')):    
+
+def transform_dir(input_dir, output_dir, extensions=('.c', '.h')):
     """Run srcML recursively under a directory
 
     First copy directory structure from input_dir to output_dir,
@@ -47,6 +49,7 @@ def transform_dir(input_dir, output_dir, extensions=('.c', '.h')):
             counter += 1
     print("Tranformation completed, {} processed.".format(counter))
 
+
 def transform_src_to_tree(source_code, ext='.c'):
     root = None
     try:
@@ -61,10 +64,11 @@ def transform_src_to_tree(source_code, ext='.c'):
         return None
 
     # rename so that srcml can open it
-    new_fname = f.name + ext 
+    new_fname = f.name + ext
     os.rename(f.name, new_fname)
     xml_path = f.name + ".xml"
-    subprocess.call('srcml {} --position -o {}'.format(new_fname, xml_path), shell=True)
+    cmd = 'srcml {} --position -o {}'.format(new_fname, xml_path)
+    subprocess.call(cmd, shell=True)
     try:
         root = etree.parse(xml_path).getroot()
     except:
@@ -77,6 +81,7 @@ def transform_src_to_tree(source_code, ext='.c'):
             os.remove(xml_path)
 
     return root
+
 
 def main():
     parser = argparse.ArgumentParser()

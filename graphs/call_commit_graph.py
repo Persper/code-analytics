@@ -1,9 +1,12 @@
+import sys
 import networkx as nx
-from graphs.processor import Processor
+from graphs.processor import Processor, _diff_with_first_parent, _fill_change_type
 from graphs.patch_parser import PatchParser
 from graphs.srcml import transform_src_to_tree
 from graphs.detect_change import get_changed_functions
-from graphs.call_graph.c import update_call_graph, get_func_ranges_c
+from graphs.call_graph.c import update_call_graph_c, get_func_ranges_c
+from graphs.call_graph.java import update_call_graph_java, get_func_ranges_java
+from graphs.call_graph.java import prepare_env
 from graphs.devrank import devrank
 from graphs.git_tools import get_contents
 
@@ -52,10 +55,18 @@ def _inverse_diff_result(adds, dels):
 
 class CallCommitGraph(Processor):
 
-    def __init__(self, repo_path, exts=('.c', '.h')):
+    def __init__(self, repo_path, lang='c'):
         super().__init__(repo_path)
         self.G = None
-        self.exts = exts
+        self.lang = lang
+        if lang == 'c':
+            self.exts = ('.c', '.h')
+        elif lang == 'java':
+            self.exts = ('.java',)
+        else:
+            print("Invalid language option, terminated.")
+            sys.exit(-1)
+        self.env = {}
         self.history = {}
         self.share = {}
         self.patch_parser = PatchParser()
@@ -67,6 +78,21 @@ class CallCommitGraph(Processor):
 
     def _start_process_commit(self, commit):
         self.history[commit.hexsha] = {}
+        if self.lang == 'java':
+            new_roots = []
+            diff_index = _diff_with_first_parent(commit)
+            _fill_change_type(diff_index)
+            for diff in diff_index:
+                if diff.change_type in ['A', 'M']:
+                    fname = diff.b_blob.path
+                elif diff.change_type == 'R':
+                    fname = diff.rename_to
+                else:
+                    continue
+
+                if self.fname_filter(fname):
+                    root = self._get_xml_root(commit, fname)
+                    prepare_env(root, env=self.env)
 
     def on_add(self, diff, commit, is_merge_commit):
         old_fname = None
@@ -133,7 +159,12 @@ class CallCommitGraph(Processor):
         return False
 
     def _get_xml_root(self, commit, fname):
-        return transform_src_to_tree(get_contents(self.repo, commit, fname))
+        if self.lang == 'c':
+            return transform_src_to_tree(
+                get_contents(self.repo, commit, fname))
+        elif self.lang == 'java':
+            return transform_src_to_tree(
+                get_contents(self.repo, commit, fname), ext='.java')
 
     def _first_phase(self, diff, commit, is_merge_commit,
                      old_fname=None, new_fname=None):
@@ -160,8 +191,12 @@ class CallCommitGraph(Processor):
                 if old_root is None:
                     return -1
 
-                modified_func = get_changed_functions(
-                    *get_func_ranges_c(old_root), additions, deletions)
+                if self.lang == 'c':
+                    modified_func = get_changed_functions(
+                        *get_func_ranges_c(old_root), additions, deletions)
+                elif self.lang == 'java':
+                    modified_func = get_changed_functions(
+                        *get_func_ranges_java(old_root), additions, deletions)
 
             # parse new src to tree
             if new_fname is not None:
@@ -172,7 +207,12 @@ class CallCommitGraph(Processor):
 
             # update call graph
             # if on delete, then new_func is expected to be an empty dict
-            new_func = update_call_graph(self.G, update_roots, modified_func)
+            if self.lang == 'c':
+                new_func = update_call_graph_c(
+                    self.G, update_roots, modified_func)
+            elif self.lang == 'java':
+                new_func = update_call_graph_java(
+                    self.G, update_roots, modified_func, env=self.env)
 
             # only update self.history for non-merge commit
             if not is_merge_commit:
@@ -201,8 +241,12 @@ class CallCommitGraph(Processor):
                 if old_root is None:
                     return -1
 
-                modified_func = get_changed_functions(
-                    *get_func_ranges_c(old_root), adds, dels)
+                if self.lang == 'c':
+                    modified_func = get_changed_functions(
+                        *get_func_ranges_c(old_root), adds, dels)
+                elif self.lang == 'java':
+                    modified_func = get_changed_functions(
+                        *get_func_ranges_java(old_root), adds, dels)
 
             if new_fname is not None:
                 inv_adds, inv_dels = _inverse_diff_result(adds, dels)
@@ -210,8 +254,12 @@ class CallCommitGraph(Processor):
                 if new_root is None:
                     return -1
 
-                inv_modified_func = get_changed_functions(
-                    *get_func_ranges_c(new_root), inv_adds, inv_dels)
+                if self.lang == 'c':
+                    inv_modified_func = get_changed_functions(
+                        *get_func_ranges_c(new_root), inv_adds, inv_dels)
+                elif self.lang == 'java':
+                    inv_modified_func = get_changed_functions(
+                        *get_func_ranges_java(new_root), inv_adds, inv_dels)
 
             for func_name in modified_func:
                 if func_name in self.G:
@@ -285,7 +333,9 @@ class CallCommitGraph(Processor):
         state = super().__getstate__()
         state['G'] = self.G
         state['history'] = self.history
+        state['lang'] = self.lang
         state['exts'] = self.exts
+        state['env'] = self.env
         return state
 
     def __setstate__(self, state):
