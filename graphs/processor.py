@@ -47,7 +47,6 @@ class Processor():
     def __init__(self, repo_path):
         self.repo_path = repo_path
         self.repo = initialize_repo(repo_path)
-        self.git = self.repo.git
         self.visited = set()
         self.last_processed_commit = None
 
@@ -332,6 +331,11 @@ class Processor():
     def _start_process_commit(self, commit):
         pass
 
+    def set_repo_path(self, repo_path):
+        self.repo_path = repo_path
+        self.repo = initialize_repo(repo_path)
+        self.last_processed_commit = self.repo.commit(self.last_sha)
+
     def on_add(self, diff, commit, is_merge_commit):
         return 0
 
@@ -359,16 +363,12 @@ class Processor():
     def __getstate__(self):
         state = {
             'visited': self.visited,
-            'repo_path': self.repo_path,
             'last_sha': self.last_processed_commit.hexsha
         }
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
-        self.repo = initialize_repo(state['repo_path'])
-        self.git = self.repo.git
-        self.last_processed_commit = self.repo.commit(state['last_sha'])
 
     def save(self, fname):
         with open(fname, 'wb+') as f:
