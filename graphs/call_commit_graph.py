@@ -53,6 +53,15 @@ def _inverse_diff_result(adds, dels):
     return inv_adds, inv_dels
 
 
+def _normalize_shares(email_to_share):
+    share_sum = 0
+    for email, share in email_to_share.items():
+        share_sum += share
+
+    for email in email_to_share:
+        email_to_share[email] /= share_sum
+
+
 class CallCommitGraph(Processor):
 
     def __init__(self, repo_path, lang='c'):
@@ -304,18 +313,29 @@ class CallCommitGraph(Processor):
         self.scores = devrank(self.G, alpha=alpha)
         return sorted(self.scores.items(), key=lambda x: x[1], reverse=True)
 
-    def devrank_developers(self, alpha):
+    def devrank_developers(self, alpha, sha_to_type={}, coefs=[1, 1, 1, 1]):
         self.update_shares(alpha)
         email_to_share = {}
         email_to_name = {}
+
+        hexsha_to_type = {}
+        for sha, t in sha_to_type.items():
+            c = self.repo.commit(sha)
+            hexsha_to_type[c.hexsha] = t
+
         for sha in self.history:
+            if sha in hexsha_to_type:
+                coef = coefs[int(hexsha_to_type[sha])]
+            else:
+                coef = 1
             actor = self.repo.commit(sha).author
             email = actor.email
             email_to_name[email] = actor.name
             if email in email_to_share:
-                email_to_share[email] += self.share[sha]
+                email_to_share[email] += coef * self.share[sha]
             else:
-                email_to_share[email] = self.share[sha]
+                email_to_share[email] = coef * self.share[sha]
+        _normalize_shares(email_to_share)
         sorted_shares = sorted(email_to_share.items(),
                                key=lambda x: x[1],
                                reverse=True)
