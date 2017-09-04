@@ -1,0 +1,8 @@
+The data structure of fs-patch.pickle:
+
+The data structure of jira-issues.pickle:
+
+A nested dictionary [repo_name][issue_id]['commits'/'title'/'description'/'comment'/'type'/'priority']
+
+'commits' indexes a list of commit hashes related to the issue.
+
