@@ -8,12 +8,12 @@
 Download and install Python: <https://www.python.org/downloads/>
 Note: Python 3.5+ is required.
 
-Install packages dicttoxml gitpython lxml networkx numpy openpyxl statistics scipy: <https://packaging.python.org/installing/>
+Install packages dicttoxml gitpython lxml networkx numpy openpyxl statistics scipy matplotlib: <https://packaging.python.org/installing/>
 
 E.g., Ubuntu:
 ```
 sudo apt install -y python3 python3-pip
-sudo -H pip3 install dicttoxml gitpython lxml networkx numpy openpyxl statistics scipy
+sudo -H pip3 install dicttoxml gitpython lxml networkx numpy openpyxl statistics scipy matplotlib
 ```
 
 In order to uset the `--indent-heuristic` option of `git diff`, we require git version >= 2.11. Use the following commands to upgrade:
