@@ -10,7 +10,7 @@ Note: Python 3.5+ is required.
 
 Install packages dicttoxml gitpython lxml networkx numpy openpyxl statistics scipy matplotlib: <https://packaging.python.org/installing/>
 
-E.g., Ubuntu:
+E.g., on Ubuntu:
 ```
 sudo apt install -y python3 python3-pip
 sudo -H pip3 install dicttoxml gitpython lxml networkx numpy openpyxl statistics scipy matplotlib
@@ -34,10 +34,16 @@ cd misc/
 
 Reference <http://jupyter.org/install.html>.
 
-E.g., Ubuntu:
+E.g., on Ubuntu:
 ```
 sudo -H pip3 install --upgrade pip
 sudo -H pip3 install jupyter
+```
+
+To fit notebooks well in git, install jq and run gitconfig.sh. E.g., on Ubuntu:
+```
+sudo apt install -y jq
+./gitconfig.sh
 ```
 
 3. Install TensorFlow
