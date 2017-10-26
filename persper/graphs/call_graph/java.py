@@ -1,7 +1,7 @@
 import networkx as nx
 from lxml import etree
-from graphs.call_graph.utils import transform_node_to_src, remove_edges_of_node
-from graphs.call_graph.utils import ns, line_attr
+from persper.graphs.call_graph.utils import transform_node_to_src, remove_edges_of_node
+from persper.graphs.call_graph.utils import ns, line_attr
 
 
 def generate_fid(class_name, func_name):

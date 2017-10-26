@@ -1,10 +1,11 @@
 import os
-from graphs.patch_parser import PatchParser 
-from graphs.detect_change import get_changed_functions
-from graphs.call_graph.cpp import get_func_ranges_cpp
-from graphs.srcml import transform_src_to_tree
+from persper.graphs.patch_parser import PatchParser
+from persper.graphs.detect_change import get_changed_functions
+from persper.graphs.call_graph.cpp import get_func_ranges_cpp
+from persper.graphs.srcml import transform_src_to_tree
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
+
 
 def test_detect_change():
     parser = PatchParser()

@@ -1,14 +1,14 @@
 import sys
 import networkx as nx
-from graphs.processor import Processor, _diff_with_first_parent, _fill_change_type
-from graphs.patch_parser import PatchParser
-from graphs.srcml import transform_src_to_tree
-from graphs.detect_change import get_changed_functions
-from graphs.call_graph.c import update_call_graph_c, get_func_ranges_c
-from graphs.call_graph.java import update_call_graph_java, get_func_ranges_java
-from graphs.call_graph.java import prepare_env
-from graphs.devrank import devrank
-from graphs.git_tools import get_contents
+from persper.graphs.processor import Processor, _diff_with_first_parent, _fill_change_type
+from persper.graphs.patch_parser import PatchParser
+from persper.graphs.srcml import transform_src_to_tree
+from persper.graphs.detect_change import get_changed_functions
+from persper.graphs.call_graph.c import update_call_graph_c, get_func_ranges_c
+from persper.graphs.call_graph.java import update_call_graph_java, get_func_ranges_java
+from persper.graphs.call_graph.java import prepare_env
+from persper.graphs.devrank import devrank
+from persper.graphs.git_tools import get_contents
 
 
 def _inverse_diff_result(adds, dels):

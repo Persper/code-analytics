@@ -83,4 +83,4 @@ class PatchParser():
         elif self.in_del:
             self.finish_del()
 
-        return self.additions, self.deletions 
+        return self.additions, self.deletions

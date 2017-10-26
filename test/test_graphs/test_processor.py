@@ -2,8 +2,8 @@ import os
 import pytest
 import pickle
 import subprocess
-from graphs.processor import Processor
-from util.path import root_path
+from persper.graphs.processor import Processor
+from persper.util.path import root_path
 
 
 def setup_module(module):

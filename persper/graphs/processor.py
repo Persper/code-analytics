@@ -1,7 +1,7 @@
 import os
 import time
 import pickle
-from graphs.git_tools import initialize_repo
+from persper.graphs.git_tools import initialize_repo
 from collections import deque
 import functools
 print = functools.partial(print, flush=True)

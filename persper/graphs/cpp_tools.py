@@ -3,7 +3,7 @@ import subprocess
 from git import Repo
 import networkx as nx
 
-from graphs.write_graph_to_dot import write_G_to_dot_with_pr
+from persper.graphs.write_graph_to_dot import write_G_to_dot_with_pr
 
 def get_func_ranges_cpp(src, fname):
     re_signature = re.compile("""^(?P<return_type>\w+(\s*[\*\&])?)\s+
