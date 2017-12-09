@@ -4,6 +4,7 @@ import argparse
 import git
 import json
 import re
+import sys
 
 
 def main():
@@ -17,13 +18,19 @@ def main():
                         help='Output JSON file')
     parser.add_argument('-s', '--show-stats', action='store_true',
                         help='Show stats of commits instead of outputting')
+    parser.add_argument('-l', '--min-count', type=int, default=0,
+                        help='Min number of commits to count')
+    parser.add_argument('-u', '--max-count', type=int, default=sys.maxsize,
+                        help='Max number of commits to count')
     args = parser.parse_args()
 
     repo = git.Repo(args.repo_dir)
 
     if args.show_stats:
         email2stats = {}
-        for i, commit in enumerate(repo.iter_commits(args.branch)):
+        commits = repo.iter_commits(args.branch, max_count=args.max_count,
+                                    skip=args.min_count)
+        for i, commit in enumerate(commits):
             if len(commit.parents) > 1:
                 continue
             email = commit.author.email
