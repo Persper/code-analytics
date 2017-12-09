@@ -2,6 +2,7 @@
 
 import math
 
+
 def deviation(map1, map2, index):
     n = len(map1)
     assert len(map2) == n
@@ -9,6 +10,7 @@ def deviation(map1, map2, index):
     for func, values in map1.items():
         var += (values[index] - map2.get(func, values)[index])**2
     return math.sqrt(var / n)
+
 
 def pair_changes(map1, map2, index):
     n = len(map1)
@@ -26,4 +28,3 @@ def pair_changes(map1, map2, index):
             elif d1 * d2 < 0:
                 p += 1
     return p
-

@@ -19,9 +19,9 @@ def main():
     parser.add_argument('-s', '--show-stats', action='store_true',
                         help='Show stats of commits instead of outputting')
     parser.add_argument('-l', '--min-count', type=int, default=0,
-                        help='Min number of commits to count')
+                        help='Min number of commit to begin with')
     parser.add_argument('-u', '--max-count', type=int, default=sys.maxsize,
-                        help='Max number of commits to count')
+                        help='Max number of commit to end with')
     args = parser.parse_args()
 
     repo = git.Repo(args.repo_dir)

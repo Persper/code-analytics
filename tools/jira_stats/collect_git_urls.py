@@ -6,6 +6,7 @@ import re
 import requests
 import sys
 
+
 def main():
     parser = argparse.ArgumentParser(
         description='Collect Apache and GitHub repo URLs of Apache projects')
@@ -18,13 +19,13 @@ def main():
 
     out_file = open(args.file, 'w')
 
-    APACHE_GIT = 'https://git.apache.org/'
+    apache_git = 'https://git.apache.org/'
 
-    resp = requests.get(APACHE_GIT)
+    resp = requests.get(apache_git)
 
     pattern = re.compile(r'<td>(.+)</td>\s*'
-                     r'<td>\s*<a href="(.+)">.+</a>\s*</td>\s*'
-                     r'<td>\s*<a href="(https\://github\.com/.+)">')
+                         r'<td>\s*<a href="(.+)">.+</a>\s*</td>\s*'
+                         r'<td>\s*<a href="(https://github\.com/.+)">')
 
     for match in pattern.finditer(resp.text):
         name = match.group(1)
@@ -34,6 +35,6 @@ def main():
 
     out_file.close()
 
+
 if __name__ == '__main__':
     main()
-

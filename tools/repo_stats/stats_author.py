@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-from sh.contrib import git
 import os
 import subprocess
 import sys
+
 
 def stats_commits(repo_path, author_stats=None):
     if not author_stats:
@@ -15,11 +15,12 @@ def stats_commits(repo_path, author_stats=None):
     with os.fdopen(os.dup(p.stdout.fileno())) as commits_per_author:
         for line in commits_per_author:
             num, name = [s.strip() for s in line.split('\t')]
-            if not name in author_stats:
-                author_stats[name] = { 'n_commits': int(num) }
+            if name not in author_stats:
+                author_stats[name] = {'n_commits': int(num)}
             else:
                 author_stats[name]['n_commits'] = int(num)
     return author_stats
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -46,11 +47,12 @@ def main():
             print('Parsing ' + repo_name)
             project_authors[repo_name] = stats_commits(d)
         for repo_name, author_stats in sorted(project_authors.items(),
-                                            key=lambda x: len(x[1]),
-                                            reverse=True):
+                                              key=lambda x: len(x[1]),
+                                              reverse=True):
             print(repo_name, len(author_stats), sep=',')
     else:
         sys.exit('Error: see -h for usage.')
+
 
 if __name__ == '__main__':
     main()

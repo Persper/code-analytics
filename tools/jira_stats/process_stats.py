@@ -4,8 +4,9 @@ import argparse
 import os
 import re
 
+
 def find_github(name, urls):
-    candidates = [ ]
+    candidates = []
     target = set(x.lower() for x in name.split() if len(x) > 1)
     for item in urls:
         name_set = set(x.lower() for x in item['name'].split() if len(x) > 1)
@@ -15,6 +16,25 @@ def find_github(name, urls):
                 'github_repo': item['github_repo']
             })
     return candidates
+
+
+def get_issue_stats(file_path):
+    issue_stats = []
+    with open(file_path, 'r') as stats:
+        for line in stats:
+            name, key, id, count, \
+                feature, bug, improvement, maintenance, \
+                high, mid, low = line.split(',')
+            if name == 'name' and key == 'key':
+                continue
+            issue_stats.append({
+                'name': name, 'key': key, 'id': id, 'count': count,
+                'feature': feature, 'bug': bug,
+                'improvement': improvement, 'maintenance': maintenance,
+                'high': high, 'mid': mid, 'low': low
+            })
+    return issue_stats
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -31,21 +51,9 @@ def main():
                         help='output file')
     args = parser.parse_args()
 
-    issue_stats = [ ]
-    with open(args.stats_file, 'r') as stats:
-        for line in stats:
-            name, key, id, count, \
-                feature, bug, improvement, maintenance, \
-                high, mid, low = line.split(',')
-            if name == 'name' and key == 'key': continue
-            issue_stats.append({
-                'name': name, 'key': key, 'id': id, 'count': count,
-                'feature': feature, 'bug': bug,
-                'improvement': improvement, 'maintenance': maintenance,
-                'high': high, 'mid': mid, 'low': low
-            })
+    issue_stats = get_issue_stats(args.stats_file)
 
-    project_urls = [ ] 
+    project_urls = []
     with open(args.url_file, 'r') as urls:
         for line in urls:
             name, apache_repo, github_repo = line.split(',')
@@ -58,7 +66,7 @@ def main():
     out_file = open(args.output_file, 'w')
     empty_file = open(args.output_file + '.empty', 'w')
 
-    re_name = re.compile(r'https\://github\.com/apache/(\S+)')
+    re_name = re.compile(r'https://github\.com/apache/(\S+)')
     for project in issue_stats:
         candidates = find_github(project['name'], project_urls)
         if len(candidates) == 0:
@@ -75,6 +83,6 @@ def main():
     empty_file.close()
     out_file.close()
 
+
 if __name__ == '__main__':
     main()
-
