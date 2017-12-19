@@ -33,7 +33,7 @@ def main():
         for i, commit in enumerate(commits):
             if len(commit.parents) > 1:
                 continue
-            email = commit.author.email
+            email = commit.author.email.lower()
             if email not in email2stats:
                 email2stats[email] = {'commits': 1, 'begin': i, 'end': i,
                                       'names': [commit.author.name]}
@@ -44,6 +44,7 @@ def main():
                 if commit.author.name not in stats['names']:
                     stats['names'].append(commit.author.name)
 
+        print('# Email\t# commits\tBegin index\tEnd index')
         for email, stats in email2stats.items():
             print('%s\t%d\t%d\t%d\t' % (email, stats['commits'],
                                         stats['begin'], stats['end']),
@@ -70,7 +71,7 @@ def main():
         commit_list.append({
               'hash': commit.hexsha,
               'url': url_base + commit.hexsha,
-              'email': commit.author.email,
+              'email': commit.author.email.lower(),
               'summary': commit.summary,
               'additions': n_add,
               'deletions': n_del,
