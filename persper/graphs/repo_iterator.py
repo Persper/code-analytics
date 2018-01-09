@@ -56,7 +56,7 @@ class RepoIterator():
             from_beginning: A boolean flag, see above.
             continue_iter: A boolean flag, see above.
             end_commit_sha: A string, see above.
-            into_branches: A boolean flag, if True, the process function
+            into_branches: A boolean flag, if True, the iter function
                 will operate in two phases.
 
                 In the first phase, a call commit graph is contructed
@@ -83,7 +83,6 @@ class RepoIterator():
         if not continue_iter:
             self.visited = set()
             self.last_processed_commit = None
-        merge_commits = deque()
 
         # Method 2
         if from_beginning:
@@ -126,19 +125,16 @@ class RepoIterator():
 
         if into_branches:
             # find all merge commits
+            start_points = deque()
             for commit in reversed(commits):
                 if len(commit.parents) > 1:
-                    merge_commits.append(commit)
+                    for pc in commit.parents[1:]:
+                        start_points.append(pc)
 
-            print("# of merge commits on master: " + str(len(merge_commits)))
-
-            commit_cnt = 1
-            branch_cnt = 1
             branch_commits = []
 
-            while len(merge_commits) > 0:
-                mc = merge_commits.popleft()
-                cur_commit = mc.parents[1]
+            while len(start_points) > 0:
+                cur_commit = start_points.popleft()
                 branch_length = 0
                 valid_branch = False
 
@@ -159,30 +155,21 @@ class RepoIterator():
                         print("WARNING: MAX_BRANCH_LENGTH reached.")
                         break
 
+                    self.visited.add(cur_commit.hexsha)
+                    branch_commits.append(cur_commit)
+                    branch_length += 1
+
                     # stop if we have reached the very first commit
                     if len(cur_commit.parents) == 0:
                         break
 
-                    # will return at least one commit on this branch
-                    valid_branch = True
-
-                    self.visited.add(cur_commit.hexsha)
-                    branch_commits.append(cur_commit)
-
-                    # add to queue if prev_commit is a merge commit
-                    if len(cur_commit.parents) == 2:
-                        merge_commits.append(cur_commit)
+                    # add to queue if cur_commit is a merge commit
+                    if len(cur_commit.parents) > 1:
+                        for pc in cur_commit.parents[1:]:
+                            start_points.append(pc)
 
                     # get next commit
                     prev_commit = cur_commit.parents[0]
-
                     cur_commit = prev_commit
-                    branch_length += 1
-                    commit_cnt += 1
-
-                if valid_branch:
-                    branch_cnt += 1
-
-            print("# of branches: " + str(branch_cnt))
 
         return commits, branch_commits
