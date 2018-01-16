@@ -81,8 +81,7 @@ class RepoIterator():
         branch_commits = None
 
         if not continue_iter:
-            self.visited = set()
-            self.last_processed_commit = None
+            self._reset_state()
 
         # Method 2
         if from_beginning:
@@ -98,7 +97,7 @@ class RepoIterator():
             # Method 4
             if end_commit_sha:
                 rev = self.last_processed_commit.hexsha + '..' + end_commit_sha
-                self.commits = list(self.repo.iter_commits(
+                commits = list(self.repo.iter_commits(
                     rev, first_parent=True))
             # Method 3
             elif num_commits:
@@ -173,3 +172,7 @@ class RepoIterator():
                     cur_commit = prev_commit
 
         return commits, branch_commits
+
+    def _reset_state(self):
+        self.visited = set()
+        self.last_processed_commit = None
