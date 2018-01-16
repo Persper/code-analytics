@@ -38,7 +38,8 @@ def test_callcommitgraph(g):
     }
 
     for commit in g.repo.iter_commits():
-        assert(g.history[commit.hexsha] == history_truth[commit.message.strip()])
+        assert(g.history[commit.hexsha] ==
+               history_truth[commit.message.strip()])
 
     edges_truth = [
         ('append', 'free'),
@@ -122,11 +123,3 @@ def test_save(g):
         gp = pickle.load(f)
     os.remove(fname)
     assert_callcommitgraphs_equal(g, gp)
-
-
-
-
-
-
-
-
