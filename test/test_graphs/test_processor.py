@@ -1,6 +1,5 @@
 import os
 import pytest
-import pickle
 import subprocess
 from persper.graphs.processor import Processor
 from persper.util.path import root_path
