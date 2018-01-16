@@ -8,7 +8,7 @@ from persper.util.path import root_path
 def setup_module(module):
     # build the repo first if not exists yet
     repo_path = os.path.join(root_path, 'repos/test_processor')
-    script_path = os.path.join(root_path, 'repos/repo_creater/create_repo.py')
+    script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
     test_src_path = os.path.join(root_path, 'test/test_processor')
     if not os.path.isdir(repo_path):
         cmd = '{} {}'.format(script_path, test_src_path)
