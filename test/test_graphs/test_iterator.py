@@ -2,7 +2,7 @@ import os
 import pytest
 import pickle
 import subprocess
-from persper.graphs.repo_iterator import RepoIterator
+from persper.graphs.iterator import RepoIterator
 from persper.util.path import root_path
 
 
@@ -55,3 +55,11 @@ def test_rev(ri):
         continue_iter=True, end_commit_sha='D', into_branches=True)
     assert(serialized_messages(commits2) == 'D')
     assert(serialized_messages(branch_commits2) == 'G F E J I H L K')
+
+
+def test_iter_twice(ri):
+    commits, branch_commits = ri.iter(from_beginning=True, into_branches=True)
+    commits2, branch_commits2 = ri.iter(
+        from_beginning=True, into_branches=True)
+    assert(commits == commits2)
+    assert(branch_commits == branch_commits2)
