@@ -92,7 +92,7 @@ class RepoIterator():
         elif continue_iter:
             if not self.last_processed_commit:
                 print("No history exists yet, terminated.")
-                return
+                return [], []
 
             # Method 4
             if end_commit_sha:
@@ -106,7 +106,7 @@ class RepoIterator():
                     rev, first_parent=True))[-num_commits:]
             else:
                 print("Both end_commit_sha and num_commits are None.")
-                return
+                return [], []
 
         else:
             # Method 1
@@ -117,7 +117,7 @@ class RepoIterator():
             self.last_processed_commit = commits[0]
         else:
             print("The range specified is empty, terminated.")
-            return
+            return [], []
 
         for commit in reversed(commits):
             self.visited.add(commit.hexsha)
