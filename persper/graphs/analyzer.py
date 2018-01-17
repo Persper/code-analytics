@@ -1,7 +1,31 @@
+import os
+import time
 import pickle
 from persper.graphs.devrank import devrank
 from persper.graphs.git_tools import get_contents, _diff_with_first_parent
 from persper.graphs.iterator import RepoIterator
+
+
+def print_overview(commits, branch_commits):
+    print('----- Overview ------')
+    print('# of commits on master: %d' % len(commits))
+    print('# of commits on branch: %d' % len(branch_commits))
+
+
+def print_commit_info(phase, idx, commit, start_time, verbose):
+    if verbose:
+        print('----- No.%d %s %s %s -----' %
+              (idx, commit.hexsha, subject_of(commit.message),
+               time.strftime("%b %d %Y", time.gmtime(commit.authored_date))))
+    else:
+        print('----- No.%d %s on %s -----' % (idx, commit.hexsha, phase))
+
+    if idx % 100 == 0:
+        print('------ Used time: %.3f -----' % (time.time() - start_time))
+
+
+def subject_of(msg):
+    return msg.split('\n', 1)[0].lstrip().rstrip()
 
 
 def _get_fnames(diff):
@@ -56,7 +80,9 @@ class Analyzer():
                 end_commit_sha=None,
                 into_branches=False,
                 max_branch_length=100,
-                min_branch_date=None):
+                min_branch_date=None,
+                checkpoint_interval=1000,
+                verbose=False):
 
         if not continue_iter:
             self.reset_state()
@@ -72,11 +98,22 @@ class Analyzer():
                          max_branch_length=max_branch_length,
                          min_branch_date=min_branch_date)
 
-        for commit in reversed(commits):
+        print_overview(commits, branch_commits)
+        start_time = time.time()
+
+        for idx, commit in enumerate(reversed(commits), 1):
+            phase = 'master'
+            print_commit_info(phase, idx, commit, start_time, verbose)
+            self.autosave(phase, idx, checkpoint_interval)
             self.analyze_master_commit(commit, into_branches)
 
-        for commit in branch_commits:
+        for idx, commit in enumerate(branch_commits, 1):
+            phase = 'branch'
+            print_commit_info(phase, idx, commit, start_time, verbose)
+            self.autosave(phase, idx, checkpoint_interval)
             self.analyze_branch_commit(commit)
+
+        self.autosave('finished', 0, 1)
 
     def analyze_master_commit(self, commit, into_branches):
         self.history[commit.hexsha] = {}
@@ -178,3 +215,9 @@ class Analyzer():
     def save(self, fname):
         with open(fname, 'wb+') as f:
             pickle.dump(self, f)
+
+    def autosave(self, phase, idx, checkpoint_interval):
+        if idx % checkpoint_interval == 0:
+            repo_name = os.path.basename(self.ri.repo_path.rstrip('/'))
+            fname = repo_name + '-' + phase + '-' + str(idx) + '.pickle'
+            self.save(fname)
