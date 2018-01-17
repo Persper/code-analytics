@@ -77,8 +77,8 @@ class RepoIterator():
                 a commit is authored before this time.
             checkpoint_interval: An int.
         """
-        commits = None
-        branch_commits = None
+        commits = []
+        branch_commits = []
 
         if not continue_iter:
             self._reset_state()
@@ -129,8 +129,6 @@ class RepoIterator():
                 if len(commit.parents) > 1:
                     for pc in commit.parents[1:]:
                         start_points.append(pc)
-
-            branch_commits = []
 
             while len(start_points) > 0:
                 cur_commit = start_points.popleft()
