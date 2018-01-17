@@ -1,5 +1,6 @@
 import os
 import pytest
+import pickle
 import subprocess
 from persper.graphs.c import CGraph
 from persper.graphs.analyzer import Analyzer
@@ -105,3 +106,13 @@ def test_analyze_interface(az):
                 end_commit_sha=commits[6].hexsha,
                 into_branches=True)
     assert_analyzer_equal(az2, az)
+
+
+def test_save(az):
+    az.analyze(from_beginning=True, into_branches=True)
+    fname = "test_save_g.pickle"
+    az.save(fname)
+    with open(fname, 'rb') as f:
+        az1 = pickle.load(f)
+    os.remove(fname)
+    assert_analyzer_equal(az, az1)

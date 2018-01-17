@@ -1,3 +1,4 @@
+import pickle
 from persper.graphs.devrank import devrank
 from persper.graphs.git_tools import get_contents, _diff_with_first_parent
 from persper.graphs.iterator import RepoIterator
@@ -173,3 +174,7 @@ class Analyzer():
             for func in self.history[sha]:
                 loc[sha] += self.history[sha][func]
         return sorted(loc.items(), key=lambda x: x[1], reverse=True)
+
+    def save(self, fname):
+        with open(fname, 'wb+') as f:
+            pickle.dump(self, f)
