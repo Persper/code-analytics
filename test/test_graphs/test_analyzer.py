@@ -21,23 +21,58 @@ def az():
     return Analyzer(repo_path, CGraph())
 
 
+def assert_graphs_equal(G1, G2):
+    assert(set(G1.nodes()) == set(G2.nodes()))
+    assert(set(G1.edges()) == set(G2.edges()))
+    for n in G1:
+        print(n)
+        assert(G1.node[n] == G2.node[n])
+
+
+def assert_analyzer_equal(az1, az2):
+    assert(az1.history == az2.history)
+    assert_graphs_equal(az1.ccg.get_graph(), az2.ccg.get_graph())
+
+
+def assert_graph_match_history(analyzer):
+    # total edits data stored in the graph should match analyzer.history
+    master_commits, _ = analyzer.ri.iter(from_beginning=True)
+    master_sha_set = set([c.hexsha for c in master_commits])
+    G = analyzer.ccg.get_graph()
+    for func in G.nodes():
+        print(func)
+        func_sum = 0
+        for sha in analyzer.history:
+            if sha in master_sha_set and func in analyzer.history[sha]:
+                func_sum += analyzer.history[sha][func]
+        if G.node[func]['defined']:
+            assert(func_sum == G.node[func]['num_lines'])
+
+
 def test_az_basic(az):
     # calling analyze twice should make no differenece
     az.analyze(from_beginning=True, into_branches=True)
     az.analyze(from_beginning=True, into_branches=True)
+    assert_graph_match_history(az)
 
     history_truth = {
-        'J': {'count': 12, 'display': 14},
-        'I': {'add': 5, 'append': 35, 'insert': 25},
-        'E': {},
-        'G': {'str_equals': 1, 'str_replace': 26},
-        'D': {},
-        'H': {'add': 16, 'append': 12, 'insert': 25},
-        'F': {},
-        'A': {'str_append': 7, 'str_len': 6},
         'K': {'display': 5},
+        'F': {'display': 14, 'count': 12},
+        'E': {'append': 29, 'add': 11},
+        'D': {'str_replace': 26},
         'C': {'str_append_chr': 34, 'str_equals': 1},
-        'B': {'str_append': 9, 'str_append_chr': 7, 'str_equals': 11}
+        'B': {'str_append': 9, 'str_append_chr': 7, 'str_equals': 11},
+        'A': {'str_append': 7, 'str_len': 6},
+
+        # branch J from commit A, merge back through F
+        'J': {'count': 12, 'display': 14},
+
+        # branch G from commit B, merge back through D
+        'G': {'str_equals': 1, 'str_replace': 26},
+
+        # branch H from commit D, merge back through  E
+        'I': {'add': 5, 'append': 35, 'insert': 25},
+        'H': {'add': 16, 'append': 12, 'insert': 25},
     }
 
     for commit in az.ri.repo.iter_commits():
@@ -60,21 +95,8 @@ def test_az_basic(az):
     assert(set(az.ccg.get_graph().edges()) == set(edges_truth))
 
 
-def assert_graphs_equal(G1, G2):
-    assert(set(G1.nodes()) == set(G2.nodes()))
-    assert(set(G1.edges()) == set(G2.edges()))
-    for n in G1:
-        print(n)
-        assert(G1.node[n] == G2.node[n])
-
-
-def assert_analyzer_equal(az1, az2):
-    assert(az1.history == az2.history)
-    assert_graphs_equal(az1.ccg.get_graph(), az2.ccg.get_graph())
-
-
 def test_analyze_interface(az):
-    """test various ways to invoke process function"""
+    # test various ways to invoke process function
     az.analyze(from_beginning=True, into_branches=True)
 
     repo_path = os.path.join(root_path, 'repos/test_feature_branch')

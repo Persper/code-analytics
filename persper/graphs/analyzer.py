@@ -104,16 +104,16 @@ class Analyzer():
         for idx, commit in enumerate(reversed(commits), 1):
             phase = 'master'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self.autosave(phase, idx, checkpoint_interval)
+            # self.autosave(phase, idx, checkpoint_interval)
             self.analyze_master_commit(commit, into_branches)
 
         for idx, commit in enumerate(branch_commits, 1):
             phase = 'branch'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self.autosave(phase, idx, checkpoint_interval)
+            # self.autosave(phase, idx, checkpoint_interval)
             self.analyze_branch_commit(commit)
 
-        self.autosave('finished', 0, 1)
+        # self.autosave('finished', 0, 1)
 
     def analyze_master_commit(self, commit, into_branches):
         self.history[commit.hexsha] = {}
@@ -137,9 +137,9 @@ class Analyzer():
             if old_src or new_src:
                 change_stats = self.ccg.update_graph(
                     old_src, new_src, diff.diff)
-                if not (into_branches and is_merge_commit(commit)):
-                    for func_name, num_lines in change_stats.items():
-                        self.history[commit.hexsha][func_name] = num_lines
+                # record all changes no matter whether it's a merge or not
+                for func_name, num_lines in change_stats.items():
+                    self.history[commit.hexsha][func_name] = num_lines
 
     def analyze_branch_commit(self, commit):
         self.history[commit.hexsha] = {}
@@ -163,10 +163,9 @@ class Analyzer():
             if old_src or new_src:
                 change_stats = self.ccg.get_change_stats(
                     old_src, new_src, diff.diff)
-                # TODO verify correctness
-                if not is_merge_commit(commit):
-                    for func_name, num_lines in change_stats.items():
-                        self.history[commit.hexsha][func_name] = num_lines
+                # record all changes no matter whether it's a merge or not
+                for func_name, num_lines in change_stats.items():
+                    self.history[commit.hexsha][func_name] = num_lines
 
     def reset_state(self):
         self.history = {}
