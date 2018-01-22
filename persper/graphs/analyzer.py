@@ -104,14 +104,14 @@ class Analyzer():
         for idx, commit in enumerate(reversed(commits), 1):
             phase = 'master'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self.autosave(phase, idx, checkpoint_interval)
             self.analyze_master_commit(commit, into_branches)
+            self.autosave(phase, idx, checkpoint_interval)
 
         for idx, commit in enumerate(branch_commits, 1):
             phase = 'branch'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self.autosave(phase, idx, checkpoint_interval)
             self.analyze_branch_commit(commit)
+            self.autosave(phase, idx, checkpoint_interval)
 
         self.autosave('finished', 0, 1)
 
