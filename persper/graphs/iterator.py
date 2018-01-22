@@ -56,26 +56,11 @@ class RepoIterator():
             from_beginning: A boolean flag, see above.
             continue_iter: A boolean flag, see above.
             end_commit_sha: A string, see above.
-            into_branches: A boolean flag, if True, the iter function
-                will operate in two phases.
-
-                In the first phase, a call commit graph is contructed
-                by traversing the specified range of commits on the master
-                branch. Merge commits are detected and recorded if the
-                start commit (on master) and end/merge commit of the
-                corresponding branch are both within the range of
-                traversal. Those recorded merge commits do not
-                get any credits (thus they are not present in
-                self.history data structure).
-
-                In the second phase, it traverses all the branches detected
-                in the first phase and assign them due credits.
-
+            into_branches: A boolean flag.
             max_branch_length: An int, the maximum number of commits
                 to trace back before abortion.
             min_branch_date: A python time object, stop backtracing if
                 a commit is authored before this time.
-            checkpoint_interval: An int.
         """
         commits = []
         branch_commits = []
@@ -130,10 +115,11 @@ class RepoIterator():
                     for pc in commit.parents[1:]:
                         start_points.append(pc)
 
+            self.branch_lengths = []
+
             while len(start_points) > 0:
                 cur_commit = start_points.popleft()
                 branch_length = 0
-                valid_branch = False
 
                 while True:
 
@@ -166,8 +152,10 @@ class RepoIterator():
                             start_points.append(pc)
 
                     # get next commit
-                    prev_commit = cur_commit.parents[0]
-                    cur_commit = prev_commit
+                    cur_commit = cur_commit.parents[0]
+
+                if branch_length > 0:
+                    self.branch_lengths.append(branch_length)
 
         return commits, branch_commits
 
@@ -180,12 +168,18 @@ class RepoIterator():
         state['repo_path'] = self.repo_path
         state['visited'] = self.visited
         # Avoid directly pickle Commit object
-        state['last_processed_sha'] = self.last_processed_commit.hexsha
+        if self.last_processed_commit is None:
+            state['last_processed_sha'] = None
+        else:
+            state['last_processed_sha'] = self.last_processed_commit.hexsha
         return state
 
     def __setstate__(self, state):
         self.repo_path = state['repo_path']
         self.visited = state['visited']
         self.repo = initialize_repo(state['repo_path'])
-        self.last_processed_commit = self.repo.commit(
-            state['last_processed_sha'])
+        if state['last_processed_sha'] is None:
+            self.last_processed_commit = None
+        else:
+            self.last_processed_commit = self.repo.commit(
+                state['last_processed_sha'])
