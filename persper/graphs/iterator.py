@@ -81,7 +81,7 @@ class RepoIterator():
         branch_commits = []
 
         if not continue_iter:
-            self._reset_state()
+            self.reset_state()
 
         # Method 2
         if from_beginning:
@@ -171,6 +171,21 @@ class RepoIterator():
 
         return commits, branch_commits
 
-    def _reset_state(self):
+    def reset_state(self):
         self.visited = set()
         self.last_processed_commit = None
+
+    def __getstate__(self):
+        state = {}
+        state['repo_path'] = self.repo_path
+        state['visited'] = self.visited
+        # Avoid directly pickle Commit object
+        state['last_processed_sha'] = self.last_processed_commit.hexsha
+        return state
+
+    def __setstate__(self, state):
+        self.repo_path = state['repo_path']
+        self.visited = state['visited']
+        self.repo = initialize_repo(state['repo_path'])
+        self.last_processed_commit = self.repo.commit(
+            state['last_processed_sha'])
