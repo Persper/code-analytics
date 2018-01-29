@@ -177,6 +177,22 @@ class Analyzer():
                 return True
         return False
 
+    def build_history(self,
+                      commits,
+                      phase='build-history',
+                      checkpoint_interval=1000,
+                      verbose=False):
+        """A helper function to access `analyze_branch_commit`"""
+        print_overview([], commits)
+        start_time = time.time()
+
+        for idx, commit in enumerate(commits, 1):
+            print_commit_info(phase, idx, commit, start_time, verbose)
+            self.analyze_branch_commit(commit)
+            self.autosave(phase, idx, checkpoint_interval)
+
+        self.autosave(phase, 0, 1)
+
     def compute_shares(self, alpha):
         G = self.ccg.get_graph()
         scores = devrank(G, alpha=alpha)
