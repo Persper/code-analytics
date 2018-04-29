@@ -1,0 +1,3 @@
+digraph test_feature_branch {
+	A -> B -> C;
+}
