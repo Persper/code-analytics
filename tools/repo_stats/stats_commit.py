@@ -25,11 +25,10 @@ def main():
     args = parser.parse_args()
 
     repo = git.Repo(args.repo_dir)
-
+    commits = repo.iter_commits(args.branch, max_count=args.max_count,
+                                skip=args.min_count)
     if args.show_stats:
         email2stats = {}
-        commits = repo.iter_commits(args.branch, max_count=args.max_count,
-                                    skip=args.min_count)
         for i, commit in enumerate(commits):
             if len(commit.parents) > 1:
                 continue
@@ -61,7 +60,7 @@ def main():
     user_name, repo_name = re.split('[/:.]', repo.remotes.origin.url)[-3:-1]
     url_base = 'https://github.com/%s/%s/commit/' % (user_name, repo_name)
 
-    for commit in repo.iter_commits(args.branch):
+    for commit in commits:
         if len(commit.parents) > 1:
             continue
         n_add = 0

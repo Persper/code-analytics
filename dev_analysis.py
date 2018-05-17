@@ -110,7 +110,10 @@ def main():
     if not os.path.isdir(xml_dir):
         sys.exit('Invalid dir for -x.')
  
-    wb = load_workbook(args.o) if os.path.isfile(args.o) else Workbook() 
+    wb = load_workbook(args.o) if os.path.isfile(args.o) else Workbook()
+    for ws in wb.worksheets:
+        if ws.max_row == 0:
+            wb.remove(ws)
     graph = None
     func2file = None
 
@@ -140,7 +143,7 @@ def main():
             graph, func2file = build_call_graph(xml_dir) 
         ccg = CallCommitGraph(src_dir)
         for n in args.n:
-            ccg.process(rev='v4.10', num_commits=n)
+            ccg.process(rev='v4.10', num_commits=n, into_branches=True)
             ranks_array = devrank_c2(ccg, args.a[0], args.a[1], args.a[2])
             ranks_array = fname_array(ranks_array, func2file)
             ws = wb.create_sheet('DevRank-CC n=' + str(n))
