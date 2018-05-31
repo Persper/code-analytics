@@ -136,7 +136,7 @@ class Analyzer():
 
             if old_src or new_src:
                 change_stats = self.ccg.update_graph(
-                    old_src, new_src, diff.diff)
+                    old_fname, old_src, new_fname, new_src, diff.diff)
                 # record all changes no matter whether it's a merge or not
                 for func_name, num_lines in change_stats.items():
                     self.history[commit.hexsha][func_name] = num_lines
@@ -162,7 +162,7 @@ class Analyzer():
 
             if old_src or new_src:
                 change_stats = self.ccg.get_change_stats(
-                    old_src, new_src, diff.diff)
+                    old_fname, old_src, new_fname, new_src, diff.diff)
                 # record all changes no matter whether it's a merge or not
                 for func_name, num_lines in change_stats.items():
                     self.history[commit.hexsha][func_name] = num_lines
