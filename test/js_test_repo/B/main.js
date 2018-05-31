@@ -8,7 +8,7 @@ function main() {
 	let a = funcA;
 	let b = function funcB () {
 		print('func B is called!');
-	}
+	};
 	let c = a;
 	b();
 	c();
