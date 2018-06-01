@@ -14,7 +14,12 @@ E.g., on Ubuntu LTS 16.04:
 ```
 sudo apt update
 sudo apt install -y python3 python3-pip
-sudo -H pip3 install dicttoxml gitpython lxml networkx numpy openpyxl statistics scipy matplotlib
+sudo -H pip3 install -r requirements.txt
+```
+
+Also, create a symbolic link from `python3` to `python` since some scripts reply on it.
+```
+sudo ln -s /usr/bin/python3 /usr/bin/python
 ```
 
 2. Update Git
@@ -34,6 +39,28 @@ git --version
 ```
 cd misc/
 ./apply_patch.py
+```
+
+4. Add project directory to path
+
+Add the following line to your `~/.bashrc` file.
+```
+export PATH=$PATH:/path/to/dir
+```
+
+To update your path for the remainder of the session.
+```
+source ~/.bashrc
+```
+
+5. Install srcML for parsing C/C++ and Java
+
+Please download from [here](https://www.srcml.org/#download) and follow the [instructions](http://131.123.42.38/lmcrs/beta/README).
+
+srcML also needs `libarchive-dev` and `libcurl4-openssl-dev`.
+```
+sudo apt install libarchive-dev
+sudo apt install libcurl4-openssl-dev
 ```
 
 ### Interactive Mode
