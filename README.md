@@ -63,6 +63,15 @@ sudo apt install libarchive-dev
 sudo apt install libcurl4-openssl-dev
 ```
 
+6. Check setup correctness
+
+```
+cd test
+pytest
+```
+
+You should see all tests passed.
+
 ### Interactive Mode
 
 1. Install Jupyter
