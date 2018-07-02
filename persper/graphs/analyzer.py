@@ -71,6 +71,7 @@ class Analyzer():
         self.ccg = ccg
         self.ri = RepoIterator(repo_path)
         self.history = {}
+        self.id_map = {}
         self.share = {}
 
     def analyze(self, rev=None,
@@ -116,7 +117,9 @@ class Analyzer():
         self.autosave('finished', 0, 1)
 
     def analyze_master_commit(self, commit, into_branches):
-        self.history[commit.hexsha] = {}
+        sha = commit.hexsha
+        self.history[sha] = {}
+        self.id_map[sha] = {}
         diff_index = _diff_with_first_parent(commit)
 
         for diff in diff_index:
@@ -135,14 +138,17 @@ class Analyzer():
                 new_src = get_contents(self.ri.repo, commit, new_fname)
 
             if old_src or new_src:
-                change_stats = self.ccg.update_graph(
+                # Delegate actual work to ccg
+                id_to_lines, id_map = self.ccg.update_graph(
                     old_fname, old_src, new_fname, new_src, diff.diff)
-                # record all changes no matter whether it's a merge or not
-                for func_name, num_lines in change_stats.items():
-                    self.history[commit.hexsha][func_name] = num_lines
+
+                self.history[sha].update(id_to_lines)
+                self.id_map[sha].update(id_map)
 
     def analyze_branch_commit(self, commit):
-        self.history[commit.hexsha] = {}
+        sha = commit.hexsha
+        self.history[sha] = {}
+        self.id_map[sha] = {}
         diff_index = _diff_with_first_parent(commit)
 
         for diff in diff_index:
@@ -161,14 +167,16 @@ class Analyzer():
                 new_src = get_contents(self.ri.repo, commit, new_fname)
 
             if old_src or new_src:
-                change_stats = self.ccg.get_change_stats(
+                # Delegate actual work to ccg
+                id_to_lines, id_map = self.ccg.get_change_stats(
                     old_fname, old_src, new_fname, new_src, diff.diff)
-                # record all changes no matter whether it's a merge or not
-                for func_name, num_lines in change_stats.items():
-                    self.history[commit.hexsha][func_name] = num_lines
+
+                self.history[sha].update(id_to_lines)
+                self.id_map[sha].update(id_map)
 
     def reset_state(self):
         self.history = {}
+        self.id_map = {}
         self.share = {}
 
     def fname_filter(self, fname):
