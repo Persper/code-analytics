@@ -130,11 +130,11 @@ class Analyzer():
 
             old_src = new_src = None
 
-            if old_fname and self.fname_filter(old_fname):
+            if old_fname and self.ccg.fname_filter(old_fname):
                 old_src = get_contents(
                     self.ri.repo, commit.parents[0], old_fname)
 
-            if new_fname and self.fname_filter(new_fname):
+            if new_fname and self.ccg.fname_filter(new_fname):
                 new_src = get_contents(self.ri.repo, commit, new_fname)
 
             if old_src or new_src:
@@ -159,11 +159,11 @@ class Analyzer():
 
             old_src = new_src = None
 
-            if old_fname and self.fname_filter(old_fname):
+            if old_fname and self.ccg.fname_filter(old_fname):
                 old_src = get_contents(
                     self.ri.repo, commit.parents[0], old_fname)
 
-            if new_fname and self.fname_filter(new_fname):
+            if new_fname and self.ccg.fname_filter(new_fname):
                 new_src = get_contents(self.ri.repo, commit, new_fname)
 
             if old_src or new_src:
@@ -178,12 +178,6 @@ class Analyzer():
         self.history = {}
         self.id_map = {}
         self.share = {}
-
-    def fname_filter(self, fname):
-        for ext in self.ccg.exts:
-            if fname.endswith(ext):
-                return True
-        return False
 
     def build_history(self,
                       commits,
