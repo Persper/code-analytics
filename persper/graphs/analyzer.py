@@ -105,7 +105,7 @@ class Analyzer():
         for idx, commit in enumerate(reversed(commits), 1):
             phase = 'master'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self.analyze_master_commit(commit, into_branches)
+            self.analyze_master_commit(commit)
             self.autosave(phase, idx, checkpoint_interval)
 
         for idx, commit in enumerate(branch_commits, 1):
@@ -116,7 +116,7 @@ class Analyzer():
 
         self.autosave('finished', 0, 1)
 
-    def analyze_master_commit(self, commit, into_branches):
+    def _analyze_commit(self, commit, ccg_func):
         sha = commit.hexsha
         self.history[sha] = {}
         self.id_map[sha] = {}
@@ -124,55 +124,39 @@ class Analyzer():
 
         for diff in diff_index:
             old_fname, new_fname = _get_fnames(diff)
+            # Cases we don't handle
+            # 1. Both file names are None
             if old_fname is None and new_fname is None:
-                print('Unknown change type encountered.')
+                print('WARNING: unknown change type encountered.')
+                continue
+
+            # 2. Either old_fname and new_fname doesn't pass filter
+            if ((old_fname and not self.ccg.fname_filter(old_fname)) or
+               (new_fname and not self.ccg.fname_filter(new_fname))):
                 continue
 
             old_src = new_src = None
 
-            if old_fname and self.ccg.fname_filter(old_fname):
+            if old_fname:
                 old_src = get_contents(
                     self.ri.repo, commit.parents[0], old_fname)
 
-            if new_fname and self.ccg.fname_filter(new_fname):
+            if new_fname:
                 new_src = get_contents(self.ri.repo, commit, new_fname)
 
             if old_src or new_src:
                 # Delegate actual work to ccg
-                id_to_lines, id_map = self.ccg.update_graph(
+                id_to_lines, id_map = ccg_func(
                     old_fname, old_src, new_fname, new_src, diff.diff)
 
                 self.history[sha].update(id_to_lines)
                 self.id_map[sha].update(id_map)
+
+    def analyze_master_commit(self, commit):
+        self._analyze_commit(commit, self.ccg.update_graph)
 
     def analyze_branch_commit(self, commit):
-        sha = commit.hexsha
-        self.history[sha] = {}
-        self.id_map[sha] = {}
-        diff_index = _diff_with_first_parent(commit)
-
-        for diff in diff_index:
-            old_fname, new_fname = _get_fnames(diff)
-            if old_fname is None and new_fname is None:
-                print('Unknown change type encountered.')
-                continue
-
-            old_src = new_src = None
-
-            if old_fname and self.ccg.fname_filter(old_fname):
-                old_src = get_contents(
-                    self.ri.repo, commit.parents[0], old_fname)
-
-            if new_fname and self.ccg.fname_filter(new_fname):
-                new_src = get_contents(self.ri.repo, commit, new_fname)
-
-            if old_src or new_src:
-                # Delegate actual work to ccg
-                id_to_lines, id_map = self.ccg.get_change_stats(
-                    old_fname, old_src, new_fname, new_src, diff.diff)
-
-                self.history[sha].update(id_to_lines)
-                self.id_map[sha].update(id_map)
+        self._analyze_commit(commit, self.ccg.get_change_stats)
 
     def reset_state(self):
         self.history = {}
