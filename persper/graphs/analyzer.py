@@ -72,7 +72,6 @@ class Analyzer():
         self.ri = RepoIterator(repo_path)
         self.history = {}
         self.id_map = {}
-        self.share = {}
 
     def analyze(self, rev=None,
                 from_beginning=False,
@@ -161,7 +160,6 @@ class Analyzer():
     def reset_state(self):
         self.history = {}
         self.id_map = {}
-        self.share = {}
 
     def build_history(self,
                       commits,
@@ -179,11 +177,26 @@ class Analyzer():
 
         self.autosave(phase, 0, 1)
 
-    def compute_shares(self, alpha):
+    def aggregate_id_map(self):
+        final_map = {}
+        for sha in self.id_map:
+            final_map.update(self.id_map[sha])
+
+        for old_fid, new_fid in final_map.items():
+            if new_fid in final_map:
+                final_fid = new_fid
+                while final_fid in final_map:
+                    final_fid = final_map[final_fid]
+                final_map[old_fid] = final_fid
+
+        return final_map
+
+    def compute_commit_shares(self, alpha):
+        commit_share = {}
         G = self.ccg.get_graph()
         scores = devrank(G, alpha=alpha)
         for sha in self.history:
-            self.share[sha] = 0
+            commit_share[sha] = 0
             for func in self.history[sha]:
                 if func in self.G:
                     """
@@ -195,6 +208,7 @@ class Analyzer():
                         (self.history[sha][func] /
                          self.G.node[func]['num_lines'] *
                          self.scores[func])
+        return commit_share
 
     def devrank_commits(self, alpha):
         self.compute_shares(alpha)
