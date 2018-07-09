@@ -86,7 +86,8 @@ class RepoIterator():
                     rev, first_parent=True))
             # Method 3
             elif num_commits:
-                rev = self.last_processed_commit.hexsha + '..master'
+                # some project's main branch might not be master, thus use HEAD
+                rev = self.last_processed_commit.hexsha + '..HEAD'
                 commits = list(self.repo.iter_commits(
                     rev, first_parent=True))[-num_commits:]
             else:
