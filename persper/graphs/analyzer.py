@@ -234,6 +234,18 @@ class Analyzer():
 
         return commit_share
 
+    def compute_developer_share(self, alpha):
+        dev_share = {}
+        commit_share = self.compute_commit_share(alpha)
+
+        for sha in commit_share:
+            email = self.ri.repo.commit(sha).author.email
+            if email in dev_share:
+                dev_share[email] += commit_share[sha]
+            else:
+                dev_share[email] = commit_share[sha]
+        return dev_share
+
     def locrank_commits(self):
         loc = {}
         for sha in self.history:
