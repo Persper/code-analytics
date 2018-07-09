@@ -16,22 +16,29 @@ def test_map_id():
     server_addr = 'http://localhost:3000'
     az = Analyzer(repo_path, JSGraph(server_addr))
 
+    az.ordered_shas = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7']
+
     az.id_map = {
         'c1': {'A': 'B'},
         'c2': {'B': 'C', 'E': 'F'},
         'c3': {'C': 'D', 'F': 'G'},
         'c4': {'G': 'H'},
-        'c5': {'D': 'I'}
+        'c5': {'D': 'I', 'J': 'K'},
+        'c6': {'I': 'B', 'H': 'E'},  # make two cycles
+        'c7': {'B': 'L'}  # remove a cycle
     }
 
     final_map_truth = {
-        'A': 'I',
-        'B': 'I',
-        'C': 'I',
-        'D': 'I',
-        'E': 'H',
-        'F': 'H',
-        'G': 'H'
+        'A': 'L',
+        'B': 'L',
+        'C': 'L',
+        'D': 'L',
+        'I': 'L',
+        'E': 'E',
+        'F': 'E',
+        'G': 'E',
+        'H': 'E',
+        'J': 'K'
     }
 
     final_map = az.aggregate_id_map()

@@ -4,6 +4,7 @@ import pickle
 from persper.graphs.devrank import devrank
 from persper.graphs.git_tools import get_contents, _diff_with_first_parent
 from persper.graphs.iterator import RepoIterator
+from persper.util.bidict import bidict
 
 
 def print_overview(commits, branch_commits):
@@ -72,6 +73,7 @@ class Analyzer():
         self.ri = RepoIterator(repo_path)
         self.history = {}
         self.id_map = {}
+        self.ordered_shas = []
 
     def analyze(self, rev=None,
                 from_beginning=False,
@@ -102,7 +104,7 @@ class Analyzer():
         start_time = time.time()
 
         for idx, commit in enumerate(reversed(commits), 1):
-            phase = 'master'
+            phase = 'main'
             print_commit_info(phase, idx, commit, start_time, verbose)
             self.analyze_master_commit(commit)
             self.autosave(phase, idx, checkpoint_interval)
@@ -117,6 +119,7 @@ class Analyzer():
 
     def _analyze_commit(self, commit, ccg_func):
         sha = commit.hexsha
+        self.ordered_shas.append(sha)
         self.history[sha] = {}
         self.id_map[sha] = {}
         diff_index = _diff_with_first_parent(commit)
@@ -160,6 +163,8 @@ class Analyzer():
     def reset_state(self):
         self.history = {}
         self.id_map = {}
+        self.ordered_shas = []
+        self.G = None
 
     def build_history(self,
                       commits,
@@ -178,46 +183,56 @@ class Analyzer():
         self.autosave(phase, 0, 1)
 
     def aggregate_id_map(self):
-        final_map = {}
-        for sha in self.id_map:
-            final_map.update(self.id_map[sha])
+        final_map = bidict()
+        for sha in self.ordered_shas:
+            for old_fid, new_fid in self.id_map[sha].items():
+                if old_fid in final_map.inverse:
+                    # Make a copy so that we don't remove list elements
+                    # during iteration
+                    existing_fids = final_map.inverse[old_fid].copy()
+                    for ex_fid in existing_fids:
+                        final_map[ex_fid] = new_fid
+                final_map[old_fid] = new_fid
+        return dict(final_map)
 
-        for old_fid, new_fid in final_map.items():
-            if new_fid in final_map:
-                final_fid = new_fid
-                while final_fid in final_map:
-                    final_fid = final_map[final_fid]
-                final_map[old_fid] = final_fid
+    def cache_graph(self):
+        self.G = self.ccg.get_graph()
 
-        return final_map
+    def compute_function_share(self, alpha):
+        self.cache_graph()
+        return devrank(self.G, alpha=alpha)
 
-    def compute_commit_shares(self, alpha):
+    def compute_commit_share(self, alpha):
         commit_share = {}
-        G = self.ccg.get_graph()
-        scores = devrank(G, alpha=alpha)
+        func_share = self.compute_function_share(alpha)
+        final_map = self.aggregate_id_map()
+
+        # Compute final history using final_map
+        final_history = {}
         for sha in self.history:
+            final_history[sha] = {}
+            for fid, num_lines in self.history[sha].items():
+                if fid in final_map:
+                    final_history[sha][final_map[fid]] = num_lines
+                else:
+                    final_history[sha][fid] = num_lines
+
+        # Propagate to commit level
+        for sha in final_history:
             commit_share[sha] = 0
-            for func in self.history[sha]:
-                if func in self.G:
+            for fid in final_history[sha]:
+                if fid in self.G:
                     """
                     this condition handles the case where
                     func is deleted by sha,
                     but has never been added or modified before
                     """
-                    self.share[sha] += \
-                        (self.history[sha][func] /
-                         self.G.node[func]['num_lines'] *
-                         self.scores[func])
+                    commit_share[sha] += \
+                        (final_history[sha][fid] /
+                         self.G.node[fid]['num_lines'] *
+                         func_share[fid])
+
         return commit_share
-
-    def devrank_commits(self, alpha):
-        self.compute_shares(alpha)
-        return sorted(self.share.items(), key=lambda x: x[1], reverse=True)
-
-    def devrank_functions(self, alpha):
-        G = self.ccg.get_graph()
-        scores = devrank(G, alpha=alpha)
-        return sorted(scores.items(), key=lambda x: x[1], reverse=True)
 
     def locrank_commits(self):
         loc = {}
