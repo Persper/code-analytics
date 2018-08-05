@@ -17,7 +17,7 @@ def main():
     parser.add_argument('-f', '--output-file',
                         help='Output JSON file')
     parser.add_argument('-s', '--show-stats', action='store_true',
-                        help='Show stats of commits instead of outputting to a JSON file')
+                        help='Show aggregated stats of authors instead of outputting commits to a JSON file')
     parser.add_argument('-l', '--min-count', type=int, default=0,
                         help='Min number of commit to begin with')
     parser.add_argument('-u', '--max-count', type=int, default=sys.maxsize,
@@ -43,11 +43,11 @@ def main():
                 if commit.author.name not in stats['names']:
                     stats['names'].append(commit.author.name)
 
-        print('# Email\tCommit count\tBegin index\tEnd index\tAuthor names')
-        for email, stats in email2stats.items():
-            print('%s\t%d\t%d\t%d\t' % (email, stats['commits'],
-                                        stats['begin'], stats['end']),
-                  stats['names'])
+        print('#\tEmail\tCommit count\tBegin index\tEnd index\tAuthor names')
+        sorted_items = sorted(email2stats.items(), key=lambda x: x[1]['commits'], reverse=True)
+        for i, item in enumerate(sorted_items, start=1):
+            email, stats = item
+            print('%d\t%s\t%d\t%d\t%d\t' % (i, email, stats['commits'], stats['begin'], stats['end']), stats['names'])
         return
 
     if not args.output_file:
