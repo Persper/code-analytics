@@ -13,6 +13,7 @@ class JSGraph():
                               re.compile('^(?!dist/).+'),
                               re.compile('^(?!test/).+'),
                               re.compile('^(?!packages/).+'),
+                              re.compile('^(?!spec/).+'),
                               re.compile('^(?!build/).+'))
         self.server_addr = server_addr
 
