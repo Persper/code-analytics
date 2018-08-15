@@ -7,16 +7,20 @@ from networkx.readwrite import json_graph
 
 class JSGraph():
 
-    def __init__(self, server_addr):
+    def __init__(self, server_addr, fname_regex_strs=None):
         self.parser = PatchParser()
-        self.fname_regexes = (re.compile('.+\.js$'),
-                              re.compile('^(?!dist/).+'),
-                              re.compile('^(?!test(s)?/).+'),
-                              re.compile('^(?!packages/).+'),
-                              re.compile('^(?!spec/).+'),
-                              re.compile('^(?!build/).+'),
-                              re.compile('^(?!bin/).+'),
-                              re.compile('^(?!doc(s)?/).+'))
+        if fname_regex_strs:
+            self.fname_regexes = \
+                [re.compile(regex_str) for regex_str in fname_regex_strs]
+        else:
+            self.fname_regexes = [re.compile('.+\.js$'),
+                                  re.compile('^(?!dist/).+'),
+                                  re.compile('^(?!test(s)?/).+'),
+                                  re.compile('^(?!packages/).+'),
+                                  re.compile('^(?!spec/).+'),
+                                  re.compile('^(?!build/).+'),
+                                  re.compile('^(?!bin/).+'),
+                                  re.compile('^(?!doc(s)?/).+')]
         self.server_addr = server_addr
 
     def update_graph(self, old_fname, old_src, new_fname, new_src, patch):
