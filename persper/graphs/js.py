@@ -11,10 +11,12 @@ class JSGraph():
         self.parser = PatchParser()
         self.fname_regexes = (re.compile('.+\.js$'),
                               re.compile('^(?!dist/).+'),
-                              re.compile('^(?!test/).+'),
+                              re.compile('^(?!test(s)?/).+'),
                               re.compile('^(?!packages/).+'),
                               re.compile('^(?!spec/).+'),
-                              re.compile('^(?!build/).+'))
+                              re.compile('^(?!build/).+'),
+                              re.compile('^(?!bin/).+'),
+                              re.compile('^(?!doc(s)?/).+'))
         self.server_addr = server_addr
 
     def update_graph(self, old_fname, old_src, new_fname, new_src, patch):
