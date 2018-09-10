@@ -1,6 +1,17 @@
 
 ## Quick Start
 
+### Run Tests for Javascript
+
+Make sure you have downloaded the submodule `contribs/js-callgraph` before running the following commands.
+
+```
+cd contribs/js-callgraph
+npm install
+cd ../../
+pytest test/test_graphs/test_analyzer_js.py
+```
+
 ### Interactive Mode
 
 1. Install Python and packages
