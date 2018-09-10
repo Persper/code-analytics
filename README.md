@@ -1,7 +1,18 @@
 
 ## Quick Start
 
-### Basic Setup
+### Run Tests for Javascript
+
+Make sure you have downloaded the submodule `contribs/js-callgraph` before running the following commands.
+
+```
+cd contribs/js-callgraph
+npm install
+cd ../../
+pytest test/test_graphs/test_analyzer_js.py
+```
+
+### Setup on Ubuntu
 
 1. Install Python and packages
 
