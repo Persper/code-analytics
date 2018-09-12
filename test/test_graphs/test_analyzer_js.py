@@ -34,20 +34,20 @@ def az():
 
 def assert_graph_match_history(analyzer):
     # total edits data stored in the graph should match analyzer.history
-    G = analyzer.ccg.get_graph()
-    for fid in G.nodes():
+    g = analyzer.ccg.get_graph()
+    for fid in g.nodes():
         print(fid)
         total_edits = 0
         for sha in analyzer.history:
             if fid in analyzer.history[sha]:
                 total_edits += analyzer.history[sha][fid]
-        assert(total_edits == G.node[fid]['num_lines'])
+        assert(total_edits == g.node[fid]['num_lines'])
 
 
 def test_az(az):
     my_env = os.environ.copy()
     my_env["PORT"] = str(server_port)
-    proc = subprocess.Popen(['node', server_path], env=my_env)
+    p = subprocess.Popen(['node', server_path], env=my_env)
 
     try:
         # wait for the server to spin up
@@ -83,4 +83,4 @@ def test_az(az):
         assert(set(az.ccg.get_graph().edges()) == set(edges_truth))
 
     finally:
-        proc.terminate()
+        p.terminate()

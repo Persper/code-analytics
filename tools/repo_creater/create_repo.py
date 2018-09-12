@@ -30,26 +30,26 @@ def copy_files(src_dir_path, dest_dir_path):
             shutil.copyfile(e.path, os.path.join(dest_dir_path, e.name))
 
 
-def find_first_commit(G):
-    fcn = None
-    for n in G.nodes_iter():
-        if G.in_degree(n) == 0:
-            if fcn is None:
-                fcn = n
+def find_first_commit(graph):
+    first = None
+    for n in graph.nodes_iter():
+        if graph.in_degree(n) == 0:
+            if first is None:
+                first = n
             else:
                 print("Multiple starting nodes is not supported.")
                 sys.exit()
-    return fcn
+    return first
 
 
-def depth_first_traverse(G, fcn):
+def depth_first_traverse(graph, first_commit):
     stack = []
     visited = set()
-    stack.append(fcn)
+    stack.append(first_commit)
     while len(stack) > 0:
         n = stack.pop()
         if n not in visited:
-            sorted_out_nodes = sorted([x for x in G[n]], reverse=True)
+            sorted_out_nodes = sorted([x for x in graph[n]], reverse=True)
             stack += sorted_out_nodes
             visited.add(n)
             yield n
@@ -57,12 +57,11 @@ def depth_first_traverse(G, fcn):
 
 def simple_commit(repo, commit_dir, repo_path, commit_msg):
     """
-    Args:
-        commit_dir: the dir which contains shapshot of target commit
-        repo_path: path to target repo
-
-    Returns:
-        the SHA of newly created commit
+    :param repo: a GitPython Repo object
+    :param commit_dir: the dir which contains snapshot of target commit
+    :param repo_path: path to target repo
+    :param commit_msg:
+    :return: the SHA of newly created commit
     """
     delete_files_under_dir(repo_path)
     copy_files(commit_dir, repo_path)
@@ -73,19 +72,19 @@ def simple_commit(repo, commit_dir, repo_path, commit_msg):
     return sha
 
 
-def find_the_other_parent(G, n, p):
+def find_the_other_parent(graph, node, parent):
     """
     Args:
-        G: networkx.Digraph, the commit graph
-        n: A node in G that has two parents
-        p: A node in G, one of the two parents of n
+        graph: networkx.Digraph, the commit graph
+        node: a node in graph that has two parents
+        parent: a node in graph, one of the two parents of the node
 
     Returns:
-        A node in G, the other parent of n
+        A node in g, the other parent of n
     """
-    for np in G.pred[n]:
-        if np != p:
-            return np
+    for p in graph.pred[node]:
+        if p != parent:
+            return p
 
 
 def create_repo(src_dir):
@@ -103,37 +102,37 @@ def create_repo(src_dir):
     for e in os.scandir(src_dir):
         n_to_dir[e.name] = e.path
 
-    G = nx.DiGraph(
+    g = nx.DiGraph(
             nx.drawing.nx_pydot.read_dot(
                 os.path.join(src_dir, 'cg.dot')
             )
         )
 
-    fcn = find_first_commit(G)
+    first_commit = find_first_commit(g)
 
     last_n = None
     n_to_sha = {}
     additional_parents = {}
-    for n in depth_first_traverse(G, fcn):
+    for n in depth_first_traverse(g, first_commit):
         print(n)
-        in_dg = G.in_degree(n)
+        in_dg = g.in_degree()
         assert(in_dg in (0, 1, 2))
 
         # n is on the same branch as last_n
-        if last_n is None or n in G[last_n]:
+        if last_n is None or n in g[last_n]:
             sha = simple_commit(repo, n_to_dir[n], repo_path, n)
             n_to_sha[n] = sha
 
             # if n has 2 parents, then remember n and
             # add additional parent later
             if in_dg == 2:
-                p = find_the_other_parent(G, n, last_n)
+                p = find_the_other_parent(g, n, last_n)
                 additional_parents[p] = n
 
         # need to create a new branch for n
         else:
             assert(in_dg == 1)
-            p = G.predecessors(n)[0]
+            p = g.predecessors(n)[0]
             repo.git.checkout(n_to_sha[p])
             branch_name = "feature-" + n
             repo.git.checkout(b=branch_name)
@@ -144,7 +143,7 @@ def create_repo(src_dir):
         if n in additional_parents:
             second_parent = n
             child = additional_parents[n]
-            first_parent = find_the_other_parent(G, child, second_parent)
+            first_parent = find_the_other_parent(g, child, second_parent)
 
             # add the second parent
             repo.git.replace(n_to_sha[child],
@@ -172,6 +171,7 @@ def main():
         create_repo(src_dir)
     else:
         usage(sys.argv[0])
+
 
 if __name__ == "__main__":
     main()
