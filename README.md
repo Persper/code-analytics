@@ -1,15 +1,19 @@
 
 ## Quick Start
 
-### Run Tests for Javascript
+### Run Tests for JavaScript
 
-Make sure you have downloaded the submodule `contribs/js-callgraph` before running the following commands.
-
+Download the submodule `contribs/js-callgraph`:
+```bash
+git submodule update --init --recursive
 ```
-cd contribs/js-callgraph
-npm install
-cd ../../
-pytest test/test_graphs/test_analyzer_js.py
+
+Run the following commands:
+```bash
+npm install --prefix contribs/js-callgraph
+pipenv install
+pipenv run ./tools/repo_creater/create_repo.py test/js_test_repo/
+pipenv run pytest test/test_graphs/test_analyzer_js.py
 ```
 
 ### Setup on Ubuntu
