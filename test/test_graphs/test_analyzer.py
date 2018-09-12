@@ -21,12 +21,12 @@ def az():
     return Analyzer(repo_path, CGraph())
 
 
-def assert_graphs_equal(G1, G2):
-    assert(set(G1.nodes()) == set(G2.nodes()))
-    assert(set(G1.edges()) == set(G2.edges()))
-    for n in G1:
+def assert_graphs_equal(g1, g2):
+    assert(set(g1.nodes()) == set(g2.nodes()))
+    assert(set(g1.edges()) == set(g2.edges()))
+    for n in g1:
         print(n)
-        assert(G1.node[n] == G2.node[n])
+        assert(g1.node[n] == g2.node[n])
 
 
 def assert_analyzer_equal(az1, az2):
@@ -34,23 +34,23 @@ def assert_analyzer_equal(az1, az2):
     assert_graphs_equal(az1.ccg.get_graph(), az2.ccg.get_graph())
 
 
-def assert_graph_match_history(analyzer):
-    # total edits data stored in the graph should match analyzer.history
-    master_commits, _ = analyzer.ri.iter(from_beginning=True)
+def assert_graph_match_history(az):
+    # total edits data stored in the graph should match az.history
+    master_commits, _ = az.ri.iter(from_beginning=True)
     master_sha_set = set([c.hexsha for c in master_commits])
-    G = analyzer.ccg.get_graph()
-    for func in G.nodes():
+    g = az.ccg.get_graph()
+    for func in g.nodes():
         print(func)
         func_sum = 0
-        for sha in analyzer.history:
-            if sha in master_sha_set and func in analyzer.history[sha]:
-                func_sum += analyzer.history[sha][func]
-        if G.node[func]['defined']:
-            assert(func_sum == G.node[func]['num_lines'])
+        for sha in az.history:
+            if sha in master_sha_set and func in az.history[sha]:
+                func_sum += az.history[sha][func]
+        if g.node[func]['defined']:
+            assert(func_sum == g.node[func]['num_lines'])
 
 
 def test_az_basic(az):
-    # calling analyze twice should make no differenece
+    # calling analyze twice should make no difference
     az.analyze(from_beginning=True, into_branches=True)
     az.analyze(from_beginning=True, into_branches=True)
     assert_graph_match_history(az)
@@ -132,9 +132,9 @@ def test_analyze_interface(az):
 
 def test_save(az):
     az.analyze(from_beginning=True, into_branches=True)
-    fname = "test_save_g.pickle"
-    az.save(fname)
-    with open(fname, 'rb') as f:
+    filename = "test_save_g.pickle"
+    az.save(filename)
+    with open(filename, 'rb') as f:
         az1 = pickle.load(f)
-    os.remove(fname)
+    os.remove(filename)
     assert_analyzer_equal(az, az1)
