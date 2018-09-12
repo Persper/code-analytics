@@ -16,7 +16,7 @@ def write_G_to_dot_with_pr(G, pr, fname, edge_attrib=None, header_lines=None):
         if header_lines:
             for line in header_lines:
                 f.write(line)
-        for n in G.nodes_iter(data=False):
+        for n in G.nodes(data=False):
             color_str = map_to_color(pr[n], m)
             f.write(
                 '\"%s\" [style=filled fillcolor="%s" tooltip=\"%f\"];\n' %
