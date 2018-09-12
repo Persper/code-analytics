@@ -13,6 +13,8 @@ lxml = "*"
 sklearn = "*"
 nltk = "*"
 openpyxl = "*"
+pytest = "*"
+pydot = "*"
 
 [dev-packages]
 
