@@ -32,7 +32,7 @@ def copy_files(src_dir_path, dest_dir_path):
 
 def find_first_commit(graph):
     first = None
-    for n in graph.nodes_iter():
+    for n in graph.nodes():
         if graph.in_degree(n) == 0:
             if first is None:
                 first = n
@@ -115,7 +115,7 @@ def create_repo(src_dir):
     additional_parents = {}
     for n in depth_first_traverse(g, first_commit):
         print(n)
-        in_dg = g.in_degree()
+        in_dg = g.in_degree(n)
         assert(in_dg in (0, 1, 2))
 
         # n is on the same branch as last_n
