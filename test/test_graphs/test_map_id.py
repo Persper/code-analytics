@@ -1,6 +1,7 @@
 import os
-import pytest
-from persper.graphs.js import JSGraph
+import subprocess
+from persper.graphs.graph_server import JS_FILENAME_REGEXES
+from persper.graphs.graph_server_http import GraphServerHttp
 from persper.graphs.analyzer import Analyzer
 from persper.util.path import root_path
 
@@ -14,7 +15,7 @@ def test_map_id():
         subprocess.call(cmd, shell=True)
 
     server_addr = 'http://localhost:3000'
-    az = Analyzer(repo_path, JSGraph(server_addr))
+    az = Analyzer(repo_path, GraphServerHttp(server_addr, JS_FILENAME_REGEXES))
 
     az.ordered_shas = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7']
 
