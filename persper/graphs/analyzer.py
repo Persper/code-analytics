@@ -66,14 +66,15 @@ def _normalize_shares(email_to_share):
         email_to_share[email] /= share_sum
 
 
-class Analyzer():
+class Analyzer:
 
-    def __init__(self, repo_path, ccg):
-        self.ccg = ccg
+    def __init__(self, repo_path, graph_server):
+        self.graph_server = graph_server
         self.ri = RepoIterator(repo_path)
         self.history = {}
         self.id_map = {}
         self.ordered_shas = []
+        self.graph = None
 
     def analyze(self, rev=None,
                 from_beginning=False,
@@ -88,7 +89,7 @@ class Analyzer():
 
         if not continue_iter:
             self.reset_state()
-            self.ccg.reset_graph()
+            self.graph_server.reset_graph()
 
         commits, branch_commits = \
             self.ri.iter(rev=rev,
@@ -133,8 +134,8 @@ class Analyzer():
                 continue
 
             # 2. Either old_fname and new_fname doesn't pass filter
-            if ((old_fname and not self.ccg.fname_filter(old_fname)) or
-               (new_fname and not self.ccg.fname_filter(new_fname))):
+            if ((old_fname and not self.graph_server.filter_file(old_fname)) or
+               (new_fname and not self.graph_server.filter_file(new_fname))):
                 continue
 
             old_src = new_src = None
@@ -147,7 +148,7 @@ class Analyzer():
                 new_src = get_contents(self.ri.repo, commit, new_fname)
 
             if old_src or new_src:
-                # Delegate actual work to ccg
+                # Delegate actual work to graph_server
                 id_to_lines, id_map = ccg_func(
                     old_fname, old_src, new_fname, new_src, diff.diff)
 
@@ -155,16 +156,16 @@ class Analyzer():
                 self.id_map[sha].update(id_map)
 
     def analyze_master_commit(self, commit):
-        self._analyze_commit(commit, self.ccg.update_graph)
+        self._analyze_commit(commit, self.graph_server.update_graph)
 
     def analyze_branch_commit(self, commit):
-        self._analyze_commit(commit, self.ccg.get_change_stats)
+        self._analyze_commit(commit, self.graph_server.get_change_stats)
 
     def reset_state(self):
         self.history = {}
         self.id_map = {}
         self.ordered_shas = []
-        self.G = None
+        self.graph = None
 
     def build_history(self,
                       commits,
@@ -187,8 +188,7 @@ class Analyzer():
         for sha in self.ordered_shas:
             for old_fid, new_fid in self.id_map[sha].items():
                 if old_fid in final_map.inverse:
-                    # Make a copy so that we don't remove list elements
-                    # during iteration
+                    # Make a copy so as not to remove list elements during iteration
                     existing_fids = final_map.inverse[old_fid].copy()
                     for ex_fid in existing_fids:
                         final_map[ex_fid] = new_fid
@@ -196,11 +196,11 @@ class Analyzer():
         return dict(final_map)
 
     def cache_graph(self):
-        self.G = self.ccg.get_graph()
+        self.graph = self.graph_server.get_graph()
 
     def compute_function_share(self, alpha):
         self.cache_graph()
-        return devrank(self.G, alpha=alpha)
+        return devrank(self.graph, alpha=alpha)
 
     def compute_commit_share(self, alpha):
         commit_share = {}
@@ -221,7 +221,7 @@ class Analyzer():
         for sha in final_history:
             commit_share[sha] = 0
             for fid in final_history[sha]:
-                if fid in self.G:
+                if fid in self.graph:
                     """
                     this condition handles the case where
                     func is deleted by sha,
@@ -229,7 +229,7 @@ class Analyzer():
                     """
                     commit_share[sha] += \
                         (final_history[sha][fid] /
-                         self.G.node[fid]['num_lines'] *
+                         self.graph.node[fid]['num_lines'] *
                          func_share[fid])
 
         return commit_share
