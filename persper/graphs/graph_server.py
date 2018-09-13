@@ -1,6 +1,16 @@
 from abc import ABC
 from abc import abstractmethod
 
+JS_FILENAME_REGEXES = [
+    '.+\.js$',
+    '^(?!dist/).+',
+    '^(?!test(s)?/).+',
+    '^(?!spec/).+',
+    '^(?!build/).+',
+    '^(?!bin/).+',
+    '^(?!doc(s)?/).+'
+]
+
 
 class GraphServer(ABC):
 
@@ -48,6 +58,14 @@ class GraphServer(ABC):
         """
         Check if the file should be filtered out
         :param filename: the path of the file to check
-        :return: True if the file should be ignored; False otherwise.
+        :return: True if the file should be selected; False otherwise.
+        """
+        pass
+
+    @abstractmethod
+    def config(self, param: dict):
+        """
+        One-time configuration of the server for following calls
+        :param param: key-value pairs of configuration
         """
         pass
