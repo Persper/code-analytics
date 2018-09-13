@@ -2,7 +2,8 @@ import os
 import time
 import pytest
 import subprocess
-from persper.graphs.js import JSGraph
+from persper.graphs.graph_server import JS_FILENAME_REGEXES
+from persper.graphs.graph_server_http import GraphServerHttp
 from persper.graphs.analyzer import Analyzer
 from persper.util.path import root_path
 
@@ -29,22 +30,22 @@ def az():
         cmd = '{} {}'.format(script_path, test_src_path)
         subprocess.call(cmd, shell=True)
 
-    return Analyzer(repo_path, JSGraph(server_addr))
+    return Analyzer(repo_path, GraphServerHttp(server_addr, JS_FILENAME_REGEXES))
 
 
-def assert_graph_match_history(analyzer):
-    # total edits data stored in the graph should match analyzer.history
-    g = analyzer.ccg.get_graph()
+def assert_graph_match_history(az: Analyzer):
+    # total edits data stored in the graph should match az.history
+    g = az.graph_server.get_graph()
     for fid in g.nodes():
         print(fid)
         total_edits = 0
-        for sha in analyzer.history:
-            if fid in analyzer.history[sha]:
-                total_edits += analyzer.history[sha][fid]
+        for sha in az.history:
+            if fid in az.history[sha]:
+                total_edits += az.history[sha][fid]
         assert(total_edits == g.node[fid]['num_lines'])
 
 
-def test_az(az):
+def test_az(az: Analyzer):
     my_env = os.environ.copy()
     my_env["PORT"] = str(server_port)
     p = subprocess.Popen(['node', server_path], env=my_env)
@@ -52,7 +53,7 @@ def test_az(az):
     try:
         # wait for the server to spin up
         time.sleep(1.0)
-        az.ccg.reset_graph()
+        az.graph_server.reset_graph()
         az.analyze()
         # assert_graph_match_history(az)
 
@@ -80,7 +81,7 @@ def test_az(az):
             ('main.js:main:7:16', 'main.js:funcA:3:5'),
             ('main.js:global', 'main.js:main:7:16')
         ]
-        assert(set(az.ccg.get_graph().edges()) == set(edges_truth))
+        assert(set(az.graph_server.get_graph().edges()) == set(edges_truth))
 
     finally:
         p.terminate()
