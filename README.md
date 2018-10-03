@@ -16,7 +16,50 @@ pipenv run ./tools/repo_creater/create_repo.py test/js_test_repo/
 pipenv run pytest test/test_graphs/test_analyzer_js.py
 ```
 
+<<<<<<< HEAD
 ### Setup on Ubuntu
+=======
+### Use jupyter notebook with pipenv
+
+In the project folder, run
+
+```
+pipenv install ipykernel
+pipenv shell
+```
+
+This will bring up a terminal in your virtualenv like this:
+
+```
+(code-analytics-8iDyuztf) bash-3.2$
+```
+
+In that shell, do
+
+```
+python -m ipykernel install --user --name=my-virtualenv-name
+```
+
+Launch jupyter notebook:
+
+```
+jupyter notebook
+```
+
+In your notebook, the new kernel should now be an option.
+
+### Trouble Shooting
+
+#### 1. No module named 'persper'
+
+Add this repo to python path so python can find the persper package. Insert the following line into `.bashrc` or `.bash_profile`.
+
+```
+export PYTHONPATH="/path/to/repo:$PYTHONPATH"
+```
+
+### Interactive Mode
+>>>>>>> Get jupyter notebook to work with pipenv
 
 1. Install Python and packages
 
@@ -89,6 +132,7 @@ To fit notebooks well in git, install jq and run gitconfig.sh. E.g., on Ubuntu:
 ```bash
 sudo apt install -y jq
 ./gitconfig.sh
+<<<<<<< HEAD
 >>>>>>> Update README to apply GitPython patch
 ```
 
@@ -174,3 +218,6 @@ When running TensorFlow, get out of the tensorflow source dir. Otherwise,
 python would prompt an error message "No module named
 pywrap_tensorflow_internal".
 
+=======
+```
+>>>>>>> Get jupyter notebook to work with pipenv

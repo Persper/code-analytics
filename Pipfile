@@ -15,6 +15,7 @@ nltk = "*"
 openpyxl = "*"
 pytest = "*"
 pydot = "*"
+ipykernel = "*"
 
 [dev-packages]
 
