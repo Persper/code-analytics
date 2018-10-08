@@ -217,19 +217,22 @@ class Analyzer:
                 else:
                     final_history[sha][fid] = num_lines
 
+        # add edits by each commit up to compute total edits
+        total_edits = {}
+        for sha in final_history:
+            for fid, num_lines in final_history[sha].items():
+                if fid in total_edits:
+                    total_edits[fid] += num_lines
+                else:
+                    total_edits[fid] = num_lines
+
         # Propagate to commit level
         for sha in final_history:
             commit_share[sha] = 0
             for fid in final_history[sha]:
-                if fid in self.graph:
-                    """
-                    this condition handles the case where
-                    func is deleted by sha,
-                    but has never been added or modified before
-                    """
+                if fid in func_share:
                     commit_share[sha] += \
-                        (final_history[sha][fid] /
-                         self.graph.node[fid]['num_lines'] *
+                        (final_history[sha][fid] / total_edits[fid] *
                          func_share[fid])
 
         return commit_share
