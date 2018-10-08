@@ -16,6 +16,7 @@ openpyxl = "*"
 pytest = "*"
 pydot = "*"
 ipykernel = "*"
+matplotlib = "*"
 
 [dev-packages]
 
