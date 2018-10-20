@@ -2,10 +2,11 @@ import os
 import pytest
 import pickle
 import subprocess
-from persper.graphs.c import CGraph
+from persper.graphs.c import CGraphServer
 from persper.graphs.analyzer import Analyzer
 from persper.graphs.iterator import RepoIterator
 from persper.util.path import root_path
+from persper.graphs.graph_server import C_FILENAME_REGEXES
 
 
 @pytest.fixture(scope='module')
@@ -18,7 +19,7 @@ def az():
         cmd = '{} {}'.format(script_path, test_src_path)
         subprocess.call(cmd, shell=True)
 
-    return Analyzer(repo_path, CGraph())
+    return Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES))
 
 
 def assert_graphs_equal(g1, g2):
@@ -31,14 +32,14 @@ def assert_graphs_equal(g1, g2):
 
 def assert_analyzer_equal(az1, az2):
     assert(az1.history == az2.history)
-    assert_graphs_equal(az1.ccg.get_graph(), az2.ccg.get_graph())
+    assert_graphs_equal(az1.graph_server.get_graph(), az2.graph_server.get_graph())
 
 
 def assert_graph_match_history(az):
     # total edits data stored in the graph should match az.history
     master_commits, _ = az.ri.iter(from_beginning=True)
     master_sha_set = set([c.hexsha for c in master_commits])
-    g = az.ccg.get_graph()
+    g = az.graph_server.get_graph()
     for func in g.nodes():
         print(func)
         func_sum = 0
@@ -50,8 +51,6 @@ def assert_graph_match_history(az):
 
 
 def test_az_basic(az):
-    # calling analyze twice should make no difference
-    az.analyze(from_beginning=True, into_branches=True)
     az.analyze(from_beginning=True, into_branches=True)
     assert_graph_match_history(az)
 
@@ -92,7 +91,7 @@ def test_az_basic(az):
         ('str_append_chr', 'str_append'),
         ('add', 'malloc')
     ]
-    assert(set(az.ccg.get_graph().edges()) == set(edges_truth))
+    assert(set(az.graph_server.get_graph().edges()) == set(edges_truth))
 
 
 def test_analyze_interface(az):
@@ -100,7 +99,7 @@ def test_analyze_interface(az):
     az.analyze(from_beginning=True, into_branches=True)
 
     repo_path = os.path.join(root_path, 'repos/test_feature_branch')
-    az1 = Analyzer(repo_path, CGraph())
+    az1 = Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES))
     # A B
     az1.analyze(from_beginning=True, num_commits=2, into_branches=True)
     # C D
@@ -111,7 +110,7 @@ def test_analyze_interface(az):
     az1.analyze(continue_iter=True, num_commits=1, into_branches=True)
     assert_analyzer_equal(az1, az)
 
-    az2 = Analyzer(repo_path, CGraph())
+    az2 = Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES))
     ri = RepoIterator(repo_path)
     commits, _ = ri.iter(from_beginning=True)
     assert(len(commits) == 7)
