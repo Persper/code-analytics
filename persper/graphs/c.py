@@ -1,19 +1,20 @@
+import re
 import networkx as nx
 from persper.graphs.patch_parser import PatchParser
 from persper.graphs.srcml import transform_src_to_tree
 from persper.graphs.call_graph.c import update_call_graph_c, get_func_ranges_c
 from persper.graphs.detect_change import get_changed_functions
 from persper.graphs.inverse_diff import inverse_diff
+from persper.graphs.graph_server import GraphServer
 
 
-class CGraph():
+class CGraphServer(GraphServer):
+    def __init__(self, filename_regex_strs):
+        self._graph = nx.DiGraph()
+        self._filename_regexes = [re.compile(regex_str) for regex_str in filename_regex_strs]
+        self._pparser = PatchParser()
 
-    def __init__(self):
-        self.G = nx.DiGraph()
-        self.parser = PatchParser()
-        self.exts = ('.c', '.h')
-
-    def update_graph(self, old_src, new_src, patch):
+    def update_graph(self, old_filename, old_src, new_filename, new_src, patch):
         # on add, rename, modify: update_roots = [new_root]
         # on delete: update_roots = []
         update_root = []
@@ -26,38 +27,38 @@ class CGraph():
         if old_src is not None:
             old_root = transform_src_to_tree(old_src)
             if old_root is None:
-                return None
+                return {}, {}
 
             modified_func = get_changed_functions(
                 *get_func_ranges_c(old_root),
-                *self.parse_patch(patch))
+                *self._parse_patch(patch))
 
         if new_src is not None:
             new_root = transform_src_to_tree(new_src)
             if new_root is None:
-                return None
+                return {}, {}
             update_root = [new_root]
 
         # update call graph
         # if on delete, then new_func is expected to be an empty dict
-        new_func = update_call_graph_c(self.G, update_root, modified_func)
+        new_func = update_call_graph_c(self.graph, update_root, modified_func)
 
         # return history
-        return {**new_func, **modified_func}
+        return {**new_func, **modified_func}, {}
 
-    def get_change_stats(self, old_src, new_src, patch):
+    def parse(self, old_filename, old_src, new_filename, new_src, patch):
         """Return None if there is an error"""
         forward_stats = {}
         bckward_stats = {}
 
-        adds, dels = self.parse_patch(patch)
+        adds, dels = self._parse_patch(patch)
         if adds is None or dels is None:
-            return None
+            return None, {}
 
         if old_src is not None:
             old_root = transform_src_to_tree(old_src)
             if old_root is None:
-                return None
+                return None, {}
 
             forward_stats = get_changed_functions(
                 *get_func_ranges_c(old_root), adds, dels)
@@ -66,7 +67,7 @@ class CGraph():
             inv_adds, inv_dels = inverse_diff(adds, dels)
             new_root = transform_src_to_tree(new_src)
             if new_root is None:
-                return None
+                return None, {}
 
             bckward_stats = get_changed_functions(
                 *get_func_ranges_c(new_root), inv_adds, inv_dels)
@@ -79,18 +80,27 @@ class CGraph():
         https://github.com/UltimateBeaver/test_feature_branch/commit/364d5cc49aeb2e354da458924ce84c0ab731ac77
         """
         bckward_stats.update(forward_stats)
-        return bckward_stats
+        return bckward_stats, {}
 
     def get_graph(self):
-        return self.G
+        return self.graph
 
     def reset_graph(self):
-        self.G = nx.DiGraph()
+        self.graph = nx.DiGraph()
 
-    def parse_patch(self, patch):
+    def filter_file(self, filename):
+        for regex in self._filename_regexes:
+            if not regex.match(filename):
+                return False
+        return True
+
+    def config(self, param):
+        pass
+
+    def _parse_patch(self, patch):
         adds, dels = None, None
         try:
-            adds, dels = self.parser.parse(patch.decode('utf-8', 'replace'))
+            adds, dels = self._pparser.parse(patch.decode('utf-8', 'replace'))
         except UnicodeDecodeError:
             print("UnicodeDecodeError when parsing patch!")
         except:

@@ -159,7 +159,7 @@ class Analyzer:
         self._analyze_commit(commit, self.graph_server.update_graph)
 
     def analyze_branch_commit(self, commit):
-        self._analyze_commit(commit, self.graph_server.get_change_stats)
+        self._analyze_commit(commit, self.graph_server.parse)
 
     def reset_state(self):
         self.history = {}
