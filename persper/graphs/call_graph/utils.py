@@ -30,16 +30,16 @@ def remove_edges_of_node(G, n, in_edges=True, out_edges=True):
 
     """
     try:
-        nbrs = G.succ[n]
+        nbrs = G._succ[n]
     except KeyError:  # NetworkXError if not in self
         # raise NetworkXError("The node %s is not in the digraph."%(n, ))
         print("The node %s is not in the digraph." % n)
         return
     if out_edges:
         for u in nbrs:
-            del G.pred[u][n]
-        G.succ[n] = {}
+            del G._pred[u][n]
+        G._succ[n] = {}
     if in_edges:
-        for u in G.pred[n]:
-            del G.succ[u][n]
-        G.pred[n] = {}
+        for u in G._pred[n]:
+            del G._succ[u][n]
+        G._pred[n] = {}

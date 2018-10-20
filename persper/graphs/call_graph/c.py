@@ -91,8 +91,7 @@ def build_call_graph_c(roots, G=None):
             if caller_name not in G:
                 # Case 1: hasn't been defined and hasn't been called
                 new_func[caller_name] = num_lines
-                G.add_node(caller_name,
-                           {'num_lines': num_lines, 'defined': True})
+                G.add_node(caller_name, num_lines=num_lines, defined=True)
             elif not G.node[caller_name]['defined']:
                 # Case 2: has been called but hasn't been defined
                 new_func[caller_name] = num_lines
@@ -120,7 +119,7 @@ def build_call_graph_c(roots, G=None):
                     continue
 
                 if callee_name not in G:
-                    G.add_node(callee_name, {'num_lines': 1, 'defined': False})
+                    G.add_node(callee_name, num_lines=1, defined=False)
                 G.add_edge(caller_name, callee_name)
 
     return G, new_func, func_to_file
