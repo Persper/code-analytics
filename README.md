@@ -16,9 +16,6 @@ pipenv run ./tools/repo_creater/create_repo.py test/js_test_repo/
 pipenv run pytest test/test_graphs/test_analyzer_js.py
 ```
 
-<<<<<<< HEAD
-### Setup on Ubuntu
-=======
 ### Use jupyter notebook with pipenv
 
 In the project folder, run
@@ -58,8 +55,7 @@ Add this repo to python path so python can find the persper package. Insert the 
 export PYTHONPATH="/path/to/repo:$PYTHONPATH"
 ```
 
-### Interactive Mode
->>>>>>> Get jupyter notebook to work with pipenv
+### Old Setup
 
 1. Install Python and packages
 
@@ -79,12 +75,8 @@ sudo ln -s /usr/bin/python3 /usr/bin/python
 2. Update Git
 
 In order to uset the `--indent-heuristic` option of `git diff`, we require git version >= 2.11. Use the following commands to upgrade:
-<<<<<<< HEAD
-```
-git --version
-=======
+
 ```bash
->>>>>>> Update README to apply GitPython patch
 sudo add-apt-repository ppa:git-core/ppa -y
 sudo apt-get update
 sudo apt-get install git -y
@@ -94,6 +86,7 @@ git --version
 3. Apply a patch to gitpython
 
 (Try to) apply a patch to gitpython 2.1.x:
+
 ```bash
 pipenv shell
 cd misc/
@@ -104,11 +97,11 @@ exit
 4. Add project directory to path
 
 Add the following line to your `~/.bashrc` file.
+
 ```
 export PATH=$PATH:/path/to/dir
 ```
 
-<<<<<<< HEAD
 To update your path for the remainder of the session.
 ```
 source ~/.bashrc
@@ -129,11 +122,10 @@ sudo -H pip3 install jupyter
 ```
 
 To fit notebooks well in git, install jq and run gitconfig.sh. E.g., on Ubuntu:
+
 ```bash
 sudo apt install -y jq
 ./gitconfig.sh
-<<<<<<< HEAD
->>>>>>> Update README to apply GitPython patch
 ```
 
 6. Check setup correctness
