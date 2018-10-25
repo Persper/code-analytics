@@ -4,7 +4,7 @@ import re
 class PatchParser():
 
     def __init__(self):
-        self.re_chunk_header = re.compile("""\@\@\s*
+        self.re_chunk_header = re.compile(r"""\@\@\s*
                                             \-(?P<old_start_line>\d+)(,(?P<old_num_lines>\d+))?\s*
                                             \+(?P<new_start_line>\d+)(,(?P<new_num_lines>\d+))?\s*
                                             \@\@
