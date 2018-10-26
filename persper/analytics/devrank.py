@@ -3,20 +3,33 @@ from numpy import linalg as LA
 from scipy.sparse import coo_matrix
 
 
-def devrank(G, count_self=False, alpha=0.85, epsilon=1e-5, max_iters=300):
-    """Memory efficient DevRank using scipy.sparse"""
+def devrank(G, weight_label, count_self=False,
+            alpha=0.85, epsilon=1e-5, max_iters=300):
+    """Memory efficient DevRank using scipy.sparse
+
+    Args:
+                   G - A nx.Digraph object.
+        weight_label - A string, each node in graph should have this attribute.
+                     - It will be used as the weight of each node.
+          count_self - A boolean, whether a node keeps partial credits.
+               alpha - A float between 0 and 1, DevRank's damping factor.
+             epsilon - A float.
+           max_iters - An integer, specify max number of iterations to run.
+
+    Returns:
+        A dict with node names being keys and DevRanks being values.
+    """
     ni = {}
     for i, u in enumerate(G):
         ni[u] = i
 
     def sizeof(u):
-        return G.node[u]['num_lines']
+        return G.node[u][weight_label]
 
     num_nodes = len(G.nodes())
     row, col, data = [], [], []
     for u in G:
-        num_out_edges = len(G[u])
-        if num_out_edges > 0:
+        if G.out_degree(u) > 0:
             total_out_sizes = 0
             for v in G[u]:
                 total_out_sizes += sizeof(v)
@@ -51,8 +64,8 @@ def devrank(G, count_self=False, alpha=0.85, epsilon=1e-5, max_iters=300):
             break
         v = new_v
 
-    pr = {}
+    dr = {}
     for u in G:
-        pr[u] = v[ni[u]]
+        dr[u] = v[ni[u]]
 
-    return pr
+    return dr
