@@ -1,10 +1,8 @@
 import os
 import pytest
-import pickle
 import subprocess
 from persper.analytics.c import CGraphServer
 from persper.analytics.analyzer import Analyzer
-from persper.analytics.iterator import RepoIterator
 from persper.analytics.graph_server import C_FILENAME_REGEXES
 from persper.util.path import root_path
 
@@ -22,37 +20,16 @@ def az():
     return Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES))
 
 
-def assert_graphs_equal(g1, g2):
-    assert(set(g1.nodes()) == set(g2.nodes()))
-    assert(set(g1.edges()) == set(g2.edges()))
-    for n in g1:
-        print(n)
-        assert(g1.node[n] == g2.node[n])
-
-
-def assert_analyzer_equal(az1, az2):
-    assert(az1.history == az2.history)
-    assert_graphs_equal(az1.graph_server.get_graph(), az2.graph_server.get_graph())
-
-
-def assert_graph_match_history(az):
-    # total edits data stored in the graph should match az.history
-    master_commits, _ = az.ri.iter(from_beginning=True)
-    master_sha_set = set([c.hexsha for c in master_commits])
-    g = az.graph_server.get_graph()
-    for func in g.nodes():
-        print(func)
-        func_sum = 0
-        for sha in az.history:
-            if sha in master_sha_set and func in az.history[sha]:
-                func_sum += az.history[sha][func]
-        if g.node[func]['defined']:
-            assert(func_sum == g.node[func]['num_lines'])
+def assert_size_match_history(size, history):
+    size_from_history = 0
+    for _, csize in history.items():
+        size_from_history += csize
+    assert(size == size_from_history)
 
 
 def test_az_basic(az):
-    az.analyze(from_beginning=True, into_branches=True)
-    assert_graph_match_history(az)
+    az.analyze(from_beginning=True)
+    ccgraph = az.get_graph()
 
     history_truth = {
         'K': {'display': 5},
@@ -74,9 +51,15 @@ def test_az_basic(az):
         'H': {'add': 16, 'append': 12, 'insert': 25},
     }
 
-    for commit in az.ri.repo.iter_commits():
-        assert(az.history[commit.hexsha] ==
-               history_truth[commit.message.strip()])
+    commits = ccgraph.commits()
+    for func, data in ccgraph.nodes():
+        size = data['size']
+        history = data['history']
+        assert_size_match_history(size, history)
+
+        for cindex, csize in history.items():
+            commit_message = commits[cindex]['message']
+            assert(csize == history_truth[commit_message.strip()])
 
     edges_truth = [
         ('append', 'free'),
@@ -92,48 +75,3 @@ def test_az_basic(az):
         ('add', 'malloc')
     ]
     assert(set(az.graph_server.get_graph().edges()) == set(edges_truth))
-
-
-def test_analyze_interface(az):
-    # test various ways to invoke process function
-    az.analyze(from_beginning=True, into_branches=True)
-
-    repo_path = os.path.join(root_path, 'repos/test_feature_branch')
-    az1 = Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES))
-    # A B
-    az1.analyze(from_beginning=True, num_commits=2, into_branches=True)
-    # C D
-    az1.analyze(continue_iter=True, num_commits=2, into_branches=True)
-    # E F K
-    az1.analyze(continue_iter=True, num_commits=3, into_branches=True)
-    # should see "The range specified is empty, terminated."
-    az1.analyze(continue_iter=True, num_commits=1, into_branches=True)
-    assert_analyzer_equal(az1, az)
-
-    az2 = Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES))
-    ri = RepoIterator(repo_path)
-    commits, _ = ri.iter(from_beginning=True)
-    assert(len(commits) == 7)
-    # should see "No history exists yet, terminated."
-    az2.analyze(continue_iter=True, num_commits=1, into_branches=True)
-    # A B C
-    az2.analyze(from_beginning=True, num_commits=3, into_branches=True)
-    # D E F
-    az2.analyze(from_beginning=True,
-                end_commit_sha=commits[5].hexsha,
-                into_branches=True)
-    # K
-    az2.analyze(from_beginning=True,
-                end_commit_sha=commits[6].hexsha,
-                into_branches=True)
-    assert_analyzer_equal(az2, az)
-
-
-def test_save(az):
-    az.analyze(from_beginning=True, into_branches=True)
-    filename = "test_save_g.pickle"
-    az.save(filename)
-    with open(filename, 'rb') as f:
-        az1 = pickle.load(f)
-    os.remove(filename)
-    assert_analyzer_equal(az, az1)
