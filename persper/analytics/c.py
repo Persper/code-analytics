@@ -1,92 +1,57 @@
 import re
-import networkx as nx
-from persper.analytics.patch_parser import PatchParser
-from persper.analytics.srcml import transform_src_to_tree
-from persper.analytics.call_graph.c import update_call_graph_c, get_func_ranges_c
-from persper.analytics.detect_change import get_changed_functions
 from persper.analytics.inverse_diff import inverse_diff
+from persper.analytics.srcml import transform_src_to_tree
+from persper.analytics.call_graph.c import update_graph, get_func_ranges_c
+from persper.analytics.detect_change import get_changed_functions
+from persper.analytics.patch_parser import PatchParser
 from persper.analytics.graph_server import GraphServer
+from persper.analytics.call_commit_graph import CallCommitGraph
 
 
 class CGraphServer(GraphServer):
     def __init__(self, filename_regex_strs):
-        self._graph = nx.DiGraph()
+        self._ccgraph = CallCommitGraph()
         self._filename_regexes = [re.compile(regex_str) for regex_str in filename_regex_strs]
         self._pparser = PatchParser()
 
+    def register_commit(self, hexsha, author_name, author_email,
+                        commit_message):
+        self._ccgraph.add_commit(hexsha, author_name, author_email,
+                                 commit_message)
+
     def update_graph(self, old_filename, old_src, new_filename, new_src, patch):
-        # on add, rename, modify: update_roots = [new_root]
-        # on delete: update_roots = []
-        update_root = []
-
-        # on add: modified_func = {}
-        # on rename, modify, delete: modified_func is computed by
-        #   parsing patch and call get_changed_functions
-        modified_func = {}
-
-        if old_src is not None:
-            old_root = transform_src_to_tree(old_src)
-            if old_root is None:
-                return {}, {}
-
-            modified_func = get_changed_functions(
-                *get_func_ranges_c(old_root),
-                *self._parse_patch(patch))
-
-        if new_src is not None:
-            new_root = transform_src_to_tree(new_src)
-            if new_root is None:
-                return {}, {}
-            update_root = [new_root]
-
-        # update call graph
-        # if on delete, then new_func is expected to be an empty dict
-        new_func = update_call_graph_c(self.graph, update_root, modified_func)
-
-        # return history
-        return {**new_func, **modified_func}, {}
-
-    def parse(self, old_filename, old_src, new_filename, new_src, patch):
-        """Return None if there is an error"""
+        ast_list = []
         forward_stats = {}
         bckward_stats = {}
-
         adds, dels = self._parse_patch(patch)
-        if adds is None or dels is None:
-            return None, {}
 
-        if old_src is not None:
-            old_root = transform_src_to_tree(old_src)
-            if old_root is None:
-                return None, {}
+        if old_src:
+            old_ast = transform_src_to_tree(old_src)
+            if old_ast is None:
+                return -1
 
             forward_stats = get_changed_functions(
-                *get_func_ranges_c(old_root), adds, dels)
+                *get_func_ranges_c(old_ast), adds, dels)
 
-        if new_src is not None:
+        if new_src:
+            new_ast = transform_src_to_tree(new_src)
+            if new_ast is None:
+                return -1
+
+            ast_list = [new_ast]
             inv_adds, inv_dels = inverse_diff(adds, dels)
-            new_root = transform_src_to_tree(new_src)
-            if new_root is None:
-                return None, {}
-
             bckward_stats = get_changed_functions(
-                *get_func_ranges_c(new_root), inv_adds, inv_dels)
+                *get_func_ranges_c(new_ast), inv_adds, inv_dels)
 
-        """
-        forward_stats and bckward_stats might have different values
-        for the same function, as an example, please refer to
-        `str_equals` function in the following link. In this case,
-        we'll stick with forward_stats (override bckward_stats).
-        https://github.com/UltimateBeaver/test_feature_branch/commit/364d5cc49aeb2e354da458924ce84c0ab731ac77
-        """
         bckward_stats.update(forward_stats)
-        return bckward_stats, {}
+        update_graph(self._ccgraph, ast_list, bckward_stats)
+        return 0
 
     def get_graph(self):
-        return self.graph
+        return self._ccgraph
 
     def reset_graph(self):
-        self.graph = nx.DiGraph()
+        self._ccgraph.reset()
 
     def filter_file(self, filename):
         for regex in self._filename_regexes:

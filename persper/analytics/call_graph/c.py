@@ -67,74 +67,34 @@ def handle_call(call_node):
     return callee_name
 
 
-def build_call_graph_c(roots, G=None):
-    if G is None:
-        G = nx.DiGraph()
-
-    new_func = {}
-    func_to_file = {}
-    for root in roots:
-        # print('------ ' + root.attrib['filename'] + ' ------')
-
-        for func_node in root.findall('./srcml:function', namespaces=ns):
-
-            caller_name, start_line, end_line = handle_function(func_node)
+def update_graph(ccgraph, ast_list, change_stats):
+    for ast in ast_list:
+        for function in ast.findall('./srcml:function', namespaces=ns):
+            caller_name, _, _ = handle_function(function)
             if not caller_name:
                 continue
 
-            if start_line and end_line:
-                num_lines = end_line - start_line + 1
-            else:
-                # default num_lines is 1
-                num_lines = 1
+            if caller_name not in ccgraph:
+                ccgraph.add_node(caller_name)
 
-            if caller_name not in G:
-                # Case 1: hasn't been defined and hasn't been called
-                new_func[caller_name] = num_lines
-                G.add_node(caller_name, num_lines=num_lines, defined=True)
-            elif not G.node[caller_name]['defined']:
-                # Case 2: has been called but hasn't been defined
-                new_func[caller_name] = num_lines
-                G.node[caller_name]['defined'] = True
-                G.node[caller_name]['num_lines'] = num_lines
-            else:
-                # Case 3: has been called and has been defined
-                # it is modified in the latest commit
-                # pass because it's not a new function
-                # so no need to add it to new_func and to
-                # update G.node[caller_name]['num_lines']
-                pass
-
-            func_to_file[caller_name] = root.attrib['filename']
-
-            # handle all function calls
-            for call_node in func_node.xpath('.//srcml:call', namespaces=ns):
-
+            for call in function.xpath('.//srcml:call', namespaces=ns):
                 try:
-                    callee_name = handle_call(call_node)
+                    callee_name = handle_call(call)
                 except NotFunctionCallError:
                     continue
                 except:
-                    print("Callee name not found! (in func %s)" % caller_name)
+                    print("Callee name not found (in %s)" % caller_name)
                     continue
 
-                if callee_name not in G:
-                    G.add_node(callee_name, num_lines=1, defined=False)
-                G.add_edge(caller_name, callee_name)
+                if callee_name not in ccgraph:
+                    ccgraph.add_node(callee_name)
+                ccgraph.add_edge(caller_name, callee_name)
 
-    return G, new_func, func_to_file
-
-
-def update_call_graph_c(G, roots, modified_func):
-    for func_name in modified_func:
-        if func_name in G:
-            remove_edges_of_node(G, func_name, in_edges=False)
-            G.node[func_name]['num_lines'] += modified_func[func_name]
-
-    # here roots should be constructed from the more recent commit
-    # new functions and their sizes are stored in new_func dictionary
-    _, new_func, _ = build_call_graph_c(roots, G)
-    return new_func
+    for func_name, change_size in change_stats.items():
+        if func_name not in ccgraph:
+            print("%s in change_stats but not in ccgraph" % func_name)
+            continue
+        ccgraph.update_node_history(func_name, change_size)
 
 
 def get_func_ranges_c(root):
