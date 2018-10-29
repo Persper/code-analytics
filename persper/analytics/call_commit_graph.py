@@ -23,8 +23,12 @@ class CallCommitGraph:
             self._digraph = nx.DiGraph(commitList=[])
 
     # Read-only access
-    def nodes(self):
-        return self._digraph.nodes
+    def nodes(self, data=False):
+        return self._digraph.nodes(data=data)
+
+    # Read-only access
+    def edges(self, data=False):
+        return self._digraph.edges(data=data)
 
     # Read-only access
     def commits(self):
@@ -33,8 +37,8 @@ class CallCommitGraph:
 
     def add_commit(self, hexsha, author_name, author_email, commit_message):
         self._digraph.graph['commitList'].append({
-            'hexsha': hexsha, 'author_name': author_name,
-            'author_email': author_email, 'commit_message': commit_message
+            'hexsha': hexsha, 'authorName': author_name,
+            'authorEmail': author_email, 'message': commit_message
         })
 
     # The index of the commit being analyzed
@@ -51,21 +55,27 @@ class CallCommitGraph:
         self._digraph.add_node(node, size=0, history={})
 
     def add_edge(self, source, target):
-        self._digraph.add_edge(source, target, addedBy=self._cur_cindex())
+        self._digraph.add_edge(source, target,
+                               addedBy=self._cur_cindex(),
+                               weight=self._digraph.nodes[target]['size'])
 
     # Use current commit index
     def update_node_history(self, node, size):
         self._digraph.nodes[node]['history'][self._cur_cindex()] = size
-        self._update_node_size(self, node, size)
+        self._update_node_size(node, size)
         self._check_history_match_size(node)
 
     # node's size is automatically updated when history is updated
     def _update_node_size(self, node, size):
         self._digraph.nodes[node]['size'] += size
 
+    # todo (hezheng)
+    def _update_edge_weight(self, source, target):
+        pass
+
     def _check_history_match_size(self, node):
-        assert(sum(self.nodes[node]['history'].values()) ==
-               self.nodes[node]['size'])
+        assert(sum(self._digraph.nodes[node]['history'].values()) ==
+               self._digraph.nodes[node]['size'])
 
     def function_devranks(self, alpha):
         return devrank(self._digraph, 'weight', alpha=alpha)
@@ -96,7 +106,7 @@ class CallCommitGraph:
         commit_devranks = self.commit_devranks(alpha)
 
         for commit in self.commits:
-            sha = commit['hexsha]']
+            sha = commit['hexsha']
             email = commit['authorEmail']
             if email in developer_devranks:
                 developer_devranks[email] += commit_devranks[sha]
