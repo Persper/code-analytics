@@ -1,10 +1,8 @@
 import os
 import time
 import pickle
-from persper.analytics.devrank import devrank
 from persper.analytics.git_tools import get_contents, _diff_with_first_parent
 from persper.analytics.iterator import RepoIterator
-from persper.util.bidict import bidict
 
 
 def print_overview(commits, branch_commits):
@@ -57,24 +55,12 @@ def is_merge_commit(commit):
     return len(commit.parents) > 1
 
 
-def _normalize_shares(email_to_share):
-    share_sum = 0
-    for email, share in email_to_share.items():
-        share_sum += share
-
-    for email in email_to_share:
-        email_to_share[email] /= share_sum
-
-
 class Analyzer:
 
     def __init__(self, repo_path, graph_server):
-        self.graph_server = graph_server
-        self.ri = RepoIterator(repo_path)
-        self.history = {}
-        self.id_map = {}
-        self.ordered_shas = []
-        self.graph = None
+        self._graph_server = graph_server
+        self._ri = RepoIterator(repo_path)
+        self._ccgraph = None
 
     def analyze(self, rev=None,
                 from_beginning=False,
@@ -89,17 +75,17 @@ class Analyzer:
 
         if not continue_iter:
             self.reset_state()
-            self.graph_server.reset_graph()
+            self._graph_server.reset_graph()
 
         commits, branch_commits = \
-            self.ri.iter(rev=rev,
-                         from_beginning=from_beginning,
-                         num_commits=num_commits,
-                         continue_iter=continue_iter,
-                         end_commit_sha=end_commit_sha,
-                         into_branches=into_branches,
-                         max_branch_length=max_branch_length,
-                         min_branch_date=min_branch_date)
+            self._ri.iter(rev=rev,
+                          from_beginning=from_beginning,
+                          num_commits=num_commits,
+                          continue_iter=continue_iter,
+                          end_commit_sha=end_commit_sha,
+                          into_branches=into_branches,
+                          max_branch_length=max_branch_length,
+                          min_branch_date=min_branch_date)
 
         print_overview(commits, branch_commits)
         start_time = time.time()
@@ -118,11 +104,11 @@ class Analyzer:
 
         self.autosave('finished', 0, 1)
 
-    def _analyze_commit(self, commit, ccg_func):
-        sha = commit.hexsha
-        self.ordered_shas.append(sha)
-        self.history[sha] = {}
-        self.id_map[sha] = {}
+    def _analyze_commit(self, commit, server_func):
+        self._graph_server.register_commit(commit.hexsha,
+                                           commit.author.name,
+                                           commit.author.email,
+                                           commit.message)
         diff_index = _diff_with_first_parent(commit)
 
         for diff in diff_index:
@@ -134,128 +120,36 @@ class Analyzer:
                 continue
 
             # 2. Either old_fname and new_fname doesn't pass filter
-            if ((old_fname and not self.graph_server.filter_file(old_fname)) or
-               (new_fname and not self.graph_server.filter_file(new_fname))):
+            if ((old_fname and not self._graph_server.filter_file(old_fname)) or
+               (new_fname and not self._graph_server.filter_file(new_fname))):
                 continue
 
             old_src = new_src = None
 
             if old_fname:
                 old_src = get_contents(
-                    self.ri.repo, commit.parents[0], old_fname)
+                    self._ri.repo, commit.parents[0], old_fname)
 
             if new_fname:
-                new_src = get_contents(self.ri.repo, commit, new_fname)
+                new_src = get_contents(self._ri.repo, commit, new_fname)
 
             if old_src or new_src:
-                # Delegate actual work to graph_server
-                id_to_lines, id_map = ccg_func(
-                    old_fname, old_src, new_fname, new_src, diff.diff)
-
-                self.history[sha].update(id_to_lines)
-                self.id_map[sha].update(id_map)
+                # todo (hezheng) store the status somewhere for reporting later
+                status = server_func(old_fname, old_src, new_fname, new_src, diff.diff)
 
     def analyze_master_commit(self, commit):
-        self._analyze_commit(commit, self.graph_server.update_graph)
+        self._analyze_commit(commit, self._graph_server.update_graph)
 
+    # todo (hezheng) implement correct analysis for branches
     def analyze_branch_commit(self, commit):
-        self._analyze_commit(commit, self.graph_server.parse)
+        self._analyze_commit(commit, self._graph_server.update_graph)
 
     def reset_state(self):
-        self.history = {}
-        self.id_map = {}
-        self.ordered_shas = []
-        self.graph = None
+        self._ccgraph = None
 
-    def build_history(self,
-                      commits,
-                      phase='build-history',
-                      checkpoint_interval=1000,
-                      verbose=False):
-        """A helper function to access `analyze_branch_commit`"""
-        print_overview([], commits)
-        start_time = time.time()
-
-        for idx, commit in enumerate(commits, 1):
-            print_commit_info(phase, idx, commit, start_time, verbose)
-            self.analyze_branch_commit(commit)
-            self.autosave(phase, idx, checkpoint_interval)
-
-        self.autosave(phase, 0, 1)
-
-    def aggregate_id_map(self):
-        final_map = bidict()
-        for sha in self.ordered_shas:
-            for old_fid, new_fid in self.id_map[sha].items():
-                if old_fid in final_map.inverse:
-                    # Make a copy so as not to remove list elements during iteration
-                    existing_fids = final_map.inverse[old_fid].copy()
-                    for ex_fid in existing_fids:
-                        final_map[ex_fid] = new_fid
-                final_map[old_fid] = new_fid
-        return dict(final_map)
-
-    def cache_graph(self):
-        self.graph = self.graph_server.get_graph()
-
-    def compute_function_share(self, alpha):
-        self.cache_graph()
-        return devrank(self.graph, alpha=alpha)
-
-    def compute_commit_share(self, alpha):
-        commit_share = {}
-        func_share = self.compute_function_share(alpha)
-        final_map = self.aggregate_id_map()
-
-        # Compute final history using final_map
-        final_history = {}
-        for sha in self.history:
-            final_history[sha] = {}
-            for fid, num_lines in self.history[sha].items():
-                if fid in final_map:
-                    final_history[sha][final_map[fid]] = num_lines
-                else:
-                    final_history[sha][fid] = num_lines
-
-        # add edits by each commit up to compute total edits
-        total_edits = {}
-        for sha in final_history:
-            for fid, num_lines in final_history[sha].items():
-                if fid in total_edits:
-                    total_edits[fid] += num_lines
-                else:
-                    total_edits[fid] = num_lines
-
-        # Propagate to commit level
-        for sha in final_history:
-            commit_share[sha] = 0
-            for fid in final_history[sha]:
-                if fid in func_share:
-                    commit_share[sha] += \
-                        (final_history[sha][fid] / total_edits[fid] *
-                         func_share[fid])
-
-        return commit_share
-
-    def compute_developer_share(self, alpha):
-        dev_share = {}
-        commit_share = self.compute_commit_share(alpha)
-
-        for sha in commit_share:
-            email = self.ri.repo.commit(sha).author.email
-            if email in dev_share:
-                dev_share[email] += commit_share[sha]
-            else:
-                dev_share[email] = commit_share[sha]
-        return dev_share
-
-    def locrank_commits(self):
-        loc = {}
-        for sha in self.history:
-            loc[sha] = 0
-            for func in self.history[sha]:
-                loc[sha] += self.history[sha][func]
-        return sorted(loc.items(), key=lambda x: x[1], reverse=True)
+    def get_graph(self):
+        self._ccgraph = self._graph_server.get_graph()
+        return self._ccgraph
 
     def save(self, fname):
         with open(fname, 'wb+') as f:
@@ -263,6 +157,6 @@ class Analyzer:
 
     def autosave(self, phase, idx, checkpoint_interval):
         if idx % checkpoint_interval == 0:
-            repo_name = os.path.basename(self.ri.repo_path.rstrip('/'))
+            repo_name = os.path.basename(self._ri.repo_path.rstrip('/'))
             fname = repo_name + '-' + phase + '-' + str(idx) + '.pickle'
             self.save(fname)
