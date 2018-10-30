@@ -3,15 +3,13 @@ from numpy import linalg as LA
 from scipy.sparse import coo_matrix
 
 
-def devrank(G, weight_label, count_self=False,
-            alpha=0.85, epsilon=1e-5, max_iters=300):
+def devrank(G, weight_label, alpha=0.85, epsilon=1e-5, max_iters=300):
     """Memory efficient DevRank using scipy.sparse
 
     Args:
                    G - A nx.Digraph object.
         weight_label - A string, each node in graph should have this attribute.
                      - It will be used as the weight of each node.
-          count_self - A boolean, whether a node keeps partial credits.
                alpha - A float between 0 and 1, DevRank's damping factor.
              epsilon - A float.
            max_iters - An integer, specify max number of iterations to run.
@@ -29,19 +27,13 @@ def devrank(G, weight_label, count_self=False,
     num_nodes = len(G.nodes())
     row, col, data = [], [], []
     for u in G:
-        if G.out_degree(u) > 0:
-            total_out_sizes = 0
-            for v in G[u]:
-                total_out_sizes += sizeof(v)
-            if count_self:
-                total_out_sizes += sizeof(u)
-                row.append(ni[u])
-                col.append(ni[u])
-                data.append(sizeof(u) / total_out_sizes)
-            for v in G[u]:
-                row.append(ni[v])
-                col.append(ni[u])
-                data.append(sizeof(v) / total_out_sizes)
+        size_sum = 0
+        for v in G[u]:
+            size_sum += sizeof(v)
+        for v in G[u]:
+            row.append(ni[v])
+            col.append(ni[u])
+            data.append(sizeof(v) / size_sum)
 
     P = coo_matrix((data, (row, col)), shape=(num_nodes, num_nodes)).tocsr()
 
