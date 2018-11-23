@@ -61,7 +61,7 @@ def test_az(az: Analyzer):
             'C': {'main.js:funcB:9:12': 1,
                   'main.js:global': 1,
                   'main.js:main:7:16': 1},
-            'B': {'main.js:funcB:9:11': 3,
+            'B': {'main.js:funcB:9:11': 1,
                   'main.js:global': 7,
                   'main.js:main:7:15': 7},
             'A': {'main.js:funcA:3:5': 3,
