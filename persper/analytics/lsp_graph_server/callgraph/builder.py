@@ -12,12 +12,10 @@ from antlr4.error.ErrorListener import ErrorListener
 from jsonrpc.exceptions import JsonRpcException
 
 import wildcards
-from languageclient.lspclient import LspClient
-from languageclient.lspcontract import (DocumentSymbol, Location, Position,
-                                        SymbolInformation, SymbolKind,
-                                        TextDocument,
-                                        TextDocumentContentChangeEvent)
-
+from persper.analytics.lsp_graph_server.languageclient.lspclient import LspClient
+from persper.analytics.lsp_graph_server.languageclient.lspcontract import \
+    DocumentSymbol, Location, Position, SymbolInformation, SymbolKind, \
+    TextDocument, TextDocumentContentChangeEvent
 from . import CallGraphBranch, CallGraphNode, CallGraphScope
 
 _logger = logging.getLogger(__name__)

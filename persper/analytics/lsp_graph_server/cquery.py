@@ -6,11 +6,11 @@ from antlr4 import Token
 from jsonrpc.endpoint import Endpoint
 from jsonrpc.exceptions import JsonRpcException
 
-from callgraph import CallGraphBuilder
-from fileparsers.CPP14Lexer import CPP14Lexer
-from languageclient.lspclient import LspClient
-from languageclient.lspcontract import TextDocument
-from languageclient.lspserver import LspServerStub
+from persper.analytics.lsp_graph_server.callgraph.builder import CallGraphBuilder
+from persper.analytics.lsp_graph_server.fileparsers.CPP14Lexer import CPP14Lexer
+from persper.analytics.lsp_graph_server.languageclient.lspclient import LspClient
+from persper.analytics.lsp_graph_server.languageclient.lspcontract import TextDocument
+from persper.analytics.lsp_graph_server.languageclient.lspserver import LspServerStub
 
 _logger = logging.getLogger(__name__)
 

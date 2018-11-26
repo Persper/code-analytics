@@ -8,10 +8,9 @@ from typing import Dict, Iterable, List, NamedTuple, Tuple, Type, Union
 
 import jsonpickle
 
-from languageclient.lspcontract import (DocumentSymbol, Location, Position,
-                                        SymbolInformation, SymbolKind,
-                                        TextDocument,
-                                        TextDocumentContentChangeEvent)
+from persper.analytics.lsp_graph_server.languageclient.lspcontract import \
+    DocumentSymbol, Location, Position, SymbolInformation, SymbolKind, \
+    TextDocument, TextDocumentContentChangeEvent
 
 
 _logger = logging.getLogger(__name__)

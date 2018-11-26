@@ -8,9 +8,9 @@ from jsonrpc.dispatchers import MethodDispatcher
 from jsonrpc.endpoint import Endpoint
 from jsonrpc.streams import JsonRpcStreamReader, JsonRpcStreamWriter
 
-from languageclient.lspcontract import MessageType
-from languageclient.lspserver import LspServerStub
-from jsonrpcutils import LoggedJsonRpcStreamReader, LoggedJsonRpcStreamWriter, JsonRpcLogger
+from persper.analytics.lsp_graph_server.languageclient.lspcontract import MessageType
+from persper.analytics.lsp_graph_server.languageclient.lspserver import LspServerStub
+from persper.analytics.lsp_graph_server.jsonrpcutils import LoggedJsonRpcStreamReader, LoggedJsonRpcStreamWriter, JsonRpcLogger
 
 _logger = logging.getLogger(__name__)
 
