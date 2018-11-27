@@ -11,7 +11,18 @@ class GraphServerHttp(GraphServer):
         self.filename_regexes = [re.compile(regex_str) for regex_str in filename_regex_strs]
         self.config_param = dict()
 
-    def update_graph(self, old_filename, old_src, new_filename, new_src, patch):
+    def register_commit(self, hexsha, author_name, author_email, commit_message):
+        payload = {'hexsha': hexsha,
+                   'author_name': author_name,
+                   'author_email': author_email,
+                   'commit_message': commit_message}
+        register_url = urllib.parse.urljoin(self.server_addr, '/register_commit')
+        r = requests.post(register_url, json=payload).json()
+        if r != '0':
+            raise ValueError()
+
+    def update_graph(self, old_filename, old_src,
+                     new_filename, new_src, patch):
         payload = {'oldFname': old_filename,
                    'oldSrc': old_src,
                    'newFname': new_filename,
@@ -21,19 +32,8 @@ class GraphServerHttp(GraphServer):
 
         update_url = urllib.parse.urljoin(self.server_addr, '/update')
         r = requests.post(update_url, json=payload).json()
-        return r['idToLines'], r['idMap']
-
-    def parse(self, old_filename, old_src, new_filename, new_src, patch):
-        payload = {'oldFname': old_filename,
-                   'oldSrc': old_src,
-                   'newFname': new_filename,
-                   'newSrc': new_src,
-                   'patch': patch.decode('utf-8', 'replace'),
-                   'config': self.config_param}
-
-        stats_url = urllib.parse.urljoin(self.server_addr, '/stats')
-        r = requests.get(stats_url, json=payload).json()
-        return r['idToLines'], r['idMap']
+        if r != '0':
+            raise ValueError()
 
     def get_graph(self):
         graph_url = self.server_addr + '/callgraph'
