@@ -5,6 +5,7 @@ from persper.analytics.c import CGraphServer
 from persper.analytics.analyzer import Analyzer
 from persper.analytics.graph_server import C_FILENAME_REGEXES
 from persper.util.path import root_path
+from .util import assert_size_match_history
 
 
 @pytest.fixture(scope='module')
@@ -18,13 +19,6 @@ def az():
         subprocess.call(cmd, shell=True)
 
     return Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES))
-
-
-def assert_size_match_history(size, history):
-    size_from_history = 0
-    for _, csize in history.items():
-        size_from_history += csize
-    assert(size == size_from_history)
 
 
 def test_az_basic(az):
