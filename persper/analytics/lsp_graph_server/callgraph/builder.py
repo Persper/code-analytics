@@ -336,6 +336,19 @@ class CallGraphBuilder(ABC):
             await self.closeDocument(textDoc.uri)
         _logger.info("Yielded %d branches.", counter)
 
+    async def deleteFile(self, fileName: str):
+        path = Path(fileName).resolve()
+        if not path.exists:
+            return False
+        self.removeDocumentCache(path)
+        doc = TextDocument(TextDocument.fileNameToUri(str(path)), self.inferLanguageId(path), 1, "")
+        self._lspClient.server.textDocumentDidOpen(doc)
+        # Empty the file and notify language server.
+        self._lspClient.server.textDocumentDidChange(doc.uri, 2, [TextDocumentContentChangeEvent("")])
+        path.unlink()
+        self._lspClient.server.textDocumentDidSave(doc.uri)
+        await self.closeDocument(doc.uri)
+
     async def modifyFile(self, fileName: str, newContent: str):
         """
         Modify a file's content, notifying the language server, as if the file
@@ -345,7 +358,9 @@ class CallGraphBuilder(ABC):
             newContent = ""
         path = Path(fileName).resolve()
         try:
-            doc = TextDocument.loadFile(str(path), self.inferLanguageId(path), 1)
+            doc = TextDocument.loadFile(str(path), self.inferLanguageId(path), 1) \
+                if path.exists() \
+                else TextDocument(TextDocument.fileNameToUri(str(path)), self.inferLanguageId(path), 1, "")
             try:
                 self.removeDocumentCache(path)
                 self._lspClient.server.textDocumentDidOpen(doc)
