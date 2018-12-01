@@ -143,12 +143,9 @@ class CallGraphBuilder(ABC):
     Building call graph branches from the given files with the specific Lexer and LspClient.
     """
 
-    def __init__(self, lexerType: Type, lspClient: LspClient):
-        if not issubclass(lexerType, Lexer):
-            raise TypeError("lexerType should be a subtype of Lexer.")
+    def __init__(self, lspClient: LspClient):
         if not isinstance(lspClient, LspClient):
             raise TypeError("lspClient should be an instance of LspClient.")
-        self._lexerType = lexerType
         self._lspClient = lspClient
         self._tokenizedDocCache: Dict[str, TokenizedDocument] = {}
         self._workspaceFilePatterns: List[str] = None
@@ -204,7 +201,7 @@ class CallGraphBuilder(ABC):
             return doc
         textDoc = TextDocument.loadFile(path, self.inferLanguageId(path))
         input = FileStream(path, encoding="utf-8", errors="replace")
-        lexer = self._lexerType(input)
+        lexer = self.createLexer(input)
         assert isinstance(lexer, Lexer)
         lexer.removeErrorListeners()
         lexer.addErrorListener(MyLexerErrorListener())
@@ -241,12 +238,21 @@ class CallGraphBuilder(ABC):
         """
         raise NotImplementedError
 
+    def filterFile(self, fileName: str):
+        if self._workspaceFilePatternsRegex:
+            return any(p.match(str(fileName)) for p in self._workspaceFilePatternsRegex)
+        return True
+
     def inferLanguageId(self, path: PurePath) -> str:
         """
         Infers the language ID for the given document path.
         """
         ext = path.suffix.lower()
         return _KNOWN_EXTENSION_LANGUAGES[ext]
+    
+    @abstractclassmethod
+    def createLexer(self, fileStream: FileStream) -> Lexer:
+        raise NotImplementedError
 
     async def openDocument(self, textDoc: TextDocument):
         """
@@ -309,9 +315,8 @@ class CallGraphBuilder(ABC):
                 for d in defs:
                     d: Location
                     defPath = self.pathFromUri(d.uri)
-                    if self._workspaceFilePatternsRegex:
-                        if all(not p.match(str(defPath)) for p in self._workspaceFilePatternsRegex):
-                            continue
+                    if not self.filterFile(defPath):
+                        continue
                     defsDoc = await self.getTokenizedDocument(defPath)
                     defNode = defsDoc.tokenAt(d.range.start.line, d.range.start.character)
                     defScope = defsDoc.scopeAt(d.range.start.line, d.range.start.character)

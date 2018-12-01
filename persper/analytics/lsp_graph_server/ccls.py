@@ -3,17 +3,21 @@ ccls client-side LSP support.
 """
 import logging
 from asyncio import sleep
-from pathlib import PurePath
+from pathlib import Path, PurePath
+from typing import List, Union
 
 from antlr4 import Token
+from antlr4.FileStream import FileStream
 from jsonrpc.endpoint import Endpoint
 from jsonrpc.exceptions import JsonRpcException
 
-from persper.analytics.lsp_graph_server.callgraph.builder import CallGraphBuilder
-from persper.analytics.lsp_graph_server.fileparsers.CPP14Lexer import CPP14Lexer
-from persper.analytics.lsp_graph_server.languageclient.lspclient import LspClient
-from persper.analytics.lsp_graph_server.languageclient.lspcontract import TextDocument
-from persper.analytics.lsp_graph_server.languageclient.lspserver import LspServerStub
+from . import LspClientGraphServer
+from .callgraph.builder import CallGraphBuilder
+from .callgraph.manager import CallGraphManager
+from .fileparsers.CPP14Lexer import CPP14Lexer
+from .languageclient.lspclient import LspClient
+from .languageclient.lspcontract import TextDocument
+from .languageclient.lspserver import LspServerStub
 
 _logger = logging.getLogger(__name__)
 
@@ -78,10 +82,13 @@ class CclsCallGraphBuilder(CallGraphBuilder):
                          #  CPP14Lexer.MinusMinus
                          }
 
-    def __init__(self, lspClient: LspClient):
+    def __init__(self, lspClient: CclsLspClient):
         if not isinstance(lspClient, CclsLspClient):
             raise TypeError("lspClient should be an instance of CclsLspClient.")
         super().__init__(CPP14Lexer, lspClient)
+
+    def createLexer(self, fileStream: FileStream):
+        return CPP14Lexer(fileStream)
 
     def filterToken(self, token: Token):
         return token.type in self._tokensOfInterest
@@ -122,5 +129,33 @@ class CclsCallGraphBuilder(CallGraphBuilder):
                     return False
                 raise
 
-class CclsGraphServer(GraphServer):
-    pass
+
+class CclsGraphServer(LspClientGraphServer):
+
+    defaultLanguageServerCommand = "./bin/ccls -log-file=ccls.log"
+
+    def __init__(self, workspaceRoot: str, cacheRoot: str = None, languageServerCommand: Union[str, List[str]] = None):
+        super().__init__(workspaceRoot)
+        self._cacheRoot = Path(cacheRoot).resolve() if cacheRoot else self._workspaceRoot.joinpath(".ccls-cache")
+
+    async def startLspClient(self):
+        super().startLspClient()
+        self._lspClient = CclsLspClient(self._lspServerProc.stdout, self._lspServerProc.stdin)
+        self._callGraphBuilder = CclsCallGraphBuilder(self._lspClient)
+        self._callGraphManager = CallGraphManager(self._callGraphBuilder, self._callGraph)
+        self._lspClient.start()
+        _logger.debug(await self._lspClient.server.initialize(
+            rootFolder=self._workspaceRoot,
+            initializationOptions={"cacheDirectory": self._cacheRoot,
+                                   "diagnostics": {"onParse": False, "onType": False},
+                                   "discoverSystemIncludes": True,
+                                   "enableCacheRead": True,
+                                   "enableCacheWrite": True,
+                                   "clang": {
+                                       "excludeArgs": [],
+                                       "extraArgs": ["-nocudalib"],
+                                       "pathMappings": [],
+                                       "resourceDir": ""
+                                   }
+                                   }))
+        self._lspClient.server.initialized()
