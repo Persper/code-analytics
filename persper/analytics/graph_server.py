@@ -45,6 +45,9 @@ class GraphServer(ABC):
         """
         pass
 
+    def end_commit(self, hexsha):
+        pass
+
     @abstractmethod
     def get_graph(self):
         """

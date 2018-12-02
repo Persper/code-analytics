@@ -11,7 +11,7 @@ from antlr4 import FileStream, Lexer, Token
 from antlr4.error.ErrorListener import ErrorListener
 from jsonrpc.exceptions import JsonRpcException
 
-import wildcards
+from persper.analytics.lsp_graph_server import wildcards
 from persper.analytics.lsp_graph_server.languageclient.lspclient import LspClient
 from persper.analytics.lsp_graph_server.languageclient.lspcontract import \
     DocumentSymbol, Location, Position, SymbolInformation, SymbolKind, \
@@ -51,7 +51,7 @@ class TokenizedDocument:
             if isinstance(s, DocumentSymbol):
                 # We assume selectionRange is exactly the range of symbol name
                 symbolKinds[s.selectionRange.start.toTuple()] = s.kind
-                self._scopes.append(CallGraphScope(s.name, s.kind, fileName, s.range.start, s.range.end))
+                self._scopes.append(CallGraphScope(s.detail or s.name, s.kind, fileName, s.range.start, s.range.end))
             elif isinstance(s, SymbolInformation):
                 symbolKinds[(s.location.range.start.line, s.name)] = (s.location.range.start.character, s.kind)
                 self._scopes.append(CallGraphScope(s.containerName, s.kind, fileName,
@@ -187,7 +187,10 @@ class CallGraphBuilder(ABC):
         """
         if isinstance(path, str):
             path = Path(path).resolve()
-        del self._tokenizedDocCache[path]
+        try:
+            del self._tokenizedDocCache[path]
+        except KeyError:
+            pass
 
     async def getTokenizedDocument(self, path: Union[str, PurePath]):
         class MyLexerErrorListener(ErrorListener):
@@ -249,7 +252,7 @@ class CallGraphBuilder(ABC):
         """
         ext = path.suffix.lower()
         return _KNOWN_EXTENSION_LANGUAGES[ext]
-    
+
     @abstractclassmethod
     def createLexer(self, fileStream: FileStream) -> Lexer:
         raise NotImplementedError
@@ -343,9 +346,9 @@ class CallGraphBuilder(ABC):
 
     async def deleteFile(self, fileName: str):
         path = Path(fileName).resolve()
+        self.removeDocumentCache(path)
         if not path.exists:
             return False
-        self.removeDocumentCache(path)
         doc = TextDocument(TextDocument.fileNameToUri(str(path)), self.inferLanguageId(path), 1, "")
         self._lspClient.server.textDocumentDidOpen(doc)
         # Empty the file and notify language server.
@@ -362,18 +365,19 @@ class CallGraphBuilder(ABC):
         if newContent is None:
             newContent = ""
         path = Path(fileName).resolve()
+        self.removeDocumentCache(path)
         try:
+            originalFileExists = path.exists()
             doc = TextDocument.loadFile(str(path), self.inferLanguageId(path), 1) \
-                if path.exists() \
+                if originalFileExists \
                 else TextDocument(TextDocument.fileNameToUri(str(path)), self.inferLanguageId(path), 1, "")
             try:
-                self.removeDocumentCache(path)
                 self._lspClient.server.textDocumentDidOpen(doc)
                 self._lspClient.server.textDocumentDidChange(doc.uri, 2, [TextDocumentContentChangeEvent(newContent)])
-                with open(fileName, "wt", encoding="utf-8") as f:
+                with open(fileName, "wt", encoding="utf-8", errors="replace") as f:
                     f.write(newContent)
                 self._lspClient.server.textDocumentDidSave(doc.uri)
-                _logger.info("Modified %s.", path)
+                _logger.info("%s %s.", "Modified " if originalFileExists else "Created", path)
                 return doc.text
             finally:
                 await self.closeDocument(doc.uri)

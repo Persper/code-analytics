@@ -1,4 +1,6 @@
+import json
 from datetime import datetime
+
 from jsonrpc.streams import JsonRpcStreamReader, JsonRpcStreamWriter
 
 
@@ -8,10 +10,10 @@ class JsonRpcLogger():
         self._file = open(fileName, "wt")
 
     def logTX(self, message: dict):
-        self._file.write("{0} < {1}\n".format(datetime.now(), message))
+        self._file.write("{0} < {1}\n".format(datetime.now(), json.dumps(message)))
 
     def logRX(self, message: dict):
-        self._file.write("{0} > {1}\n".format(datetime.now(), message))
+        self._file.write("{0} > {1}\n".format(datetime.now(), json.dumps(message)))
 
     def __exit__(self, exc_type, exc_value, traceback):
         self._file.close()

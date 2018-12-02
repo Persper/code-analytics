@@ -40,32 +40,42 @@ class LspClientGraphServer(GraphServer):
     def register_commit(self, hexsha, author_name, author_email, commit_message):
         self._ccgraph.add_commit(hexsha, author_name, author_email, commit_message)
 
-    def update_graph(self, old_filename: str, old_src: str, new_filename: str, new_src: str, patch: bytes):
-        with asyncio.new_event_loop() as loop:
-            loop.run_until_complete(self._onFileChanged(old_filename, old_src, new_filename, new_src, patch))
-
-    async def _onFileChanged(self, old_filename: str, old_src: str, new_filename: str, new_src: str, patch: bytes):
+    async def update_graph(self, old_filename: str, old_src: str, new_filename: str, new_src: str, patch: bytes):
         oldPath = self._workspaceRoot.joinpath(old_filename).resolve() if old_filename else None
         newPath = self._workspaceRoot.joinpath(new_filename).resolve() if new_filename else None
-        if old_filename != new_filename:
+        assert oldPath or newPath
+        if oldPath and oldPath != newPath:
             await self._callGraphBuilder.deleteFile(oldPath)
-            await self._callGraphBuilder.modifyFile(new_filename, new_src)
-        self._invalidatedFiles.add(oldPath)
-        self._invalidatedFiles.add(newPath)
+            self._invalidatedFiles.add(oldPath)
+        if newPath:
+            await self._callGraphBuilder.modifyFile(newPath, new_src)
+            self._invalidatedFiles.add(newPath)
 
-    def get_graph(self):
-        with asyncio.new_event_loop() as loop:
-            loop.run_until_complete(self.updateGraph())
+    async def end_commit(self, hexsha):
+        await self.updateGraph()
+        # self._callGraph.dumpTo("Graph-" + hexsha + ".txt")
+        _logger.info("End commit: %s", hexsha)
+
+    async def get_graph(self):
         return self._ccgraph
 
     def reset_graph(self):
         self._callGraph.clear()
 
     def filter_file(self, filename):
-        return self._callGraphBuilder.filterFile(filename)
+        filePath = self._workspaceRoot.joinpath(filename).resolve()
+        # print("Filter: ", filePath, self._callGraphBuilder.filterFile(str(filePath)))
+        return self._callGraphBuilder.filterFile(str(filePath))
 
     def config(self, param: dict):
         pass
+
+    async def __aenter__(self):
+        await self.startLspClient()
+        return self
+
+    async def __aexit__(self, exc_type, exc_value, traceback):
+        await self.stopLspClient()
 
     async def startLspClient(self):
         """
@@ -107,5 +117,5 @@ class LspClientGraphServer(GraphServer):
             return
         affectedFiles = self._callGraphManager.removeByFiles(self._invalidatedFiles)
         _logger.info("Invalidated %d files, affected %d files.", len(self._invalidatedFiles), len(affectedFiles))
-        self._callGraphManager.buildGraph(fileNames=affectedFiles)
+        await self._callGraphManager.buildGraph(fileNames=affectedFiles)
         self._invalidatedFiles.clear()

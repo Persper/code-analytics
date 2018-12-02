@@ -2,8 +2,9 @@
 Contains CallGraphManager.
 """
 import logging
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Iterable, NamedTuple, Tuple, Union
+from os import path
 
 from . import CallGraph
 from .builder import CallGraphBuilder
@@ -22,7 +23,7 @@ class CallGraphManager():
             raise TypeError("builderType should be a subtype of CallGraphBuilder.")
         self._builder = builder
         self._graph = callGraph or CallGraph()
-        #self.x = 0
+        # self._rebuildCounter = 0
 
     @property
     def graph(self):
@@ -51,10 +52,13 @@ class CallGraphManager():
                 _logger.debug("%s Branch: %s", ex, branch)
 
         if fileNames:
-            if isinstance(fileNames, str):
+            if isinstance(fileNames, (str, PurePath)):
                 fileNames = [fileNames]
             for fn in fileNames:
-                async for b in self._builder.buildCallGraphInFile(fn):
+                sfn = str(fn)
+                if not path.exists(sfn):
+                    continue
+                async for b in self._builder.buildCallGraphInFile(sfn):
                     pushBranch(b)
         if globPattern or not fileNames:
             async for b in self._builder.buildCallGraphInFiles(globPattern):
@@ -77,6 +81,6 @@ class CallGraphManager():
         whose source or definition node contains the specified files.
         """
         affectedFiles = self.removeByFiles(fileNames)
-        #self.x += 1
-        #self._graph.dumpTo("dmp" + str(self.x) + ".txt")
+        self._rebuildCounter += 1
+        # self._graph.dumpTo("rebuild_" + str(self._rebuildCounter) + ".txt")
         await self.buildGraph((str(p) for p in affectedFiles))

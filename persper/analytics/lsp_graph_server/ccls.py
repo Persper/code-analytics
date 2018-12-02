@@ -85,7 +85,7 @@ class CclsCallGraphBuilder(CallGraphBuilder):
     def __init__(self, lspClient: CclsLspClient):
         if not isinstance(lspClient, CclsLspClient):
             raise TypeError("lspClient should be an instance of CclsLspClient.")
-        super().__init__(CPP14Lexer, lspClient)
+        super().__init__(lspClient)
 
     def createLexer(self, fileStream: FileStream):
         return CPP14Lexer(fileStream)
@@ -135,18 +135,16 @@ class CclsGraphServer(LspClientGraphServer):
     defaultLanguageServerCommand = "./bin/ccls -log-file=ccls.log"
 
     def __init__(self, workspaceRoot: str, cacheRoot: str = None, languageServerCommand: Union[str, List[str]] = None):
-        super().__init__(workspaceRoot)
+        super().__init__(workspaceRoot, languageServerCommand=languageServerCommand)
         self._cacheRoot = Path(cacheRoot).resolve() if cacheRoot else self._workspaceRoot.joinpath(".ccls-cache")
 
     async def startLspClient(self):
-        super().startLspClient()
-        self._lspClient = CclsLspClient(self._lspServerProc.stdout, self._lspServerProc.stdin)
-        self._callGraphBuilder = CclsCallGraphBuilder(self._lspClient)
-        self._callGraphManager = CallGraphManager(self._callGraphBuilder, self._callGraph)
+        await super().startLspClient()
+        self._lspClient = CclsLspClient(self._lspServerProc.stdout, self._lspServerProc.stdin, logFile="rpclog.log")
         self._lspClient.start()
         _logger.debug(await self._lspClient.server.initialize(
             rootFolder=self._workspaceRoot,
-            initializationOptions={"cacheDirectory": self._cacheRoot,
+            initializationOptions={"cacheDirectory": str(self._cacheRoot),
                                    "diagnostics": {"onParse": False, "onType": False},
                                    "discoverSystemIncludes": True,
                                    "enableCacheRead": True,
@@ -156,6 +154,17 @@ class CclsGraphServer(LspClientGraphServer):
                                        "extraArgs": ["-nocudalib"],
                                        "pathMappings": [],
                                        "resourceDir": ""
-                                   }
-                                   }))
+                                    },
+                                    "index": {"threads": 1}     # Ccls has concurrency issue, for now.
+                                    }))
         self._lspClient.server.initialized()
+        self._callGraphBuilder = CclsCallGraphBuilder(self._lspClient)
+        self._callGraphBuilder.workspaceFilePatterns = [
+            str(self._workspaceRoot.joinpath("**/*.[Hh]")),
+            str(self._workspaceRoot.joinpath("**/*.[Hh]pp")),
+            str(self._workspaceRoot.joinpath("**/*.[Cc]")),
+            str(self._workspaceRoot.joinpath("**/*.[Cc]c")),
+            str(self._workspaceRoot.joinpath("**/*.[Cc]pp")),
+            str(self._workspaceRoot.joinpath("**/*.[Cc]xx"))
+        ]
+        self._callGraphManager = CallGraphManager(self._callGraphBuilder, self._callGraph)

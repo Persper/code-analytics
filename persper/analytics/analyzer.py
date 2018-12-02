@@ -1,6 +1,7 @@
 import os
 import time
 import pickle
+import asyncio
 from persper.analytics.git_tools import get_contents, _diff_with_first_parent
 from persper.analytics.iterator import RepoIterator
 
@@ -62,7 +63,7 @@ class Analyzer:
         self._ri = RepoIterator(repo_path)
         self._ccgraph = None
 
-    def analyze(self, rev=None,
+    async def analyze(self, rev=None,
                 from_beginning=False,
                 num_commits=None,
                 continue_iter=False,
@@ -93,18 +94,18 @@ class Analyzer:
         for idx, commit in enumerate(reversed(commits), 1):
             phase = 'main'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self.analyze_master_commit(commit)
+            await self.analyze_master_commit(commit)
             self.autosave(phase, idx, checkpoint_interval)
 
         for idx, commit in enumerate(branch_commits, 1):
             phase = 'branch'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self.analyze_branch_commit(commit)
+            await self.analyze_branch_commit(commit)
             self.autosave(phase, idx, checkpoint_interval)
 
         self.autosave('finished', 0, 1)
 
-    def _analyze_commit(self, commit, server_func):
+    async def _analyze_commit(self, commit, server_func):
         self._graph_server.register_commit(commit.hexsha,
                                            commit.author.name,
                                            commit.author.email,
@@ -135,14 +136,21 @@ class Analyzer:
 
             if old_src or new_src:
                 # todo (hezheng) store the status somewhere for reporting later
-                status = server_func(old_fname, old_src, new_fname, new_src, diff.diff)
+                result = server_func(old_fname, old_src, new_fname, new_src, diff.diff)
+                if asyncio.iscoroutine(result):
+                    result = await result
+                status = result
 
-    def analyze_master_commit(self, commit):
-        self._analyze_commit(commit, self._graph_server.update_graph)
+        result = self._graph_server.end_commit(commit.hexsha)
+        if asyncio.iscoroutine(result):
+            result = await result
+
+    async def analyze_master_commit(self, commit):
+        await self._analyze_commit(commit, self._graph_server.update_graph)
 
     # todo (hezheng) implement correct analysis for branches
-    def analyze_branch_commit(self, commit):
-        self._analyze_commit(commit, self._graph_server.update_graph)
+    async def analyze_branch_commit(self, commit):
+        await self._analyze_commit(commit, self._graph_server.update_graph)
 
     def reset_state(self):
         self._ccgraph = None
@@ -159,4 +167,4 @@ class Analyzer:
         if idx % checkpoint_interval == 0:
             repo_name = os.path.basename(self._ri.repo_path.rstrip('/'))
             fname = repo_name + '-' + phase + '-' + str(idx) + '.pickle'
-            self.save(fname)
+            #self.save(fname)
