@@ -37,6 +37,18 @@ class LspClientGraphServer(GraphServer):
         self._callGraphBuilder: CallGraphBuilder = None
         self._callGraphManager: CallGraphManager = None
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state["_lspServerProc"]
+        del state["_lspClient"]
+        del state["_callGraphBuilder"]
+        del state["_callGraphManager"]
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        if not self._workspaceRoot.exists():
+            self._workspaceRoot.touch()
+
     def register_commit(self, hexsha, author_name, author_email, commit_message):
         self._ccgraph.add_commit(hexsha, author_name, author_email, commit_message)
 

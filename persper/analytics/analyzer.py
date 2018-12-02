@@ -167,4 +167,4 @@ class Analyzer:
         if idx % checkpoint_interval == 0:
             repo_name = os.path.basename(self._ri.repo_path.rstrip('/'))
             fname = repo_name + '-' + phase + '-' + str(idx) + '.pickle'
-            #self.save(fname)
+            self.save(fname)
