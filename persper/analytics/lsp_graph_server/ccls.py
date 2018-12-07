@@ -16,7 +16,7 @@ from .callgraph.builder import CallGraphBuilder
 from .callgraph.manager import CallGraphManager
 from .fileparsers.CPP14Lexer import CPP14Lexer
 from .languageclient.lspclient import LspClient
-from .languageclient.lspcontract import TextDocument
+from .languageclient.lspcontract import TextDocument, TextDocumentContentChangeEvent
 from .languageclient.lspserver import LspServerStub
 
 _logger = logging.getLogger(__name__)
@@ -99,24 +99,27 @@ class CclsCallGraphBuilder(CallGraphBuilder):
     def modifyFile(self, fileName: str, newContent: str):
         return super().modifyFile(fileName, newContent)
 
-    async def openDocument(self, textDoc: TextDocument):
-        self._lspClient.server.textDocumentDidOpen(textDoc)
+    async def _waitForJobs(self):
         lastJobs = None
         while True:
+            curJobs = await self._lspClient.server.getJobs()
+            if curJobs != lastJobs:
+                _logger.debug("Server jobs: %d.", curJobs)
+                lastJobs = curJobs
+            if curJobs == 0:
+                break
+            if curJobs < 5:
+                await sleep(0.05)
+            elif curJobs < 50:
+                await sleep(0.1)
+            else:
+                await sleep(1)
+
+    async def openDocument(self, textDoc: TextDocument):
+        self._lspClient.server.textDocumentDidOpen(textDoc)
+        while True:
             try:
-                while True:
-                    curJobs = await self._lspClient.server.getJobs()
-                    if curJobs != lastJobs:
-                        _logger.debug("Server jobs: %d.", curJobs)
-                        lastJobs = curJobs
-                    if curJobs == 0:
-                        break
-                    if curJobs < 5:
-                        await sleep(0.05)
-                    elif curJobs < 50:
-                        await sleep(0.1)
-                    else:
-                        await sleep(1)
+                await self._waitForJobs()
                 # dummy request
                 await self._lspClient.server.textDocumentCodeLens(textDoc.uri)
                 return True
@@ -128,6 +131,10 @@ class CclsCallGraphBuilder(CallGraphBuilder):
                     _logger.warning("The file seems invalid. Server error: %s", ex.message)
                     return False
                 raise
+
+    async def modifyFileCore(self, filePath: PurePath, originalDocument: TextDocument, newContent: str):
+        with open(str(filePath), "wt", encoding="utf-8", errors="replace") as f:
+            f.write(newContent)
 
 
 class CclsGraphServer(LspClientGraphServer):
@@ -155,7 +162,7 @@ class CclsGraphServer(LspClientGraphServer):
                                        "pathMappings": [],
                                        "resourceDir": ""
                                     },
-                                    "index": {"threads": 1}     # Ccls has concurrency issue, for now.
+                                    "index": {"threads": 0}
                                     }))
         self._lspClient.server.initialized()
         self._callGraphBuilder = CclsCallGraphBuilder(self._lspClient)

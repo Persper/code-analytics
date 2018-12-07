@@ -4,6 +4,7 @@ import subprocess
 from abc import abstractclassmethod, abstractproperty
 from pathlib import Path
 from typing import List, Union
+from datetime import datetime, timedelta
 
 from persper.analytics.call_commit_graph import CallCommitGraph
 from persper.analytics.graph_server import GraphServer
@@ -36,6 +37,7 @@ class LspClientGraphServer(GraphServer):
         self._lspClient: LspClient = None
         self._callGraphBuilder: CallGraphBuilder = None
         self._callGraphManager: CallGraphManager = None
+        self._lastFileWrittenTime: datetime = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -62,11 +64,15 @@ class LspClientGraphServer(GraphServer):
         if newPath:
             await self._callGraphBuilder.modifyFile(newPath, new_src)
             self._invalidatedFiles.add(newPath)
+        self._lastFileWrittenTime = datetime.now()
 
     async def end_commit(self, hexsha):
         await self.updateGraph()
         # self._callGraph.dumpTo("Graph-" + hexsha + ".txt")
         _logger.info("End commit: %s", hexsha)
+        # ensure the files in the next commit has a different timestamp as this commit.
+        if datetime.now() - self._lastFileWrittenTime < timedelta(seconds=1):
+            await asyncio.sleep(1)
 
     async def get_graph(self):
         return self._ccgraph

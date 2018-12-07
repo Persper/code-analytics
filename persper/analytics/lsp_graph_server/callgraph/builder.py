@@ -372,14 +372,17 @@ class CallGraphBuilder(ABC):
                 if originalFileExists \
                 else TextDocument(TextDocument.fileNameToUri(str(path)), self.inferLanguageId(path), 1, "")
             try:
-                self._lspClient.server.textDocumentDidOpen(doc)
-                self._lspClient.server.textDocumentDidChange(doc.uri, 2, [TextDocumentContentChangeEvent(newContent)])
-                with open(fileName, "wt", encoding="utf-8", errors="replace") as f:
-                    f.write(newContent)
-                self._lspClient.server.textDocumentDidSave(doc.uri)
+                await self.modifyFileCore(path, doc, newContent)
                 _logger.info("%s %s.", "Modified " if originalFileExists else "Created", path)
                 return doc.text
             finally:
                 await self.closeDocument(doc.uri)
         except Exception as ex:
             raise Exception("Cannot modify {0}.".format(path)) from ex
+
+    async def modifyFileCore(self, filePath: PurePath, originalDocument: TextDocument, newContent: str):
+        self._lspClient.server.textDocumentDidOpen(originalDocument)
+        self._lspClient.server.textDocumentDidChange(originalDocument.uri, 2, [TextDocumentContentChangeEvent(newContent)])
+        with open(str(filePath), "wt", encoding="utf-8", errors="replace") as f:
+            f.write(newContent)
+        self._lspClient.server.textDocumentDidSave(originalDocument.uri)
