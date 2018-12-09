@@ -29,6 +29,26 @@ _KNOWN_EXTENSION_LANGUAGES = {
 }
 
 
+_SCOPE_SYMBOL_KINDS = {
+    # SymbolKind.Unknown,
+    SymbolKind.Class,
+    SymbolKind.Constructor,
+    SymbolKind.Enum,
+    SymbolKind.File,
+    SymbolKind.Function,
+    SymbolKind.Interface,
+    SymbolKind.Macro,
+    SymbolKind.Method,
+    SymbolKind.Module,
+    SymbolKind.Namespace,
+    SymbolKind.Operator,
+    SymbolKind.Package,
+    SymbolKind.Property,
+    SymbolKind.StaticMethod,
+    SymbolKind.Struct
+}
+
+
 class TokenizedDocument:
     """
     Represents a fully tokenized document that supports finding a symbol or scope from
@@ -47,17 +67,26 @@ class TokenizedDocument:
         # SymbolInformation
         # { (symbolLine, symbolName): (containerColumn, symbolKind)  }
         symbolKinds = {}
-        for s in documentSymbols:
-            if isinstance(s, DocumentSymbol):
-                # We assume selectionRange is exactly the range of symbol name
-                symbolKinds[s.selectionRange.start.toTuple()] = s.kind
-                self._scopes.append(CallGraphScope(s.detail or s.name, s.kind, fileName, s.range.start, s.range.end))
-            elif isinstance(s, SymbolInformation):
-                symbolKinds[(s.location.range.start.line, s.name)] = (s.location.range.start.character, s.kind)
-                self._scopes.append(CallGraphScope(s.containerName, s.kind, fileName,
-                                                   s.location.range.start, s.location.range.end))
-            else:
-                _logger.error("Invalid DocumentSymbol in %s: %s", fileName, s)
+
+        def PopulateSymbols(symbols):
+            for s in symbols:
+                if s.kind not in _SCOPE_SYMBOL_KINDS:
+                    continue
+                if isinstance(s, DocumentSymbol):
+                    # We assume selectionRange is exactly the range of symbol name
+                    symbolKinds[s.selectionRange.start.toTuple()] = s.kind
+                    self._scopes.append(CallGraphScope(s.detail or s.name, s.kind,
+                                                       fileName, s.range.start, s.range.end))
+                elif isinstance(s, SymbolInformation):
+                    symbolKinds[(s.location.range.start.line, s.name)] = (s.location.range.start.character, s.kind)
+                    self._scopes.append(CallGraphScope(s.containerName, s.kind, fileName,
+                                                       s.location.range.start, s.location.range.end))
+                    if s.children:
+                        PopulateSymbols(s.children)
+                else:
+                    _logger.error("Invalid DocumentSymbol in %s: %s", fileName, s)
+
+        PopulateSymbols(documentSymbols)
         # put the scopes in document order of start positions, then by the document order of their end positions
         self._scopes.sort(key=lambda sc: (sc.startPos, sc.endPos))
         NOT_EXISTS = object()
@@ -382,7 +411,8 @@ class CallGraphBuilder(ABC):
 
     async def modifyFileCore(self, filePath: PurePath, originalDocument: TextDocument, newContent: str):
         self._lspClient.server.textDocumentDidOpen(originalDocument)
-        self._lspClient.server.textDocumentDidChange(originalDocument.uri, 2, [TextDocumentContentChangeEvent(newContent)])
+        self._lspClient.server.textDocumentDidChange(
+            originalDocument.uri, 2, [TextDocumentContentChangeEvent(newContent)])
         with open(str(filePath), "wt", encoding="utf-8", errors="replace") as f:
             f.write(newContent)
         self._lspClient.server.textDocumentDidSave(originalDocument.uri)

@@ -10,6 +10,9 @@ class CallCommitGraphSynchronizer(CallGraph):
 
     def add(self, branch: CallGraphBranch):
         super().add(branch)
+        if branch.sourceScope == branch.definitionScope:
+            # e.g. variable referernces.
+            return
         # Use scope full name as identifier.
         self._callCommitGraph.add_node(branch.sourceScope.name)
         self._callCommitGraph.add_node(branch.definitionScope.name)

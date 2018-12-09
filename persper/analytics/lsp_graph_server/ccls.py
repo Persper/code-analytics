@@ -139,15 +139,20 @@ class CclsCallGraphBuilder(CallGraphBuilder):
 
 class CclsGraphServer(LspClientGraphServer):
 
-    defaultLanguageServerCommand = "./bin/ccls -log-file=ccls.log"
+    defaultLanguageServerCommand = "./bin/ccls"
+    defaultLoggedLanguageServerCommand = "./bin/ccls -log-file=ccls.log"
 
-    def __init__(self, workspaceRoot: str, cacheRoot: str = None, languageServerCommand: Union[str, List[str]] = None):
-        super().__init__(workspaceRoot, languageServerCommand=languageServerCommand)
+    def __init__(self, workspaceRoot: str, cacheRoot: str = None,
+                 languageServerCommand: Union[str, List[str]] = None,
+                 dumpLogs: bool = False,
+                 dumpGraphs: bool = False):
+        super().__init__(workspaceRoot, languageServerCommand=languageServerCommand, dumpLogs=dumpLogs, dumpGraphs=dumpGraphs)
         self._cacheRoot = Path(cacheRoot).resolve() if cacheRoot else self._workspaceRoot.joinpath(".ccls-cache")
 
     async def startLspClient(self):
         await super().startLspClient()
-        self._lspClient = CclsLspClient(self._lspServerProc.stdout, self._lspServerProc.stdin, logFile="rpclog.log")
+        self._lspClient = CclsLspClient(self._lspServerProc.stdout, self._lspServerProc.stdin,
+                                        logFile="rpclog.log" if self._dumpLogs else None)
         self._lspClient.start()
         _logger.debug(await self._lspClient.server.initialize(
             rootFolder=self._workspaceRoot,
@@ -161,9 +166,9 @@ class CclsGraphServer(LspClientGraphServer):
                                        "extraArgs": ["-nocudalib"],
                                        "pathMappings": [],
                                        "resourceDir": ""
-                                    },
-                                    "index": {"threads": 0}
-                                    }))
+            },
+                "index": {"threads": 0}
+            }))
         self._lspClient.server.initialized()
         self._callGraphBuilder = CclsCallGraphBuilder(self._lspClient)
         self._callGraphBuilder.workspaceFilePatterns = [
