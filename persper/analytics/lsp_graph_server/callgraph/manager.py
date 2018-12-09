@@ -81,6 +81,6 @@ class CallGraphManager():
         whose source or definition node contains the specified files.
         """
         affectedFiles = self.removeByFiles(fileNames)
-        self._rebuildCounter += 1
+        # self._rebuildCounter += 1
         # self._graph.dumpTo("rebuild_" + str(self._rebuildCounter) + ".txt")
         await self.buildGraph((str(p) for p in affectedFiles))

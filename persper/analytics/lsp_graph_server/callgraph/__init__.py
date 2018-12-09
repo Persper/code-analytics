@@ -6,8 +6,6 @@ from io import IOBase
 from pathlib import Path, PurePath
 from typing import Dict, Iterable, List, NamedTuple, Tuple, Type, Union
 
-import jsonpickle
-
 from persper.analytics.lsp_graph_server.languageclient.lspcontract import \
     DocumentSymbol, Location, Position, SymbolInformation, SymbolKind, \
     TextDocument, TextDocumentContentChangeEvent
@@ -96,30 +94,3 @@ class CallGraph():
     def dumpTo(self, fileName: str):
         with open(fileName, "wt") as f:
             self.dump(f)
-
-    def serialize(self, file: IOBase):
-        for item in self._items:
-            file.write(jsonpickle.dumps(item, file))
-            file.write("\n")
-        _logger.info("Written %d call graph branches.", len(self._items))
-
-    def serializeTo(self, fileName):
-        with open(fileName, "wt") as f:
-            self.serialize(f)
-
-    def deserialize(self, file: IOBase):
-        items = []
-        for line in file:
-            line: str = line.strip()
-            if line:
-                item = jsonpickle.loads(line)
-                if not isinstance(item, CallGraphBranch):
-                    raise ValueError("Parsed object [{0}] is not CallGraphBranch.".format(type(item)))
-                items.append(item)
-        self._items = items
-        _logger.info("Loaded %d call graph branches.", len(items))
-        assert isinstance(self._items, list)
-
-    def deserializeFrom(self, fileName):
-        with open(fileName, "rt") as f:
-            self.deserialize(fileName)

@@ -65,10 +65,11 @@ class LspClientGraphServer(GraphServer):
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        del state["_lspServerProc"]
-        del state["_lspClient"]
-        del state["_callGraphBuilder"]
-        del state["_callGraphManager"]
+        state.pop("_lspServerProc", None)
+        state.pop("_lspClient", None)
+        state.pop("_callGraphBuilder", None)
+        state.pop("_callGraphManager", None)
+        return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
@@ -99,7 +100,7 @@ class LspClientGraphServer(GraphServer):
         if datetime.now() - self._lastFileWrittenTime < timedelta(seconds=1):
             await asyncio.sleep(1)
 
-    async def get_graph(self):
+    def get_graph(self):
         return self._ccgraph
 
     def reset_graph(self):
