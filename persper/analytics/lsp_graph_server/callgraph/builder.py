@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import re
 import urllib.parse
@@ -179,6 +180,7 @@ class CallGraphBuilder(ABC):
         self._tokenizedDocCache: Dict[str, TokenizedDocument] = {}
         self._workspaceFilePatterns: List[str] = None
         self._workspaceFilePatternsRegex: list[re.Pattern] = None
+        self._deletePendingPaths = []
 
     @property
     def lspClient(self):
@@ -349,7 +351,12 @@ class CallGraphBuilder(ABC):
                     defPath = self.pathFromUri(d.uri)
                     if not self.filterFile(defPath):
                         continue
-                    defsDoc = await self.getTokenizedDocument(defPath)
+                    defsDoc = None
+                    try:
+                        defsDoc = await self.getTokenizedDocument(defPath)
+                    except Exception as ex:
+                        _logger.error("%s", ex)
+                        continue
                     defNode = defsDoc.tokenAt(d.range.start.line, d.range.start.character)
                     defScope = defsDoc.scopeAt(d.range.start.line, d.range.start.character)
                     if not defNode:
@@ -378,13 +385,27 @@ class CallGraphBuilder(ABC):
         self.removeDocumentCache(path)
         if not path.exists:
             return False
-        doc = TextDocument(TextDocument.fileNameToUri(str(path)), self.inferLanguageId(path), 1, "")
+        await self.waitForFileSystem(relaxed=True)
+        await self.deleteFileCore(path)
+        self._deletePendingPaths.append(path)
+        return True
+
+    async def deleteFileCore(self, filePath: Path):
+        doc = TextDocument(TextDocument.fileNameToUri(str(filePath)), self.inferLanguageId(filePath), 1, "")
         self._lspClient.server.textDocumentDidOpen(doc)
         # Empty the file and notify language server.
         self._lspClient.server.textDocumentDidChange(doc.uri, 2, [TextDocumentContentChangeEvent("")])
-        path.unlink()
+        filePath.unlink()
         self._lspClient.server.textDocumentDidSave(doc.uri)
         await self.closeDocument(doc.uri)
+
+    async def waitForFileSystem(self, relaxed: bool = False):
+        if not relaxed or len(self._deletePendingPaths) > 1000:
+            for p in self._deletePendingPaths:
+                p: Path
+                if p.exists():
+                    await asyncio.sleep(0.1)
+            self._deletePendingPaths.clear()
 
     async def modifyFile(self, fileName: str, newContent: str):
         """
@@ -396,23 +417,23 @@ class CallGraphBuilder(ABC):
         path = Path(fileName).resolve()
         self.removeDocumentCache(path)
         try:
-            originalFileExists = path.exists()
-            doc = TextDocument.loadFile(str(path), self.inferLanguageId(path), 1) \
-                if originalFileExists \
-                else TextDocument(TextDocument.fileNameToUri(str(path)), self.inferLanguageId(path), 1, "")
-            try:
-                await self.modifyFileCore(path, doc, newContent)
-                _logger.info("%s %s.", "Modified " if originalFileExists else "Created", path)
-                return doc.text
-            finally:
-                await self.closeDocument(doc.uri)
+            await self.modifyFileCore(path, newContent)
         except Exception as ex:
             raise Exception("Cannot modify {0}.".format(path)) from ex
 
-    async def modifyFileCore(self, filePath: PurePath, originalDocument: TextDocument, newContent: str):
-        self._lspClient.server.textDocumentDidOpen(originalDocument)
-        self._lspClient.server.textDocumentDidChange(
-            originalDocument.uri, 2, [TextDocumentContentChangeEvent(newContent)])
-        with open(str(filePath), "wt", encoding="utf-8", errors="replace") as f:
-            f.write(newContent)
-        self._lspClient.server.textDocumentDidSave(originalDocument.uri)
+    async def modifyFileCore(self, filePath: Path, newContent: str):
+        originalFileExists = filePath.exists()
+        doc = TextDocument.loadFile(str(path), self.inferLanguageId(path), 1) \
+            if originalFileExists \
+            else TextDocument(TextDocument.fileNameToUri(str(path)), self.inferLanguageId(path), 1, "")
+        try:
+            self._lspClient.server.textDocumentDidOpen(doc)
+            self._lspClient.server.textDocumentDidChange(
+                doc.uri, 2, [TextDocumentContentChangeEvent(newContent)])
+            with open(str(filePath), "wt", encoding="utf-8", errors="replace") as f:
+                f.write(newContent)
+            self._lspClient.server.textDocumentDidSave(doc.uri)
+            _logger.info("%s %s.", "Modified " if originalFileExists else "Created", path)
+            return doc.text
+        finally:
+            await self.closeDocument(doc.uri)

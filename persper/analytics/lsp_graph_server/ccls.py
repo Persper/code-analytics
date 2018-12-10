@@ -2,6 +2,7 @@
 ccls client-side LSP support.
 """
 import logging
+import os
 from asyncio import sleep
 from pathlib import Path, PurePath
 from typing import List, Union
@@ -132,7 +133,8 @@ class CclsCallGraphBuilder(CallGraphBuilder):
                     return False
                 raise
 
-    async def modifyFileCore(self, filePath: PurePath, originalDocument: TextDocument, newContent: str):
+    async def modifyFileCore(self, filePath: Path, newContent: str):
+        os.makedirs(str(filePath.parent), exist_ok=True)
         with open(str(filePath), "wt", encoding="utf-8", errors="replace") as f:
             f.write(newContent)
 
@@ -173,10 +175,11 @@ class CclsGraphServer(LspClientGraphServer):
         self._callGraphBuilder = CclsCallGraphBuilder(self._lspClient)
         self._callGraphBuilder.workspaceFilePatterns = [
             str(self._workspaceRoot.joinpath("**/*.[Hh]")),
-            str(self._workspaceRoot.joinpath("**/*.[Hh]pp")),
+            str(self._workspaceRoot.joinpath("**/*.[Hh][Hh]")),
+            str(self._workspaceRoot.joinpath("**/*.[Hh][Pp][Pp]")),
             str(self._workspaceRoot.joinpath("**/*.[Cc]")),
-            str(self._workspaceRoot.joinpath("**/*.[Cc]c")),
-            str(self._workspaceRoot.joinpath("**/*.[Cc]pp")),
-            str(self._workspaceRoot.joinpath("**/*.[Cc]xx"))
+            str(self._workspaceRoot.joinpath("**/*.[Cc][Cc]")),
+            str(self._workspaceRoot.joinpath("**/*.[Cc][Pp][Pp]")),
+            str(self._workspaceRoot.joinpath("**/*.[Cc][Xx][Xx]"))
         ]
         self._callGraphManager = CallGraphManager(self._callGraphBuilder, self._callGraph)

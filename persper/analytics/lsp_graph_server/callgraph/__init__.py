@@ -63,7 +63,7 @@ class CallGraphBranch(NamedTuple):
 class CallGraph():
 
     def __init__(self):
-        self._items = []
+        self._items = set()
 
     @property
     def items(self):
