@@ -71,22 +71,10 @@ sudo apt install libarchive-dev
 sudo apt install libcurl4-openssl-dev
 ```
 
-```bash
-sudo -H pip3 install jupyter
-```
-
-To fit notebooks well in git, install jq and run gitconfig.sh. E.g., on Ubuntu:
+7. Check setup correctness
 
 ```bash
-sudo apt install -y jq
-./gitconfig.sh
-```
-
-6. Check setup correctness
-
-```
-cd test
-pytest
+pipenv run pytest test/test_analytics
 ```
 
 You should see all tests passed.
