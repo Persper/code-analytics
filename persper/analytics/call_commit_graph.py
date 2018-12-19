@@ -54,6 +54,7 @@ class CallCommitGraph:
     def add_node(self, node):
         self._digraph.add_node(node, size=0, history={})
 
+    # add_node must be called on source and target first
     def add_edge(self, source, target):
         self._digraph.add_edge(source, target,
                                addedBy=self._cur_cindex(),
@@ -63,22 +64,25 @@ class CallCommitGraph:
     def update_node_history(self, node, size):
         self._digraph.nodes[node]['history'][self._cur_cindex()] = size
         self._update_node_size(node, size)
+        self._update_ingoing_weight(node)
         self._check_history_match_size(node)
 
     # node's size is automatically updated when history is updated
     def _update_node_size(self, node, size):
         self._digraph.nodes[node]['size'] += size
 
-    # todo (hezheng)
-    def _update_edge_weight(self, source, target):
-        pass
+    # edge's weight is automaitcally updated when history is updated
+    # needs to be called after _update_node_size
+    def _update_ingoing_weight(self, node):
+        for nbr, datadict in self._digraph.pred[node].items():
+            datadict['weight'] = self._digraph.nodes[node]['size']
 
     def _check_history_match_size(self, node):
         assert(sum(self._digraph.nodes[node]['history'].values()) ==
                self._digraph.nodes[node]['size'])
 
     def function_devranks(self, alpha):
-        return devrank(self._digraph, 'weight', alpha=alpha)
+        return devrank(self._digraph, 'size', alpha=alpha)
 
     def commit_devranks(self, alpha):
         commit_devranks = {}
@@ -92,7 +96,7 @@ class CallCommitGraph:
                 continue
 
             for cindex, csize in history.items():
-                sha = self.commits[cindex]['hexsha']
+                sha = self.commits()[cindex]['hexsha']
                 dr = (csize / size) * func_devranks[func]
                 if sha in commit_devranks:
                     commit_devranks[sha] += dr
@@ -105,7 +109,7 @@ class CallCommitGraph:
         developer_devranks = {}
         commit_devranks = self.commit_devranks(alpha)
 
-        for commit in self.commits:
+        for commit in self.commits():
             sha = commit['hexsha']
             email = commit['authorEmail']
             if email in developer_devranks:
