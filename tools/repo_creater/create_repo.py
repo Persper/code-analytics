@@ -132,7 +132,7 @@ def create_repo(src_dir):
         # need to create a new branch for n
         else:
             assert(in_dg == 1)
-            p = g.predecessors(n)[0]
+            p = list(g.predecessors(n))[0]
             repo.git.checkout(n_to_sha[p])
             branch_name = "feature-" + n
             repo.git.checkout(b=branch_name)
