@@ -60,9 +60,15 @@ class CallCommitGraph:
                                addedBy=self._cur_cindex(),
                                weight=self._digraph.nodes[target]['size'])
 
-    # Use current commit index
     def update_node_history(self, node, size):
-        self._digraph.nodes[node]['history'][self._cur_cindex()] = size
+        # Use current commit index
+        cc_idx = self._cur_cindex()
+        node_history = self._digraph.nodes[node]['history']
+        # A commit might update a node's history more than once
+        if cc_idx in node_history:
+            node_history[cc_idx] += size
+        else:
+            node_history[cc_idx] = size
         self._update_node_size(node, size)
         self._update_ingoing_weight(node)
         self._check_history_match_size(node)
