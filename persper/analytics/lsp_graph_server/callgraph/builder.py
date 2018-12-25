@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import re
 import urllib.parse
 from abc import ABC, abstractclassmethod
@@ -16,7 +17,7 @@ from persper.analytics.lsp_graph_server import wildcards
 from persper.analytics.lsp_graph_server.languageclient.lspclient import LspClient
 from persper.analytics.lsp_graph_server.languageclient.lspcontract import \
     DocumentSymbol, Location, Position, SymbolInformation, SymbolKind, \
-    TextDocument, TextDocumentContentChangeEvent
+    TextDocument, TextDocumentContentChangeEvent, FileEvent, FileChangeType
 from . import CallGraphBranch, CallGraphNode, CallGraphScope
 
 _logger = logging.getLogger(__name__)
@@ -352,11 +353,7 @@ class CallGraphBuilder(ABC):
                     if not self.filterFile(defPath):
                         continue
                     defsDoc = None
-                    try:
-                        defsDoc = await self.getTokenizedDocument(defPath)
-                    except Exception as ex:
-                        _logger.error("%s", ex)
-                        continue
+                    defsDoc = await self.getTokenizedDocument(defPath)
                     defNode = defsDoc.tokenAt(d.range.start.line, d.range.start.character)
                     defScope = defsDoc.scopeAt(d.range.start.line, d.range.start.character)
                     if not defNode:
@@ -400,11 +397,15 @@ class CallGraphBuilder(ABC):
         await self.closeDocument(doc.uri)
 
     async def waitForFileSystem(self, relaxed: bool = False):
-        if not relaxed or len(self._deletePendingPaths) > 1000:
+        if not relaxed and len(self._deletePendingPaths) > 0 or len(self._deletePendingPaths) > 100:
             for p in self._deletePendingPaths:
                 p: Path
                 if p.exists():
                     await asyncio.sleep(0.1)
+                else:
+                    _logger.info("Confirm deleted: %s", p)
+            self._lspClient.server.workspaceDidChangeWatchedFiles(
+                [FileEvent(TextDocument.fileNameToUri(p), FileChangeType.Deleted) for p in self._deletePendingPaths])
             self._deletePendingPaths.clear()
 
     async def modifyFile(self, fileName: str, newContent: str):
@@ -422,18 +423,12 @@ class CallGraphBuilder(ABC):
             raise Exception("Cannot modify {0}.".format(path)) from ex
 
     async def modifyFileCore(self, filePath: Path, newContent: str):
-        originalFileExists = filePath.exists()
-        doc = TextDocument.loadFile(str(path), self.inferLanguageId(path), 1) \
-            if originalFileExists \
-            else TextDocument(TextDocument.fileNameToUri(str(path)), self.inferLanguageId(path), 1, "")
-        try:
-            self._lspClient.server.textDocumentDidOpen(doc)
-            self._lspClient.server.textDocumentDidChange(
-                doc.uri, 2, [TextDocumentContentChangeEvent(newContent)])
-            with open(str(filePath), "wt", encoding="utf-8", errors="replace") as f:
-                f.write(newContent)
-            self._lspClient.server.textDocumentDidSave(doc.uri)
-            _logger.info("%s %s.", "Modified " if originalFileExists else "Created", path)
-            return doc.text
-        finally:
-            await self.closeDocument(doc.uri)
+        os.makedirs(str(filePath.parent), exist_ok=True)
+        prevFileExists = filePath.exists()
+        with open(str(filePath), "wt", encoding="utf-8", errors="replace") as f:
+            f.write(newContent)
+        uri = TextDocument.fileNameToUri(filePath)
+        self._lspClient.server.workspaceDidChangeWatchedFiles(
+            [FileEvent(uri,
+                       FileChangeType.Changed if prevFileExists else FileChangeType.Created)])
+        _logger.info("Modified %s.", filePath)

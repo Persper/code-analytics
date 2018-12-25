@@ -8,7 +8,7 @@ from jsonrpc.dispatchers import MethodDispatcher
 from jsonrpc.endpoint import Endpoint
 from jsonrpc.streams import JsonRpcStreamReader, JsonRpcStreamWriter
 
-from persper.analytics.lsp_graph_server.languageclient.lspcontract import MessageType
+from persper.analytics.lsp_graph_server.languageclient.lspcontract import MessageType, Registration
 from persper.analytics.lsp_graph_server.languageclient.lspserver import LspServerStub
 from persper.analytics.lsp_graph_server.jsonrpcutils import LoggedJsonRpcStreamReader, LoggedJsonRpcStreamWriter, JsonRpcLogger
 
@@ -71,3 +71,6 @@ class LspClient(MethodDispatcher):
     def m_text_document__publish_diagnostics(self, uri: str, diagnostics):
         # ignore all diagnostic information for now.
         pass
+
+    def m_client__register_capability(self, registrations: list):
+        regs = [Registration.fromDict(r) for r in registrations]

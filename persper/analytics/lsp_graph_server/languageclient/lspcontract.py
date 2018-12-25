@@ -225,7 +225,7 @@ class DocumentSymbol(LspContractObject):
         The range enclosing this symbol not including leading/trailing whitespace but everything else
         like comments. This information is typically used to determine if the clients cursor is
         inside the symbol to reveal in the symbol in the UI.
-        """        
+        """
         self.selectionRange = selectionRange
         """
         The range that should be selected and revealed when this symbol is being picked, e.g the name of a function.
@@ -311,3 +311,46 @@ class TextDocumentSaveReason(Enum):
     Manual = 1
     AfterDelay = 2
     FocusOut = 3
+
+
+class FileChangeType(Enum):
+    """The file event type."""
+    Created = 1
+    Changed = 2
+    Deleted = 3
+
+
+class FileEvent(LspContractObject):
+    """
+    An event describing a file change.
+    """
+
+    def __init__(self, uri: str, type: FileChangeType):
+        self.uri = uri
+        self.type = type
+
+    def toDict(self):
+        d = {"uri": self.uri, "type": self.type.value}
+        return d
+
+
+class Registration(LspContractObject):
+    """
+    Represents information about programming constructs like variables, classes,
+    interfaces etc.
+    """
+
+    def __init__(self, id: str, method: str, registerOptions: dict):
+        self.id = id
+        self.method = method
+        self.registerOptions = registerOptions
+
+    def __str__(self):
+        return self.id
+
+    def toDict(self):
+        raise NotImplementedError()
+
+    @staticmethod
+    def fromDict(d: dict):
+        return Registration(d["id"], d["method"], d.get("registerOptions", None))

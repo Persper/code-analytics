@@ -9,7 +9,7 @@ from typing import Iterable, List, Tuple, Union
 
 from jsonrpc.endpoint import Endpoint
 
-from .lspcontract import (DocumentSymbol, Location, Position,
+from .lspcontract import (DocumentSymbol, FileEvent, Location, Position,
                           SymbolInformation, TextDocument,
                           TextDocumentContentChangeEvent,
                           TextDocumentSaveReason)
@@ -200,3 +200,6 @@ class LspServerStub():
         result = await self.request("textDocument/codeLens", {"textDocument": {"uri": documentUri}})
         # We call this method only to synchronize the time sequence
         return result
+
+    def workspaceDidChangeWatchedFiles(self, changes: Iterable[FileEvent]):
+        self.notify("workspace/didChangeWatchedFiles", {"changes": [c.toDict() for c in changes]})

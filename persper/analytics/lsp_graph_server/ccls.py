@@ -17,22 +17,38 @@ from .callgraph.builder import CallGraphBuilder
 from .callgraph.manager import CallGraphManager
 from .fileparsers.CPP14Lexer import CPP14Lexer
 from .languageclient.lspclient import LspClient
-from .languageclient.lspcontract import TextDocument, TextDocumentContentChangeEvent
+from .languageclient.lspcontract import LspContractObject, TextDocument, TextDocumentContentChangeEvent
 from .languageclient.lspserver import LspServerStub
 
 _logger = logging.getLogger(__name__)
+
+
+class CclsInfo(LspContractObject):
+    def __init__(self, pendingIndexRequests: int, postIndexWorkItems:int, projectEntries: int):
+        self.pendingIndexRequests = pendingIndexRequests
+        self.postIndexWorkItems = postIndexWorkItems
+        self.projectEntries = projectEntries
+
+    def toDict(self):
+        raise NotImplementedError()
+
+    @staticmethod
+    def fromDict(d: dict):
+        return CclsInfo(int(d["pipeline"]["pendingIndexRequests"]),
+        0,
+        int(d["project"]["entries"]))
 
 
 class CclsLspServerStub(LspServerStub):
     def __init__(self, endpoint: Endpoint):
         super().__init__(endpoint)
 
-    async def getJobs(self):
+    async def cclsInfo(self):
         """
-        Gets the count of jobs to be done before server can provide latest call information.
+        Gets the ccls language server status.
         """
-        result = await self.request("$ccls/getJobs")
-        return int(result)
+        result = await self.request("$ccls/info")
+        return CclsInfo.fromDict(result)
 
 
 class CclsLspClient(LspClient):
@@ -87,6 +103,7 @@ class CclsCallGraphBuilder(CallGraphBuilder):
         if not isinstance(lspClient, CclsLspClient):
             raise TypeError("lspClient should be an instance of CclsLspClient.")
         super().__init__(lspClient)
+        self._lspClient:CclsLspClient
 
     def createLexer(self, fileStream: FileStream):
         return CPP14Lexer(fileStream)
@@ -103,7 +120,8 @@ class CclsCallGraphBuilder(CallGraphBuilder):
     async def _waitForJobs(self):
         lastJobs = None
         while True:
-            curJobs = await self._lspClient.server.getJobs()
+            info:CclsInfo = await self._lspClient.server.cclsInfo()
+            curJobs = info.pendingIndexRequests + info.postIndexWorkItems
             if curJobs != lastJobs:
                 _logger.debug("Server jobs: %d.", curJobs)
                 lastJobs = curJobs
@@ -121,8 +139,6 @@ class CclsCallGraphBuilder(CallGraphBuilder):
         while True:
             try:
                 await self._waitForJobs()
-                # dummy request
-                await self._lspClient.server.textDocumentCodeLens(textDoc.uri)
                 return True
             except JsonRpcException as ex:
                 if ex.code == -32002:
@@ -132,11 +148,6 @@ class CclsCallGraphBuilder(CallGraphBuilder):
                     _logger.warning("The file seems invalid. Server error: %s", ex.message)
                     return False
                 raise
-
-    async def modifyFileCore(self, filePath: Path, newContent: str):
-        os.makedirs(str(filePath.parent), exist_ok=True)
-        with open(str(filePath), "wt", encoding="utf-8", errors="replace") as f:
-            f.write(newContent)
 
 
 class CclsGraphServer(LspClientGraphServer):
