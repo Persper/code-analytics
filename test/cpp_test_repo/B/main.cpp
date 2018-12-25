@@ -11,5 +11,7 @@ int main(int argc, char* argv[])
 	cout << parser.GetBool("testBool", false) << endl;
 	cout << parser.GetDouble("textDouble", 1.23) << endl;
 	cout << parser.GetString("rawValue", "test") << endl;
+	exception testException("message");
+	ReportException(testException);
 	return 0;
 }
