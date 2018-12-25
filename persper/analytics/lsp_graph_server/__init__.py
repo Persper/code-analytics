@@ -109,7 +109,7 @@ class LspClientGraphServer(GraphServer):
 
     def filter_file(self, filename):
         filePath = self._workspaceRoot.joinpath(filename).resolve()
-        # print("Filter: ", filePath, self._callGraphBuilder.filterFile(str(filePath)))
+        # _logger.info("Filter: %s -> %s", filePath, self._callGraphBuilder.filterFile(str(filePath)))
         return self._callGraphBuilder.filterFile(str(filePath))
 
     def config(self, param: dict):
@@ -147,10 +147,10 @@ class LspClientGraphServer(GraphServer):
         _logger.info("Shutting down language server...")
         await asyncio.wait_for(self._lspClient.server.shutdown(), 10)
         self._lspClient.server.exit()
-        exitCode = self._lspServerProc.wait(10)
-        if exitCode != None:
+        try:
+            exitCode = self._lspServerProc.wait(10)
             _logger.info("Language server %d exited with code: %s.", self._lspServerProc.pid, exitCode)
-        else:
+        except subprocess.TimeoutExpired:
             self._lspServerProc.kill()
             _logger.warning("Killed language server %d.", self._lspServerProc.pid)
         self._lspServerProc = None
