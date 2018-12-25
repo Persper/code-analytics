@@ -1,27 +1,109 @@
+# Persper Code Analytics Tool
 
-## Quick Start
+This project implements the DevRank algorithm for quantiying the structural value of code contributions as described in
 
-### Run Tests for JavaScript
+> J. Ren\*, H. Yin\*, Q. Hu, A. Fox, W. Koszek. Towards Quantifying the Development Value of Code Contributions. In *FSE (NIER)*, 2018. 
 
-Download the submodule `contribs/js-callgraph`:
-```bash
-git submodule update --init --recursive
+This repo contains a central code analyzer written in python, which given a target git repository, invokes language-specific call graph server to construct the call-commit graph (union of all commits' call graphs) while it iterates through the commits of the repository being analzyed. The resulted call-commit graph is stored in the [CallCommitGraph](/persper/analytics/call_commit_graph.py) class, which knows how to compute DevRanks for functions, commits, and developers.
+
+## Get Started
+
+The following procedure is tested on Ubuntu 16.04 LTS.
+
+1. Install Python (>=3.6)
+
+Download and install Python 3.6+: <https://www.python.org/downloads/>.
+
+Also, create a symbolic link from `python3` to `python` since some scripts reply on it.
+```
+sudo ln -s /usr/bin/python3 /usr/bin/python
 ```
 
-Run the following commands:
+2. Install python dependencies (we recommend to use pipenv)
+
 ```bash
-npm install --prefix contribs/js-callgraph
 pipenv install
-pipenv run ./tools/repo_creater/create_repo.py test/js_test_repo/
-pipenv run pytest test/test_graphs/test_analyzer_js.py
 ```
 
-### Use jupyter notebook with pipenv
+3. Update git
+
+In order to uset the `--indent-heuristic` option of `git diff`, we require git version >= 2.11. Use the following commands to upgrade:
+
+```bash
+sudo add-apt-repository ppa:git-core/ppa -y
+sudo apt-get update
+sudo apt-get install git -y
+git --version
+```
+
+4. Apply a patch to gitpython
+
+(Try to) apply a patch to gitpython 2.1.x:
+
+```bash
+pipenv shell
+cd misc/
+./apply_patch.py
+exit
+```
+
+5. Add project directory to path
+
+Add the following line to your `~/.bashrc` file.
+
+```
+export PATH=$PATH:/path/to/dir
+```
+
+To update your path for the remainder of the session.
+```
+source ~/.bashrc
+```
+
+6. Install srcML for parsing C/C++ and Java
+
+Please download from [here](https://www.srcml.org/#download) and follow the [instructions](http://131.123.42.38/lmcrs/beta/README).
+
+srcML also needs `libarchive-dev` and `libcurl4-openssl-dev`. Install them with the following commands:
+
+```bash
+sudo apt install libarchive-dev
+sudo apt install libcurl4-openssl-dev
+```
+
+7. Check setup correctness
+
+```bash
+pipenv run pytest test/test_analytics
+```
+
+You should see all tests passed.
+
+## Interactive mode with jupyter notebook
+
+1. Install Jupyter
+
+Reference <http://jupyter.org/install.html>.
+
+E.g., on Ubuntu LTS 16.04:
+
+```
+sudo -H pip3 install --upgrade pip
+sudo -H pip3 install jupyter
+```
+
+To automaically remove cell outputs and unnecessary meta information from notebook before committing, install jq (a lightweight and flexible command-line JSON processor) and activate it by running gitconfig.sh. E.g., on Ubuntu:
+
+```
+sudo apt install -y jq
+./gitconfig.sh
+```
+
+2. Install pipenv kernel into jupyter notebook
 
 In the project folder, run
 
 ```
-pipenv install ipykernel
 pipenv shell
 ```
 
@@ -43,9 +125,30 @@ Launch jupyter notebook:
 jupyter notebook
 ```
 
-In your notebook, the new kernel should now be an option.
+In your notebook, the new kernel should now be an option. Enjoy your interactions with the notebook!
 
-### Trouble Shooting
+
+## Analyze Javascript Projects
+
+Note: This section will be updated soon as we refactor the js graph server.
+
+Download the submodule `contribs/js-callgraph`:
+
+```bash
+git submodule update --init --recursive
+```
+
+Run the following commands:
+
+```bash
+npm install --prefix contribs/js-callgraph
+pipenv install
+pipenv run ./tools/repo_creater/create_repo.py test/js_test_repo/
+pipenv run pytest test/test_graphs/test_analyzer_js.py
+```
+
+
+## Trouble Shooting
 
 #### 1. No module named 'persper'
 
@@ -55,123 +158,7 @@ Add this repo to python path so python can find the persper package. Insert the 
 export PYTHONPATH="/path/to/repo:$PYTHONPATH"
 ```
 
-### Old Setup
-
-1. Install Python and packages
-
-Download and install Python 3.6+: <https://www.python.org/downloads/>.
-
-Then install packages.
-
-```bash
-pipenv install
-```
-
-Also, create a symbolic link from `python3` to `python` since some scripts reply on it.
-```
-sudo ln -s /usr/bin/python3 /usr/bin/python
-```
-
-2. Update Git
-
-In order to uset the `--indent-heuristic` option of `git diff`, we require git version >= 2.11. Use the following commands to upgrade:
-
-```bash
-sudo add-apt-repository ppa:git-core/ppa -y
-sudo apt-get update
-sudo apt-get install git -y
-git --version
-```
-
-3. Apply a patch to gitpython
-
-(Try to) apply a patch to gitpython 2.1.x:
-
-```bash
-pipenv shell
-cd misc/
-./apply_patch.py
-exit
-```
-
-4. Add project directory to path
-
-Add the following line to your `~/.bashrc` file.
-
-```
-export PATH=$PATH:/path/to/dir
-```
-
-To update your path for the remainder of the session.
-```
-source ~/.bashrc
-```
-
-5. Install srcML for parsing C/C++ and Java
-
-Please download from [here](https://www.srcml.org/#download) and follow the [instructions](http://131.123.42.38/lmcrs/beta/README).
-
-srcML also needs `libarchive-dev` and `libcurl4-openssl-dev`.
-```
-sudo apt install libarchive-dev
-sudo apt install libcurl4-openssl-dev
-=======
-E.g., on Ubuntu:
-```bash
-sudo -H pip3 install jupyter
-```
-
-To fit notebooks well in git, install jq and run gitconfig.sh. E.g., on Ubuntu:
-
-```bash
-sudo apt install -y jq
-./gitconfig.sh
-```
-
-6. Check setup correctness
-
-```
-cd test
-pytest
-```
-
-You should see all tests passed.
-
-### Interactive Mode
-
-1. Install Jupyter
-
-Reference <http://jupyter.org/install.html>.
-
-<<<<<<< HEAD
-E.g., on Ubuntu LTS 16.04:
-```
-sudo -H pip3 install --upgrade pip
-sudo -H pip3 install jupyter
-=======
-```bash
-bazel build --config=opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-msse4.1 --copt=-msse4.2 //tensorflow/tools/pip_package:build_pip_package
->>>>>>> Update README to apply GitPython patch
-```
-
-To fit notebooks well in git, install jq and run gitconfig.sh. E.g., on Ubuntu:
-```
-sudo apt install -y jq
-./gitconfig.sh
-```
-
-2. Run a notebook
-
-All notebooks should be run in the root dir of this project.
-
-E.g., the portal notebook for development value analysis:
-```bash
-jupyter notebook dev_analysis.ipynb
-```
-
-Enjoy your interactions with the notebook!
-
-### Batch Mode
+<!--### Batch Mode
 
 Complete the basic setup first.
 Note: setup-linux-ubuntu.sh can be used for Ubuntu Server.
@@ -195,21 +182,4 @@ A sample long-time run:
 ```bash
 nohup ./dev_analysis.py -s ./repos/linux/ -x ./repos/linux-4.10-xml/ -o linux-4.10-cc.xlsx -n 1000 10000 -a 0 1 0.05 -c > dev.out 2>&1 &
 ```
-
-### Install TensorFlow
-
-Follow this tutorial: https://www.tensorflow.org/install/install_sources.
-
-An example build:
-
-```
-bazel build --config=opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-msse4.1 --copt=-msse4.2 //tensorflow/tools/pip_package:build_pip_package
-```
-
-When running TensorFlow, get out of the tensorflow source dir. Otherwise,
-python would prompt an error message "No module named
-pywrap_tensorflow_internal".
-
-=======
-```
->>>>>>> Get jupyter notebook to work with pipenv
+-->
