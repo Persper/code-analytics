@@ -118,6 +118,10 @@ class CallCommitGraph:
         for commit in self.commits():
             sha = commit['hexsha']
             email = commit['authorEmail']
+
+            if sha not in commit_devranks:
+                continue
+
             if email in developer_devranks:
                 developer_devranks[email] += commit_devranks[sha]
             else:

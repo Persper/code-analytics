@@ -33,7 +33,10 @@ def devrank(G, weight_label, alpha=0.85, epsilon=1e-5, max_iters=300):
         for v in G[u]:
             row.append(ni[v])
             col.append(ni[u])
-            data.append(sizeof(v) / size_sum)
+            if size_sum == 0:
+                data.append(0)
+            else:
+                data.append(sizeof(v) / size_sum)
 
     P = coo_matrix((data, (row, col)), shape=(num_nodes, num_nodes)).tocsr()
 
