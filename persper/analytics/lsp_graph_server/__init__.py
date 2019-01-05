@@ -133,8 +133,9 @@ class LspClientGraphServer(GraphServer):
         """
         self._lspServerProc = subprocess.Popen(
             self._languageServerCommand,
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-            creationflags=subprocess.CREATE_NEW_CONSOLE)
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            shell=True)
 
     async def stopLspClient(self):
         """
