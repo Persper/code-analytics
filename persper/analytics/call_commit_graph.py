@@ -52,42 +52,48 @@ class CallCommitGraph:
         return node in self._digraph
 
     def add_node(self, node):
-        self._digraph.add_node(node, size=0, history={})
+        self._digraph.add_node(node, size=None, history={})
 
     # add_node must be called on source and target first
     def add_edge(self, source, target):
         self._digraph.add_edge(source, target,
                                addedBy=self._cur_cindex(),
-                               weight=self._digraph.nodes[target]['size'])
+                               weight=None)
 
     def update_node_history(self, node, size):
         # Use current commit index
         cc_idx = self._cur_cindex()
-        node_history = self._digraph.nodes[node]['history']
+        node_history = self._get_node_history(node)
         # A commit might update a node's history more than once
         if cc_idx in node_history:
             node_history[cc_idx] += size
         else:
             node_history[cc_idx] = size
-        self._update_node_size(node, size)
-        self._update_ingoing_weight(node)
-        self._check_history_match_size(node)
 
-    # node's size is automatically updated when history is updated
-    def _update_node_size(self, node, size):
-        self._digraph.nodes[node]['size'] += size
+    # read/write access to node history are thourgh this function
+    def _get_node_history(self, node):
+        return self._digraph.nodes[node]['history']
 
-    # edge's weight is automaitcally updated when history is updated
-    # needs to be called after _update_node_size
-    def _update_ingoing_weight(self, node):
-        for nbr, datadict in self._digraph.pred[node].items():
-            datadict['weight'] = self._digraph.nodes[node]['size']
+    def _set_all_nodes_size(self):
+        """ Compute node size after nodes have been added to the graph
+        node size is currently defined as the total number lines of edits
+        """
+        for node in self.nodes():
+            node_history = self._get_node_history(node)
+            size = sum(node_history.values())
+            self._set_node_size(node, size)
 
-    def _check_history_match_size(self, node):
-        assert(sum(self._digraph.nodes[node]['history'].values()) ==
-               self._digraph.nodes[node]['size'])
+    def _set_node_size(self, node, size):
+        self._digraph.nodes[node]['size'] = size
+
+    def _set_all_edges_weight(self):
+        self._set_all_nodes_size()
+        for node in self.nodes():
+            for nbr, datadict in self._digraph.pred[node].items():
+                datadict['weight'] = self._digraph.nodes[node]['size']
 
     def function_devranks(self, alpha):
+        self._set_all_nodes_size()
         return devrank(self._digraph, 'size', alpha=alpha)
 
     def commit_devranks(self, alpha):
