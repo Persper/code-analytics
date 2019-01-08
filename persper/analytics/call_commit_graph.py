@@ -74,13 +74,22 @@ class CallCommitGraph:
     def _get_node_history(self, node):
         return self._digraph.nodes[node]['history']
 
-    def _set_all_nodes_size(self):
+    def _set_all_nodes_size(self, black_set=None):
         """ Compute node size after nodes have been added to the graph
         node size is currently defined as the total number lines of edits
+
+        black_set - A set of commit hexshas to be blacklisted
         """
         for node in self.nodes():
             node_history = self._get_node_history(node)
-            size = sum(node_history.values())
+            if black_set is not None:
+                size = 0
+                for cindex, csize in node_history.items():
+                    sha = self.commits()[cindex]['hexsha']
+                    if sha not in black_set:
+                        size += csize
+            else:
+                size = sum(node_history.values())
             self._set_node_size(node, size)
 
     def _set_node_size(self, node, size):
@@ -92,38 +101,59 @@ class CallCommitGraph:
             for nbr, datadict in self._digraph.pred[node].items():
                 datadict['weight'] = self._digraph.nodes[node]['size']
 
-    def function_devranks(self, alpha):
-        self._set_all_nodes_size()
+    def function_devranks(self, alpha, black_set=None):
+        """
+        Args:
+                alpha - A float between 0 and 1, commonly set to 0.85
+            black_set - A set of commit hexshas to be blacklisted
+        """
+        self._set_all_nodes_size(black_set=black_set)
         return devrank(self._digraph, 'size', alpha=alpha)
 
-    def commit_devranks(self, alpha):
+    def commit_devranks(self, alpha, black_set=None):
+        """
+        Args:
+                alpha - A float between 0 and 1, commonly set to 0.85
+            black_set - A set of commit hexshas to be blacklisted
+        """
         commit_devranks = {}
-        func_devranks = self.function_devranks(alpha)
+        func_devranks = self.function_devranks(alpha, black_set=black_set)
 
         for func, data in self.nodes(data=True):
             size = data['size']
             history = data['history']
 
             if len(history) == 0:
+                print("WARNING: node history has zero items.")
                 continue
 
             for cindex, csize in history.items():
                 sha = self.commits()[cindex]['hexsha']
-                dr = (csize / size) * func_devranks[func]
-                if sha in commit_devranks:
-                    commit_devranks[sha] += dr
-                else:
-                    commit_devranks[sha] = dr
+                if black_set is None or sha not in black_set:
+                    dr = (csize / size) * func_devranks[func]
+                    if sha in commit_devranks:
+                        commit_devranks[sha] += dr
+                    else:
+                        commit_devranks[sha] = dr
 
         return commit_devranks
 
-    def developer_devranks(self, alpha):
+    def developer_devranks(self, alpha, black_set=None):
+        """
+        Args:
+                alpha - A float between 0 and 1, commonly set to 0.85
+            black_set - A set of commit hexshas to be blacklisted
+        """
         developer_devranks = {}
-        commit_devranks = self.commit_devranks(alpha)
+        commit_devranks = self.commit_devranks(alpha, black_set=black_set)
 
         for commit in self.commits():
             sha = commit['hexsha']
             email = commit['authorEmail']
+
+            if sha not in commit_devranks:
+                continue
+
             if email in developer_devranks:
                 developer_devranks[email] += commit_devranks[sha]
             else:
