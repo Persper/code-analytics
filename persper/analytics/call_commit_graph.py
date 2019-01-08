@@ -90,6 +90,10 @@ class CallCommitGraph:
                         size += csize
             else:
                 size = sum(node_history.values())
+
+            # set default size to 1 to avoid zero division error
+            if size == 0:
+                size = 1
             self._set_node_size(node, size)
 
     def _set_node_size(self, node, size):
@@ -124,7 +128,6 @@ class CallCommitGraph:
             history = data['history']
 
             if len(history) == 0:
-                print("WARNING: node history has zero items.")
                 continue
 
             for cindex, csize in history.items():
