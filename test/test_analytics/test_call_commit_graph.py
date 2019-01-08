@@ -1,5 +1,13 @@
+import os
+import shutil
+import subprocess
 from math import isclose
+from git import Repo
 from persper.analytics.call_commit_graph import CallCommitGraph
+from persper.analytics.cpp import CPPGraphServer
+from persper.analytics.analyzer import Analyzer
+from persper.analytics.graph_server import CPP_FILENAME_REGEXES
+from persper.util.path import root_path
 
 
 def test_call_commit_graph():
@@ -84,3 +92,28 @@ def test_call_commit_graph():
     assert(isclose(commit_drs3[third_commit['hexsha']], 0.454, rel_tol=1e-2))
     assert(isclose(dev_drs3[first_commit['authorEmail']], 0.798, rel_tol=1e-2))
     assert(isclose(dev_drs3[second_commit['authorEmail']], 0.201, rel_tol=1e-2))
+
+
+def test_black_set():
+    """
+    The CRLF commit: https://github.com/bitcoin/bitcoin/commit/0a61b0df1224a5470bcddab302bc199ca5a9e356
+    Its parent: https://github.com/bitcoin/bitcoin/commit/5b721607b1057df4dfe97f80d235ed372312f398
+    Its grandparent: https://github.com/bitcoin/bitcoin/commit/2ef9cfa5b81877b1023f2fcb82f5a638b1eb013c
+    Its great grandparent: https://github.com/bitcoin/bitcoin/commit/7d7797b141dbd4ed9db1dda94684beb3395c2534
+    """
+    repo_path = os.path.join(root_path, 'repos/bitcoin')
+    bitcoin_url = 'https://github.com/bitcoin/bitcoin'
+    if not os.path.exists(repo_path):
+        Repo.clone_from(bitcoin_url, repo_path)
+    az = Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES))
+    crlf_sha = '0a61b0df1224a5470bcddab302bc199ca5a9e356'
+    ggparent_sha = '7d7797b141dbd4ed9db1dda94684beb3395c2534'
+    rev = ggparent_sha + '..' + crlf_sha
+    az.analyze(rev=rev)
+    ccgraph = az.get_graph()
+    devdict = ccgraph.commit_devranks(0.85)
+    devdict2 = ccgraph.commit_devranks(0.85, black_set=set([crlf_sha]))
+    assert(len(devdict) == 3)
+    assert(len(devdict2) == 2)
+    assert(crlf_sha in devdict)
+    assert(crlf_sha not in devdict2)
