@@ -261,8 +261,16 @@ class CallGraphBuilder(ABC):
 
     def pathFromUri(self, expr: str) -> Path:
         expr: str = urllib.parse.unquote(expr).strip()
-        if expr.lower().startswith("file:///"):
-            expr = expr[8:]
+        if expr[:7].lower() == "file://":
+            if expr[7:8] == "/":        # Local file
+                if expr[9:10] == ":":   # Windows drive e.g. C:
+                    expr = expr[8:]     # Remove all the leading slashes
+                else:                   # Linux path
+                    expr = expr[7:]
+            else:                       # UNC address
+                expr = expr[5:]
+        else:
+            expr = urllib.parse.unquote(expr)
         return Path(expr).resolve()
 
     @abstractclassmethod
