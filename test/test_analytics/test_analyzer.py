@@ -5,7 +5,6 @@ from persper.analytics.c import CGraphServer
 from persper.analytics.analyzer import Analyzer
 from persper.analytics.graph_server import C_FILENAME_REGEXES
 from persper.util.path import root_path
-from .util import assert_size_match_history
 
 
 @pytest.fixture(scope='module')
@@ -49,9 +48,7 @@ def test_az_basic(az):
 
     commits = ccgraph.commits()
     for func, data in ccgraph.nodes(data=True):
-        size = data['size']
         history = data['history']
-        assert_size_match_history(size, history)
 
         for cindex, csize in history.items():
             commit_message = commits[cindex]['message']
