@@ -42,7 +42,7 @@ def test_az(az: Analyzer):
     try:
         # wait for the server to spin up
         time.sleep(1.0)
-        az.graph_server.reset_graph()
+        az._graph_server.reset_graph()
         az.analyze()
         ccgraph = az.get_graph()
 
@@ -60,10 +60,7 @@ def test_az(az: Analyzer):
 
         commits = ccgraph.commits()
         for func, data in ccgraph.nodes(data=True):
-            size = data['size']
             history = data['history']
-            assert_size_match_history(size, history)
-
             for cindex, csize in history.items():
                 commit_message = commits[cindex]['message']
                 assert(csize == history_truth[commit_message.strip()][func])
