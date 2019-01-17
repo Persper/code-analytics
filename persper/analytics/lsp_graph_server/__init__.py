@@ -1,18 +1,20 @@
 import asyncio
 import logging
+import os
 import subprocess
 from abc import abstractclassmethod, abstractproperty
 from datetime import datetime, timedelta
 from os import path
-from pathlib import Path
-from typing import List, Union
+from pathlib import Path, PurePath
+from typing import Dict, List, Tuple, Union
 
 from persper.analytics.call_commit_graph import CallCommitGraph
 from persper.analytics.graph_server import GraphServer
 from persper.analytics.patch_parser import PatchParser
 
+from .callgraph import CallGraphScope
 from .callgraph.adapters import CallCommitGraphSynchronizer
-from .callgraph.builder import CallGraphBuilder
+from .callgraph.builder import CallGraphBuilder, TokenizedDocument
 from .callgraph.manager import CallGraphManager
 from .languageclient.lspclient import LspClient
 
@@ -63,6 +65,10 @@ class LspClientGraphServer(GraphServer):
         self._lastFileWrittenTime: datetime = None
         self._dumpLogs = dumpLogs
         self._dumpGraphs = dumpGraphs
+        self._patchParser = PatchParser()
+        # [(oldPath, newPath, addedLines, removedLines), ...]
+        # added/removedLines := [[startLine, modifiedLines], ...]
+        self._stashedPatches:List[Tuple[ PurePath, PurePath, List[Tuple[int, int]], List[Tuple[int, int]] ]] = []
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -70,12 +76,14 @@ class LspClientGraphServer(GraphServer):
         state.pop("_lspClient", None)
         state.pop("_callGraphBuilder", None)
         state.pop("_callGraphManager", None)
+        state.pop("_patchParser", None)
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
         if not self._workspaceRoot.exists():
             self._workspaceRoot.touch()
+        self._patchParser = PatchParser()
 
     def register_commit(self, hexsha, author_name, author_email, commit_message):
         self._ccgraph.add_commit(hexsha, author_name, author_email, commit_message)
@@ -84,18 +92,96 @@ class LspClientGraphServer(GraphServer):
         oldPath = self._workspaceRoot.joinpath(old_filename).resolve() if old_filename else None
         newPath = self._workspaceRoot.joinpath(new_filename).resolve() if new_filename else None
         assert oldPath or newPath
+        if newPath is None:
+            # The file has been deleted
+            # We need to scan it before it's gone, instead of in end_commit
+            self._markWholeDocumentAsChanged(await self._callGraphBuilder.getTokenizedDocument(oldPath))
+        elif oldPath is None:
+            # The file has been added
+            self._stashedPatches.append((oldPath, newPath, None, None))
+        else:
+            added, removed = self._patchParser.parse(patch.decode('utf-8', 'replace'))
+            # calculate removed lines
+            if removed:
+                # we can have removed lines only when we have old file
+                oldDoc:TokenizedDocument = await self._callGraphBuilder.getTokenizedDocument(oldPath)
+                for start, count in removed:
+                    for i in range(start - 1, start + count - 1):
+                        scope = oldDoc.scopeAt(i, 0)
+                        if scope:
+                            self._safeUpdateNodeHistory(scope.name, 1)
+            self._stashedPatches.append((oldPath, newPath, added, None))
+
+        # perform file operations
         if oldPath and oldPath != newPath:
+            # The file has been moved/deleted
             await self._callGraphBuilder.deleteFile(oldPath)
             self._invalidatedFiles.add(oldPath)
         if newPath:
+            # The file has been created/modified
             await self._callGraphBuilder.modifyFile(newPath, new_src)
             self._invalidatedFiles.add(newPath)
         self._lastFileWrittenTime = datetime.now()
 
+    def _safeUpdateNodeHistory(self, name:str, changeOfLines:int):
+        if name not in self._ccgraph.nodes():
+            self._ccgraph.add_node(name)
+        self._ccgraph.update_node_history(name, changeOfLines)
+
+    def _markWholeDocumentAsChanged(self, doc:TokenizedDocument):
+        parentScopes = []
+        # print("_markWholeDocumentAsChanged: ", doc.fileName)
+        for scope in doc.scopes:
+            while parentScopes and parentScopes[-1][0].endPos <= scope.startPos:
+                s, c = parentScopes.pop()
+                self._safeUpdateNodeHistory(s.name, c)
+            thisScopeLines = scope.endPos.line - scope.startPos.line + 1
+            if parentScopes:
+                # Subtract LOC from innermost scope to eliminate dups
+                innermostScope = parentScopes[-1]
+                s, c = innermostScope
+                assert s.startPos <= scope.startPos and s.endPos >= scope.endPos, \
+                    "`scope` should be inside parent scope: {0}. parentScopes: {1}".format(s, parentScopes)
+                c -= thisScopeLines
+                # If there are more than 1 scope on the same line,
+                # we will count in 1 line for each scope
+                if s.startPos.line == scope.startPos.line:
+                    c += 1
+                if s.startPos.line < s.endPos.line == scope.endPos.line:
+                    c += 1
+                assert c >= 0, \
+                    "parentScope's LOC change is negative: {0}. parentScopes: {1}".format(s, parentScopes)
+                innermostScope[1] = c
+            parentScopes.append([scope, thisScopeLines])
+        while parentScopes and parentScopes[-1][0].endPos <= scope.startPos:
+            s, c = parentScopes.pop()
+            self._safeUpdateNodeHistory(s.name, c)
+
     async def end_commit(self, hexsha):
+        # calculate lines of change in functions
+        # update edges
         await self.updateGraph()
         if self._dumpGraphs:
             self._callGraph.dumpTo("Graph-" + hexsha + ".txt")
+        
+        # calculate added lines
+        for oldPath, newPath, added, _ in self._stashedPatches:
+            if not newPath:
+                continue
+            if oldPath and not added:
+                continue
+            newDoc:TokenizedDocument = await self._callGraphBuilder.getTokenizedDocument(newPath)
+            if not oldPath:
+                # file has been added
+                self._markWholeDocumentAsChanged(newDoc)
+            else:
+                assert added
+                for start, count in added:
+                    for i in range(start - 1, start + count - 1):
+                        scope = newDoc.scopeAt(i, 0)
+                        if scope:
+                            self._safeUpdateNodeHistory(scope.name, 1)
+        self._stashedPatches.clear()
         _logger.info("End commit: %s", hexsha)
         # ensure the files in the next commit has a different timestamp as this commit.
         if datetime.now() - self._lastFileWrittenTime < timedelta(seconds=1):
@@ -131,11 +217,18 @@ class LspClientGraphServer(GraphServer):
         * self._callGraphBuilder
         * self._callGraphManager
         """
-        self._lspServerProc = subprocess.Popen(
-            self._languageServerCommand,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            shell=True)
+        if os.name == "nt":
+            self._lspServerProc = subprocess.Popen(
+                self._languageServerCommand,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                creationflags=subprocess.CREATE_NEW_CONSOLE)
+        else:
+            self._lspServerProc = subprocess.Popen(
+                self._languageServerCommand,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                shell=True)
 
     async def stopLspClient(self):
         """

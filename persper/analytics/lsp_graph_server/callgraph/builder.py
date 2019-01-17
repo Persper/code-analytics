@@ -89,8 +89,9 @@ class TokenizedDocument:
                     _logger.error("Invalid DocumentSymbol in %s: %s", fileName, s)
 
         PopulateSymbols(documentSymbols)
-        # put the scopes in document order of start positions, then by the document order of their end positions
-        self._scopes.sort(key=lambda sc: (sc.startPos, sc.endPos))
+        # put the scopes in document order of start positions, then by the reversed document order of their end positions
+        # so that we can find the smallest scope by one traverse along the scope list.
+        self._scopes.sort(key=lambda sc: (sc.startPos.toTuple(), (-sc.endPos.line, -sc.endPos.character)))
         NOT_EXISTS = object()
         for t in tokens:
             t: Token
@@ -164,8 +165,8 @@ class TokenizedDocument:
             if scope.startPos > pos:
                 break
             if pos < scope.endPos:
-                if lastScope is None or lastScope.startPos <= scope.startPos <= lastScope.endPos:
-                    lastScope = scope
+                assert lastScope is None or lastScope.startPos <= scope.startPos <= lastScope.endPos
+                lastScope = scope
         return lastScope
 
 

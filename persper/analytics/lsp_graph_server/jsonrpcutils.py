@@ -11,6 +11,8 @@ class JsonRpcLogger():
 
     def logTX(self, message: dict):
         self._file.write("{0} < {1}\n".format(datetime.now(), json.dumps(message)))
+        if message.get("method", None) == "shutdown":
+            self._file.flush()
 
     def logRX(self, message: dict):
         self._file.write("{0} > {1}\n".format(datetime.now(), json.dumps(message)))

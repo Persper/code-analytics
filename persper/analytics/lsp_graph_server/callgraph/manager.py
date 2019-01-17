@@ -39,15 +39,14 @@ class CallGraphManager():
         globPattern: `str` or `str[]` containing the glob pattern of the files
         from which to build the call graph branches.
         """
-        oldBranchesCount = len(self._graph.items)
-        branchCounter = oldBranchesCount
+        branchCounter = 0       # with dups
         fileCounter = 0
         await self._builder.waitForFileSystem()
         def pushBranch(branch):
             nonlocal branchCounter
             try:
                 self._graph.add(branch)
-                branchCounter = len(self._graph.items) - oldBranchesCount
+                branchCounter += 1
                 if branchCounter % 2000 == 0:
                     _logger.info("Already added %d branches.", branchCounter)
             except ValueError as ex:
@@ -67,9 +66,9 @@ class CallGraphManager():
             async for b in self._builder.buildCallGraphInFiles(globPattern):
                 pushBranch(b)        
         if fileNames and not globPattern:
-            _logger.info("Added %d branches (-> %d) from %d files.", branchCounter, len(self._graph.items), fileCounter)
+            _logger.info("Added %d branches from %d files.", branchCounter, fileCounter)
         else:
-            _logger.info("Added %d branches (-> %d).", len(self._graph.items), branchCounter)
+            _logger.info("Added %d branches.", branchCounter)
 
     def removeByFiles(self, fileNames: Iterable[str]) -> Iterable[Path]:
         """
