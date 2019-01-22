@@ -20,11 +20,8 @@ class CallCommitGraphSynchronizer(CallGraph):
         if branch.sourceScope is None or branch.definitionScope is None:
             _logger.debug("Ignored branch with None scope: %s", branch)
             return
-        # Use scope full name as identifier.
-        if branch.sourceScope.name not in self._callCommitGraph.nodes().data():
-            self._callCommitGraph.add_node(branch.sourceScope.name)
-        if branch.definitionScope.name not in self._callCommitGraph.nodes().data():
-            self._callCommitGraph.add_node(branch.definitionScope.name)
+        # assuming the referenced edges has already been registered,
+        # or there will be Error
         self._callCommitGraph.add_edge(branch.sourceScope.name, branch.definitionScope.name)
 
     def removeBySourceFiles(self, fileNames: Iterable[PurePath]):

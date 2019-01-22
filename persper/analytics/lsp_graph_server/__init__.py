@@ -159,7 +159,7 @@ class LspClientGraphServer(GraphServer):
 
     async def end_commit(self, hexsha):
         # calculate lines of change in functions
-        # update edges
+        # update vetices & edges
         await self.updateGraph()
         if self._dumpGraphs:
             self._callGraph.dumpTo("Graph-" + hexsha + ".txt")
@@ -265,5 +265,17 @@ class LspClientGraphServer(GraphServer):
             return
         affectedFiles = self._callGraphManager.removeByFiles(self._invalidatedFiles)
         _logger.info("Invalidated %d files, affected %d files.", len(self._invalidatedFiles), len(affectedFiles))
+        await self._callGraphBuilder.waitForFileSystem()
+        # update vertices
+        # Use scope full name as identifier.
+        for path in affectedFiles:
+            path:Path
+            if not path.exists():
+                continue
+            for scope in await self._callGraphBuilder.enumScopesInFile(str(path)):
+                scope:CallGraphScope
+                if scope.name not in self._ccgraph.nodes().data():
+                    self._ccgraph.add_node(scope.name)
+        # update edges
         await self._callGraphManager.buildGraph(fileNames=affectedFiles)
         self._invalidatedFiles.clear()

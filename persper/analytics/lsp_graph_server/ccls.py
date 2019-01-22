@@ -161,6 +161,7 @@ class CclsGraphServer(LspClientGraphServer):
                  dumpGraphs: bool = False):
         super().__init__(workspaceRoot, languageServerCommand=languageServerCommand, dumpLogs=dumpLogs, dumpGraphs=dumpGraphs)
         self._cacheRoot = Path(cacheRoot).resolve() if cacheRoot else self._workspaceRoot.joinpath(".ccls-cache")
+        self._c_requireScopeDefinitionMatch = True
 
     async def startLspClient(self):
         await super().startLspClient()

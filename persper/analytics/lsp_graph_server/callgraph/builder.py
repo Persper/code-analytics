@@ -31,26 +31,6 @@ _KNOWN_EXTENSION_LANGUAGES = {
 }
 
 
-_SCOPE_SYMBOL_KINDS = {
-    # SymbolKind.Unknown,
-    SymbolKind.Class,
-    SymbolKind.Constructor,
-    SymbolKind.Enum,
-    SymbolKind.File,
-    SymbolKind.Function,
-    SymbolKind.Interface,
-    SymbolKind.Macro,
-    SymbolKind.Method,
-    SymbolKind.Module,
-    SymbolKind.Namespace,
-    SymbolKind.Operator,
-    SymbolKind.Package,
-    SymbolKind.Property,
-    SymbolKind.StaticMethod,
-    SymbolKind.Struct
-}
-
-
 class TokenizedDocument:
     """
     Represents a fully tokenized document that supports finding a symbol or scope from
@@ -58,7 +38,9 @@ class TokenizedDocument:
     """
 
     def __init__(self, tokens: Iterable[Token],
-                 documentSymbols: Iterable[Union[DocumentSymbol, SymbolInformation]], fileName: PurePath):
+                 documentSymbols: Iterable[Union[DocumentSymbol, SymbolInformation]],
+                 fileName: PurePath,
+                 documentSymbolFilter):
         self._tokens = []
         self._scopes = []
         self._fileName = fileName
@@ -72,7 +54,12 @@ class TokenizedDocument:
 
         def PopulateSymbols(symbols):
             for s in symbols:
-                if s.kind not in _SCOPE_SYMBOL_KINDS:
+                filterResult = documentSymbolFilter(s)
+                if filterResult == None:
+                    continue
+                if filterResult == False:
+                    if isinstance(s, SymbolInformation):
+                        PopulateSymbols(s.children)
                     continue
                 if isinstance(s, DocumentSymbol):
                     # We assume selectionRange is exactly the range of symbol name
@@ -178,6 +165,7 @@ class CallGraphBuilder(ABC):
     def __init__(self, lspClient: LspClient):
         if not isinstance(lspClient, LspClient):
             raise TypeError("lspClient should be an instance of LspClient.")
+        # status
         self._lspClient = lspClient
         self._tokenizedDocCache: Dict[str, TokenizedDocument] = {}
         self._workspaceFilePatterns: List[str] = None
@@ -256,7 +244,8 @@ class CallGraphBuilder(ABC):
                     return
                 if self.filterToken(tk):
                     yield tk
-        doc = TokenizedDocument(tokenGenerator(), documentSymbols, path)
+        doc = TokenizedDocument(tokenGenerator(), documentSymbols, path,
+                                documentSymbolFilter=lambda s: self.filterSymbol(s))
         self._tokenizedDocCache[path] = doc
         return doc
 
@@ -281,6 +270,26 @@ class CallGraphBuilder(ABC):
         has the need to perform goto definition LSP invocations on.
         """
         raise NotImplementedError
+
+    def filterSymbol(self, symbol: Union[DocumentSymbol, SymbolInformation]) -> bool:
+        """
+        When overridden in the derived class, determines whether the given symbol
+        should be treated as a target of goto definition / scope / call graph vertex.
+        Returns
+            True    symbol should be included and its children, if available, will pass filterSymbol
+            False   symbol should be excluded, while its children will pass filterSymbol
+            None    symbol and its children will be excluded
+        """
+        return symbol.kind in {
+            SymbolKind.Constructor,
+            SymbolKind.Enum,
+            SymbolKind.Function,
+            SymbolKind.Macro,
+            SymbolKind.Method,
+            SymbolKind.Operator,
+            SymbolKind.Property,
+            SymbolKind.StaticMethod,
+        }
 
     def filterFile(self, fileName: str):
         if self._workspaceFilePatternsRegex:
@@ -385,6 +394,15 @@ class CallGraphBuilder(ABC):
         finally:
             await self.closeDocument(textDoc.uri)
         _logger.info("Yielded %d branches.", counter)
+
+    async def enumScopesInFile(self, fileName: str) -> Iterable[CallGraphScope]:
+        """
+        Enumerate all the "scope"s in the specified file.
+        Scopes are vertices of the call graph.
+        """
+        srcPath = self.pathFromUri(fileName)
+        thisDoc: TokenizedDocument = await self.getTokenizedDocument(srcPath)
+        return thisDoc.scopes
 
     async def deleteFile(self, fileName: str):
         path = Path(fileName).resolve()
