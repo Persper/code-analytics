@@ -133,6 +133,7 @@ class LspClientGraphServer(GraphServer):
         # print("_markWholeDocumentAsChanged: ", doc.fileName)
         for scope in doc.scopes:
             while parentScopes and parentScopes[-1][0].endPos <= scope.startPos:
+                # scope is out of parentScope, then the changed line count for parentScope is decided
                 s, c = parentScopes.pop()
                 self._safeUpdateNodeHistory(s.name, c)
             thisScopeLines = scope.endPos.line - scope.startPos.line + 1
@@ -153,7 +154,7 @@ class LspClientGraphServer(GraphServer):
                     "parentScope's LOC change is negative: {0}. parentScopes: {1}".format(s, parentScopes)
                 innermostScope[1] = c
             parentScopes.append([scope, thisScopeLines])
-        while parentScopes and parentScopes[-1][0].endPos <= scope.startPos:
+        while parentScopes:
             s, c = parentScopes.pop()
             self._safeUpdateNodeHistory(s.name, c)
 

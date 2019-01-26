@@ -19,6 +19,46 @@ from persper.util.path import root_path
 _logger = logging.getLogger()
 
 
+def formatEdgeId(u: str, v: str):
+    return u + "|->|" + v
+
+
+def graphToDict(ccg: CallCommitGraph):
+    result = {
+        "nodes": dict(ccg.nodes(data=True)),
+        "edges": dict(((formatEdgeId(u, v), data) for (u, v, data) in ccg.edges(data=True)))
+    }
+    return result
+
+def fixGraphDict(graphData: dict):
+    if "nodes" in graphData:
+        for id, attr in graphData["nodes"].items():
+            if "history" in attr:
+                attr["history"] = dict((int(k), v) for k, v in attr["history"].items())
+    return graphData
+
+def assertGraphMatches(baseline: dict, ccg: CallCommitGraph):
+    baselineNodeIds = set(baseline["nodes"].keys())
+    for id, attr in ccg.nodes(data=True):
+        baselineAttr = baseline["nodes"].get(id, None)
+        assert baselineAttr != None, str.format("Extra node: {0}.", id)
+        assert baselineAttr == attr, str.format(
+            "Node attribute mismatch: {0}. Baseline: {1}; Test: {2}.", id, baselineAttr, attr)
+        baselineNodeIds.remove(id)
+    assert not baselineNodeIds, str.format(
+        "Node(s) missing: %s.", baselineNodeIds)
+    baselineEdgeIds = set(baseline["edges"].keys())
+    for u, v, attr in ccg.edges(data=True):
+        id = formatEdgeId(u, v)
+        baselineAttr = baseline["edges"].get(id, None)
+        assert baselineAttr != None, str.format("Extra branch: {0}.", id)
+        assert baselineAttr == attr, str.format(
+            "Branch attribute mismatch: {0}. Baseline: {1}; Test: {2}.", id, baselineAttr, attr)
+        baselineEdgeIds.remove(id)
+    assert not baselineEdgeIds, str.format(
+        "Branch(es) missing: {0}.", baselineEdgeIds)
+
+
 def commitGraphEquals(g1: Graph, g2: Graph):
     def nodeComparer(n1: dict, n2: dict):
         if n1 == n2:
@@ -59,11 +99,10 @@ async def createFeatureBranchAnalyzer():
 
 
 class TestAnalyzerObserver(AnalyzerObserver):
-    def __init__(self, graphBaselineDumpPath: str = None, graphTestDumpPath: str = None, dumpOnlyOnError: bool = True):
+    def __init__(self, graphBaselineDumpPath: str = None, graphTestDumpPath: str = None, dumpOnlyOnError: bool = None):
         super().__init__()
         if graphBaselineDumpPath:
             self._baselinePath = Path(graphBaselineDumpPath).resolve()
-            self._baselinePath.mkdir(parents=True, exist_ok=True)
         else:
             self._baselinePath = None
         if graphTestDumpPath:
@@ -71,7 +110,7 @@ class TestAnalyzerObserver(AnalyzerObserver):
             self._dumpPath.mkdir(parents=True, exist_ok=True)
         else:
             self._dumpPath = None
-        self._dumpOnlyOnError = dumpOnlyOnError
+        self._dumpOnlyOnError = graphBaselineDumpPath != None if dumpOnlyOnError == None else dumpOnlyOnError
 
     def onAfterCommit(self, analyzer: Analyzer, index: int, commit: Commit, isMaster: bool):
         graph: CallCommitGraph = analyzer.get_graph()
@@ -82,7 +121,7 @@ class TestAnalyzerObserver(AnalyzerObserver):
                     _logger.warning(
                         "Cannot dump call commit graph because no dump path has been specified. Commit %s: %s.", commit.hexsha, commit.message)
                 return False
-            data = networkx.readwrite.json_graph.node_link_data(graph._digraph)
+            data = graphToDict(graph)
             graphPath = self._dumpPath.joinpath(
                 commit.message.strip() + ".g.json")
             with open(graphPath, "wt") as f:
@@ -93,13 +132,13 @@ class TestAnalyzerObserver(AnalyzerObserver):
             try:
                 graphPath = self._baselinePath.joinpath(
                     commit.message.strip() + ".g.json")
-                data = None
+                baselineData: dict = None
                 with open(graphPath, "rt") as f:
-                    data = json.load(f)
-                baseline = networkx.readwrite.json_graph.node_link_graph(data)
-                assert commitGraphEquals(baseline, graph._digraph), str.format(
-                    "Graph not equvalent. Commit: {0}: {1}.", commit.hexsha, commit.message)
+                    baselineData = fixGraphDict(json.load(f))
+                assertGraphMatches(baselineData, graph)
             except:
+                _logger.error("Failed on commit %s: %s.",
+                              commit.hexsha, commit.message)
                 dumpGraph(True)
                 raise
         if not self._dumpOnlyOnError:
@@ -113,5 +152,5 @@ async def testFeatureBranch():
     analyzer: Analyzer
     async with graphServer:
         analyzer.observer = TestAnalyzerObserver(
-            "./feature_branch", "./feature_branch/test")
+            "./baseline/feature_branch", "./testdump/feature_branch")
         await analyzer.analyze(from_beginning=True)
