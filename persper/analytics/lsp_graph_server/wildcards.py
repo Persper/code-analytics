@@ -21,7 +21,7 @@ def translate(pat):
                 if i < n and pat[i] == os.sep:
                     i = i + 1
             else:
-                res = res + '[^\/]+'
+                res = res + r'[^\\/]+'
         elif c == '?':
             res = res + '.'
         elif c == '[':
@@ -44,4 +44,4 @@ def translate(pat):
                 res = '%s[%s]' % (res, stuff)
         else:
             res = res + re.escape(c)
-    return res + '$(?ms)'
+    return '(?ms)' + res + '$'

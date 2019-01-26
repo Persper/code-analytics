@@ -4,7 +4,8 @@ import pickle
 import asyncio
 from persper.analytics.git_tools import get_contents, _diff_with_first_parent
 from persper.analytics.iterator import RepoIterator
-
+from abc import ABC
+from git import Commit
 
 def print_overview(commits, branch_commits):
     print('----- Overview ------')
@@ -62,6 +63,15 @@ class Analyzer:
         self._graph_server = graph_server
         self._ri = RepoIterator(repo_path)
         self._ccgraph = None
+        self._observer:AnalyzerObserver = emptyAnalyzerObserver
+
+    @property
+    def observer(self):
+        return self._observer
+
+    @observer.setter
+    def observer(self, value):
+        self._observer = value or emptyAnalyzerObserver
 
     async def analyze(self, rev=None,
                 from_beginning=False,
@@ -94,13 +104,17 @@ class Analyzer:
         for idx, commit in enumerate(reversed(commits), 1):
             phase = 'main'
             print_commit_info(phase, idx, commit, start_time, verbose)
+            self._observer.onBeforeCommit(self, idx, commit, True)
             await self.analyze_master_commit(commit)
+            self._observer.onAfterCommit(self, idx, commit, True)
             self.autosave(phase, idx, checkpoint_interval)
 
         for idx, commit in enumerate(branch_commits, 1):
             phase = 'branch'
             print_commit_info(phase, idx, commit, start_time, verbose)
+            self._observer.onBeforeCommit(self, idx, commit, False)
             await self.analyze_branch_commit(commit)
+            self._observer.onAfterCommit(self, idx, commit, False)
             self.autosave(phase, idx, checkpoint_interval)
 
         self.autosave('finished', 0, 1)
@@ -168,3 +182,26 @@ class Analyzer:
             repo_name = os.path.basename(self._ri.repo_path.rstrip('/'))
             fname = repo_name + '-' + phase + '-' + str(idx) + '.pickle'
             self.save(fname)
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state.pop("_observer", None)
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
+class AnalyzerObserver(ABC):
+    def __init__(self):
+        pass
+
+    def onBeforeCommit(self, analyzer:Analyzer, index:int, commit:Commit, isMaster:bool):
+        pass
+
+    def onAfterCommit(self, analyzer:Analyzer, index:int, commit:Commit, isMaster:bool):
+        pass
+
+class _EmptyAnalyzerObserverType(AnalyzerObserver):
+    pass
+
+emptyAnalyzerObserver = _EmptyAnalyzerObserverType()
