@@ -10,7 +10,7 @@ from typing import Dict, List, Tuple, Union
 
 from persper.analytics.call_commit_graph import CallCommitGraph
 from persper.analytics.graph_server import GraphServer
-from persper.analytics.patch_parser import PatchParser
+from persper.analytics.another_patch_parser import parseUnifiedDiff
 
 from .callgraph import CallGraphScope
 from .callgraph.adapters import CallCommitGraphSynchronizer
@@ -65,7 +65,6 @@ class LspClientGraphServer(GraphServer):
         self._lastFileWrittenTime: datetime = None
         self._dumpLogs = dumpLogs
         self._dumpGraphs = dumpGraphs
-        self._patchParser = PatchParser()
         # [(oldPath, newPath, addedLines, removedLines), ...]
         # added/removedLines := [[startLine, modifiedLines], ...]
         self._stashedPatches:List[Tuple[ PurePath, PurePath, List[Tuple[int, int]], List[Tuple[int, int]] ]] = []
@@ -76,14 +75,12 @@ class LspClientGraphServer(GraphServer):
         state.pop("_lspClient", None)
         state.pop("_callGraphBuilder", None)
         state.pop("_callGraphManager", None)
-        state.pop("_patchParser", None)
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
         if not self._workspaceRoot.exists():
             self._workspaceRoot.touch()
-        self._patchParser = PatchParser()
 
     def register_commit(self, hexsha, author_name, author_email, commit_message):
         self._ccgraph.add_commit(hexsha, author_name, author_email, commit_message)
@@ -100,13 +97,14 @@ class LspClientGraphServer(GraphServer):
             # The file has been added
             self._stashedPatches.append((oldPath, newPath, None, None))
         else:
-            added, removed = self._patchParser.parse(patch.decode('utf-8', 'replace'))
+            added, removed = parseUnifiedDiff(patch.decode('utf-8', 'replace'))
             # calculate removed lines
             if removed:
                 # we can have removed lines only when we have old file
                 oldDoc:TokenizedDocument = await self._callGraphBuilder.getTokenizedDocument(oldPath)
-                for start, count in removed:
-                    for i in range(start - 1, start + count - 1):
+                # start, end are inclusive, 1-based
+                for start, end in removed:
+                    for i in range(start - 1, end):
                         scope = oldDoc.scopeAt(i, 0)
                         if scope:
                             self._safeUpdateNodeHistory(scope.name, 1)
@@ -177,8 +175,8 @@ class LspClientGraphServer(GraphServer):
                 self._markWholeDocumentAsChanged(newDoc)
             else:
                 assert added
-                for start, count in added:
-                    for i in range(start - 1, start + count - 1):
+                for start, end in added:
+                    for i in range(start - 1, end):
                         scope = newDoc.scopeAt(i, 0)
                         if scope:
                             self._safeUpdateNodeHistory(scope.name, 1)

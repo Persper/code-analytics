@@ -18,6 +18,8 @@ from persper.util.path import root_path
 
 _logger = logging.getLogger()
 
+testDataRoot = os.path.dirname(os.path.abspath(__file__))
+
 
 def formatEdgeId(u: str, v: str):
     return u + "|->|" + v
@@ -30,12 +32,15 @@ def graphToDict(ccg: CallCommitGraph):
     }
     return result
 
+
 def fixGraphDict(graphData: dict):
     if "nodes" in graphData:
         for id, attr in graphData["nodes"].items():
             if "history" in attr:
-                attr["history"] = dict((int(k), v) for k, v in attr["history"].items())
+                attr["history"] = dict((int(k), v)
+                                       for k, v in attr["history"].items())
     return graphData
+
 
 def assertGraphMatches(baseline: dict, ccg: CallCommitGraph):
     baselineNodeIds = set(baseline["nodes"].keys())
@@ -43,7 +48,7 @@ def assertGraphMatches(baseline: dict, ccg: CallCommitGraph):
         baselineAttr = baseline["nodes"].get(id, None)
         assert baselineAttr != None, str.format("Extra node: {0}.", id)
         assert baselineAttr == attr, str.format(
-            "Node attribute mismatch: {0}. Baseline: {1}; Test: {2}.", id, baselineAttr, attr)
+            "Node attribute mismatch: {0}. Baseline: {1}; Actual: {2}.", id, baselineAttr, attr)
         baselineNodeIds.remove(id)
     assert not baselineNodeIds, str.format(
         "Node(s) missing: %s.", baselineNodeIds)
@@ -53,7 +58,7 @@ def assertGraphMatches(baseline: dict, ccg: CallCommitGraph):
         baselineAttr = baseline["edges"].get(id, None)
         assert baselineAttr != None, str.format("Extra branch: {0}.", id)
         assert baselineAttr == attr, str.format(
-            "Branch attribute mismatch: {0}. Baseline: {1}; Test: {2}.", id, baselineAttr, attr)
+            "Branch attribute mismatch: {0}. Baseline: {1}; Actual: {2}.", id, baselineAttr, attr)
         baselineEdgeIds.remove(id)
     assert not baselineEdgeIds, str.format(
         "Branch(es) missing: {0}.", baselineEdgeIds)
@@ -152,5 +157,6 @@ async def testFeatureBranch():
     analyzer: Analyzer
     async with graphServer:
         analyzer.observer = TestAnalyzerObserver(
-            "./baseline/feature_branch", "./testdump/feature_branch")
+            os.path.join(testDataRoot, "baseline/feature_branch"),
+            os.path.join(testDataRoot, "actualdump/feature_branch"))
         await analyzer.analyze(from_beginning=True)
