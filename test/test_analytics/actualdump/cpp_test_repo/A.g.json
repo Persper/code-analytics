@@ -1,0 +1,314 @@
+{
+    "edges": {
+        "bool Equal(const int &lhs, const int &rhs, StringComparison comparision)|->|bool Equal(const int &lhs, const int &rhs, int comparision)": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "bool Equal(const int &lhs, const int &rhs, StringComparison comparision)|->|enum class StringComparison : int {}": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "bool Equal(const int &lhs, const int &rhs, int comparision)|->|enum class StringComparison : int {}": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "const char *FriendlyNameOf(const ReliabilityNetworkEntry &instance)|->|const char *FriendlyNameOf()": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "const char *FriendlyNameOf(const std::type_index &type)|->|const char *FriendlyNameOf()": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "const char *FriendlyNameOf(const type_info &type)|->|const char *FriendlyNameOf()": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "int &operator>>(int &reader, bool &rhs)|->|bool Equal(const int &lhs, const int &rhs, int comparision)": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "int &operator>>(int &reader, bool &rhs)|->|enum class StringComparison : int {}": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "int &operator>>(int &reader, bool &rhs)|->|int &operator>>(int &reader, int &rhs)": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "int &operator>>(int &reader, double &rhs)|->|int &operator>>(int &reader, int &rhs)": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "int &operator>>(int &reader, float &rhs)|->|int &operator>>(int &reader, int &rhs)": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "int &operator>>(int &reader, long &rhs)|->|int &operator>>(int &reader, int &rhs)": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "int main(int argc, char *argv[])|->|TStream OpenAndValidate(const TPath arg1)": {
+            "addedBy": 0,
+            "weight": null
+        },
+        "void ReportException(const int &ex, int level)|->|void ReportException(const int &ex, int level)": {
+            "addedBy": 0,
+            "weight": null
+        }
+    },
+    "nodes": {
+        "ANSI_COLOR_BLUE": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_BRIGHT": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_CYAN": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_GREEN": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_MAGENTA": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_RED": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_RESET": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_YELLOW": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, bool &rhs)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, double &rhs)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, float &rhs)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, int &rhs)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, long &rhs)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "TDest safe_cast(TSrc obj)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "TStream &operator>>(TStream &s, RowReader &reader)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "TStream OpenAndValidate(const TPath arg1)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "_DECLARE_ENUM": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "_DECLARE_ENUM_DEFAULT": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "_RE_TRACE": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "_RangeToEnumerable<TIterator> RangeToEnumerable(const int range)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "_SILENCE_STDEXT_ALLOCATORS_DEPRECATION_WARNING": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "bool Confirm(const int &prompt)": {
+            "history": {
+                "0": 17
+            },
+            "size": null
+        },
+        "bool Equal(const int &lhs, const int &rhs, StringComparison comparision)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "bool Equal(const int &lhs, const int &rhs, int comparision)": {
+            "history": {
+                "0": 29
+            },
+            "size": null
+        },
+        "bool dynamic_kind_of(const TSrc *obj)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "bool pointer_kind_of(const int obj)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "const char *FriendlyNameOf()": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "const char *FriendlyNameOf(const ReliabilityNetworkEntry &instance)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "const char *FriendlyNameOf(const std::type_index &type)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "const char *FriendlyNameOf(const type_info &type)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "enum class StringComparison : int {}": {
+            "history": {
+                "0": 6
+            },
+            "size": null
+        },
+        "inline int to_string(const int &value)": {
+            "history": {
+                "0": 4
+            },
+            "size": null
+        },
+        "int &operator>>(int &reader, bool &rhs)": {
+            "history": {
+                "0": 24
+            },
+            "size": null
+        },
+        "int &operator>>(int &reader, double &rhs)": {
+            "history": {
+                "0": 6
+            },
+            "size": null
+        },
+        "int &operator>>(int &reader, float &rhs)": {
+            "history": {
+                "0": 6
+            },
+            "size": null
+        },
+        "int &operator>>(int &reader, int &rhs)": {
+            "history": {
+                "0": 6
+            },
+            "size": null
+        },
+        "int &operator>>(int &reader, long &rhs)": {
+            "history": {
+                "0": 6
+            },
+            "size": null
+        },
+        "int StreamStatusToString(const TStream &stream)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "int main(int argc, char *argv[])": {
+            "history": {
+                "0": 7
+            },
+            "size": null
+        },
+        "int safe_pointer_cast(const int &obj)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        },
+        "void ReportException(const int &ex, int level)": {
+            "history": {
+                "0": 21
+            },
+            "size": null
+        },
+        "void ValidateStream(const TStream &stream)": {
+            "history": {
+                "0": 1
+            },
+            "size": null
+        }
+    }
+}

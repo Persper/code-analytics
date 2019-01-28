@@ -56,3 +56,14 @@ async def testFeatureBranch():
             os.path.join(testDataRoot, "baseline/feature_branch"),
             os.path.join(testDataRoot, "actualdump/feature_branch"))
         await analyzer.analyze(from_beginning=True)
+
+@pytest.mark.asyncio
+async def testCppTestRepo():
+    graphServer, analyzer = await createFeatureBranchAnalyzer("cpp_test_repo")
+    graphServer: CclsGraphServer
+    analyzer: Analyzer
+    async with graphServer:
+        analyzer.observer = GraphDumpAnalyzerObserver(
+            os.path.join(testDataRoot, "baseline/cpp_test_repo"),
+            os.path.join(testDataRoot, "actualdump/cpp_test_repo"))
+        await analyzer.analyze(from_beginning=True)
