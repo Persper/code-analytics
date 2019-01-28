@@ -19,6 +19,7 @@ ipykernel = "*"
 matplotlib = "*"
 antlr4-python3-runtime = "*"
 python-jsonrpc-server = "*"
+pytest-asyncio = "*"
 
 [dev-packages]
 

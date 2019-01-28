@@ -67,6 +67,9 @@ class Analyzer:
 
     @property
     def observer(self):
+        """
+        The AnalyzerObserver used to observe current Analyzer.
+        """
         return self._observer
 
     @observer.setter
@@ -192,16 +195,44 @@ class Analyzer:
         self.__dict__.update(state)
 
 class AnalyzerObserver(ABC):
+    """
+    Used to observe the progress of `Analyzer` during its analysis of the target repository.
+    You need to derive your own observer class from it before assigning your observer instance
+    to `Analyzer.observer`.
+    """
     def __init__(self):
         pass
 
     def onBeforeCommit(self, analyzer:Analyzer, index:int, commit:Commit, isMaster:bool):
+        """
+        Called before the observed Analyzer is about to analyze a commit.
+        Params:
+            analyzer: the observed Analyzer instance.
+            index: the index of the commit, depending on the behavior of the analyzer.
+                    This is usually a series of 1-based ordinal index for master commits,
+                    and another series of 1-based ordinal index for branch commits.
+            commit: the commit to be analyzed.
+            isMaster: whether the current commit is one of the master commits.
+        """
         pass
 
     def onAfterCommit(self, analyzer:Analyzer, index:int, commit:Commit, isMaster:bool):
+        """
+        Called after the observed Analyzer has finished analyzing a commit.
+        Params:
+            analyzer: the observed Analyzer instance.
+            index: the index of the commit, depending on the behavior of the analyzer.
+                    This is usually a series of 1-based ordinal index for master commits,
+                    and another series of 1-based ordinal index for branch commits.
+            commit: the commit that has just been analyzed.
+            isMaster: whether the current commit is one of the master commits.
+        """
         pass
 
 class _EmptyAnalyzerObserverType(AnalyzerObserver):
     pass
 
 emptyAnalyzerObserver = _EmptyAnalyzerObserverType()
+"""
+An AnalyzerObserver instance that does nothing in their notification methods.
+"""
