@@ -1,0 +1,5 @@
+digraph go_test_repo {
+	A -> B -> C;
+	B -> D;
+
+}
