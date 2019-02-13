@@ -33,12 +33,12 @@ class CallCommitGraph:
     # Read-only access
     def commits(self):
         # https://networkx.github.io/documentation/stable/tutorial.html#graph-attributes
-        return self._digraph.graph['commitLists']
+        return self._digraph.graph['commitList']
 
     def add_commit(self, hexsha, author_name, author_email, commit_message):
-        self._digraph.graph['commitLists'].append({
-            'hexsha': hexsha, 'author_name': author_name,
-            'author_email': author_email, 'commit_message': commit_message
+        self._digraph.graph['commitList'].append({
+            'hexsha': hexsha, 'authorName': author_name,
+            'authorEmail': author_email, 'message': commit_message
         })
 
     # The index of the commit being analyzed
