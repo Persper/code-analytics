@@ -21,6 +21,9 @@ CPP_FILENAME_REGEXES = {
     r'.+\.(c|cc|cxx|cpp|CPP|c\+\+|C|hh|hpp|Hpp|h\+\+|H)$'
 }
 
+GO_FILENAME_REGEXES = [
+    r'.+\.go$'
+]
 
 class GraphServer(ABC):
 
