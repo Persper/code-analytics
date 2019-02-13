@@ -6,17 +6,18 @@ import requests
 import urllib.parse
 
 
-class GraphServerHttp(GraphServer):
+class GoGraphServer(GraphServer):
     def __init__(self, server_addr, filename_regex_strs):
         self.server_addr = server_addr
         self.filename_regexes = [re.compile(regex_str) for regex_str in filename_regex_strs]
         self.config_param = dict()
 
     def register_commit(self, hexsha, author_name, author_email, commit_message):
+        # TODO: use 'message' or 'commit_message', but not both
         payload = {'hexsha': hexsha,
                    'author_name': author_name,
                    'author_email': author_email,
-                   'commit_message': commit_message}
+                   'message': commit_message}
         register_url = urllib.parse.urljoin(self.server_addr, '/register_commit')
         r = requests.post(register_url, json=payload).json()
         if r != '0':
@@ -30,7 +31,7 @@ class GraphServerHttp(GraphServer):
                    'newSrc': new_src,
                    'patch': patch.decode('utf-8', 'replace'),
                    'config': self.config_param}
-                   
+
         update_url = urllib.parse.urljoin(self.server_addr, '/update')
         r = requests.post(update_url, json=payload).json()
         if r != '0':
@@ -39,7 +40,10 @@ class GraphServerHttp(GraphServer):
     def get_graph(self):
         graph_url = self.server_addr + '/callgraph'
         r = requests.get(graph_url)
-        return CallCommitGraph(r.json())
+        graph_data = r.json()
+        graph_data['directed'] = True
+        graph_data['multigraph'] = True
+        return CallCommitGraph(graph_data)
 
     def reset_graph(self):
         reset_url = urllib.parse.urljoin(self.server_addr, '/reset')
@@ -53,4 +57,3 @@ class GraphServerHttp(GraphServer):
 
     def config(self, param):
         self.config_param = param
-
