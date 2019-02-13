@@ -14,7 +14,7 @@ func (v Vertex) Abs() float64 {
 }
 
 func funcA () {
-	fmt.Println("func A is called!");
+	fmt.Println("func A is called!")
 }
 
 func main() {

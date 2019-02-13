@@ -19,7 +19,7 @@ func funcA () {
 }
 func funcB () {
 	funcA()
-	print("func B is called!")
+	fmt.Println("func B is called!")
 }
 func main() {
 	a := funcA

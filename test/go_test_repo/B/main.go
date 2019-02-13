@@ -18,10 +18,10 @@ func (v Vertex) Abs() float64 {
 }
 
 func funcA () {
-	fmt.Println("func A is called!");
+	fmt.Println("func A is called!")
 }
 func funcB () {
-	fmt.Println("func B is called!");
+	fmt.Println("func B is called!")
 }
 func main() {
 	a := funcA
