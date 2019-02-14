@@ -62,7 +62,8 @@ class Analyzer:
         self._ri = RepoIterator(repo_path)
         self._ccgraph = None
 
-    def analyze(self, rev=None,
+    def analyze(self, pickle_path=None,
+                rev=None,
                 from_beginning=False,
                 num_commits=None,
                 continue_iter=False,
@@ -90,19 +91,30 @@ class Analyzer:
         print_overview(commits, branch_commits)
         start_time = time.time()
 
+        analyzed_commits = 0
+        processed = 0
+        totoal_commits = len(commits) + len(branch_commits)
+
         for idx, commit in enumerate(reversed(commits), 1):
             phase = 'main'
             print_commit_info(phase, idx, commit, start_time, verbose)
             self.analyze_master_commit(commit)
-            self.autosave(phase, idx, checkpoint_interval)
+            # Todo: update redis about the processed percentage
+            analyzed_commits += 1
+            processed = analyzed_commits * 1.0 / totoal_commits
 
         for idx, commit in enumerate(branch_commits, 1):
             phase = 'branch'
             print_commit_info(phase, idx, commit, start_time, verbose)
             self.analyze_branch_commit(commit)
-            self.autosave(phase, idx, checkpoint_interval)
+            # Todo: update redis about the processed percentage
+            analyzed_commits += 1
+            processed = analyzed_commits * 1.0 / totoal_commits
 
-        self.autosave('finished', 0, 1)
+        if pickle_path:
+            self.save(pickle_path)
+        else:
+            self.autosave('finished', 0, 1)
 
     def _analyze_commit(self, commit, server_func):
         self._graph_server.register_commit(commit.hexsha,
