@@ -174,7 +174,7 @@ class Analyzer:
             fname = repo_name + '-' + phase + '-' + str(idx) + '.pickle'
             self.save(fname)
 
-    def update_estimated_delay(repo_url, totoal_commits, analyzed_commits):
+    def update_estimated_delay(self, repo_url, totoal_commits, analyzed_commits):
         redis_conn = Redis()
         estimation = 1.0 * analyzed_commits / totoal_commits
         redis_conn.hmset(repo_url, {'estimation': estimation})
