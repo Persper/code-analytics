@@ -1,6 +1,7 @@
 import os
 import time
 import pickle
+from redis import Redis
 from persper.analytics.git_tools import get_contents, _diff_with_first_parent
 from persper.analytics.iterator import RepoIterator
 
@@ -62,7 +63,8 @@ class Analyzer:
         self._ri = RepoIterator(repo_path)
         self._ccgraph = None
 
-    def analyze(self, pickle_path=None,
+    def analyze(self, repo_url,
+                pickle_path=None,
                 rev=None,
                 from_beginning=False,
                 num_commits=None,
@@ -92,24 +94,23 @@ class Analyzer:
         start_time = time.time()
 
         analyzed_commits = 0
-        processed = 0
         totoal_commits = len(commits) + len(branch_commits)
 
         for idx, commit in enumerate(reversed(commits), 1):
             phase = 'main'
             print_commit_info(phase, idx, commit, start_time, verbose)
             self.analyze_master_commit(commit)
-            # Todo: update redis about the processed percentage
+
             analyzed_commits += 1
-            processed = analyzed_commits * 1.0 / totoal_commits
+            self.update_estimated_delay(repo_url, totoal_commits, analyzed_commits)
 
         for idx, commit in enumerate(branch_commits, 1):
             phase = 'branch'
             print_commit_info(phase, idx, commit, start_time, verbose)
             self.analyze_branch_commit(commit)
-            # Todo: update redis about the processed percentage
+
             analyzed_commits += 1
-            processed = analyzed_commits * 1.0 / totoal_commits
+            self.update_estimated_delay(repo_url, totoal_commits, analyzed_commits)
 
         if pickle_path:
             self.save(pickle_path)
@@ -172,3 +173,8 @@ class Analyzer:
             repo_name = os.path.basename(self._ri.repo_path.rstrip('/'))
             fname = repo_name + '-' + phase + '-' + str(idx) + '.pickle'
             self.save(fname)
+
+    def update_estimated_delay(repo_url, totoal_commits, analyzed_commits):
+        redis_conn = Redis()
+        estimation = 1.0 * analyzed_commits / totoal_commits
+        redis_conn.hmset(repo_url, {'estimation': estimation})
