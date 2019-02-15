@@ -1,5 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
+from enum import Enum
 
 JS_FILENAME_REGEXES = [
     r'.+\.js$',
@@ -25,6 +26,12 @@ GO_FILENAME_REGEXES = [
     r'.+\.go$'
 ]
 
+class CommitSeekingMode:
+    NormalForward = 0,
+    MergeCommit = 1,
+    Rewind = 2
+
+
 class GraphServer(ABC):
 
     @abstractmethod
@@ -48,7 +55,13 @@ class GraphServer(ABC):
         """
         pass
 
-    def end_commit(self, hexsha):
+    def start_commit(self, hexsha: str, seeking_mode: CommitSeekingMode, author_name: str,
+                     author_email: str, commit_message: str):
+        # default implementation for backwards compatibility
+        if seeking_mode == CommitSeekingMode.NormalForward:
+            self.register_commit(hexsha, author_name, author_email, commit_message)
+
+    def end_commit(self, hexsha: str):
         pass
 
     @abstractmethod

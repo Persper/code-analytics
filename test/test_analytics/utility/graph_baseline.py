@@ -4,14 +4,15 @@ Utility functions for graph-dump-based regression tests.
 import json
 import logging
 import os
-from pathlib import Path
 from enum import Enum
+from pathlib import Path
 
 from git import Commit
 from networkx import Graph
 
-from persper.analytics.analyzer import Analyzer, AnalyzerObserver
+from persper.analytics.analyzer2 import Analyzer, AnalyzerObserver
 from persper.analytics.call_commit_graph import CallCommitGraph
+from persper.analytics.graph_server import CommitSeekingMode
 
 _logger = logging.getLogger()
 
@@ -100,8 +101,10 @@ class GraphDumpAnalyzerObserver(AnalyzerObserver):
             self._dumpPath = None
         self._dumpOnlyOnError = graphBaselineDumpPath != None if dumpOnlyOnError == None else dumpOnlyOnError
 
-    def onAfterCommit(self, analyzer: Analyzer, index: int, commit: Commit, isMaster: bool):
-        graph: CallCommitGraph = analyzer.get_graph()
+    def onAfterCommit(self, analyzer: Analyzer, commit: Commit, seeking_mode: CommitSeekingMode):
+        if seeking_mode == CommitSeekingMode.Rewind:
+            return
+        graph: CallCommitGraph = analyzer.graph
 
         def dumpGraph(warnIfNotAvailable: bool):
             if not self._dumpPath:

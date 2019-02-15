@@ -12,7 +12,7 @@ from git import Commit
 from networkx import Graph
 from networkx.algorithms.isomorphism import is_isomorphic
 
-from persper.analytics.analyzer import Analyzer
+from persper.analytics.analyzer2 import Analyzer
 from persper.analytics.call_commit_graph import CallCommitGraph
 from persper.analytics.lsp_graph_server.ccls import CclsGraphServer
 from persper.util.path import root_path
@@ -22,7 +22,7 @@ _logger = logging.getLogger()
 testDataRoot = os.path.dirname(os.path.abspath(__file__))
 
 
-async def createFeatureBranchAnalyzer(repoName: str):
+def prepareRepo(repoName: str):
     # build the repo first if not exists yet
     repo_path = os.path.join(root_path, 'repos/' + repoName)
     script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
@@ -30,7 +30,11 @@ async def createFeatureBranchAnalyzer(repoName: str):
     if not os.path.isdir(repo_path):
         cmd = '{} {}'.format(script_path, test_src_path)
         subprocess.call(cmd, shell=True)
+    print("Repository path: ", repo_path)
+    return repo_path
 
+
+def createCclsGraphServer():
     # create workspace root folder
     CCLS_COMMAND = os.path.join(root_path, "bin/ccls")
     DUMP_LOGS = False
@@ -40,30 +44,29 @@ async def createFeatureBranchAnalyzer(repoName: str):
                                   languageServerCommand=CCLS_COMMAND +
                                   (" -log-file=ccls.log" if DUMP_LOGS else ""),
                                   dumpLogs=DUMP_LOGS)
-    print(repo_path)
-    analyzer = Analyzer(repo_path, graphServer)
     graphServer.reset_graph()
-    return graphServer, analyzer
+    return graphServer
 
 
 @pytest.mark.asyncio
 async def testFeatureBranch():
-    graphServer, analyzer = await createFeatureBranchAnalyzer("test_feature_branch")
-    graphServer: CclsGraphServer
-    analyzer: Analyzer
+    repoPath = prepareRepo("test_feature_branch")
+    graphServer = createCclsGraphServer()
+    analyzer = Analyzer(repoPath, graphServer, firstParentOnly=True)
     async with graphServer:
         analyzer.observer = GraphDumpAnalyzerObserver(
-            os.path.join(testDataRoot, "baseline/feature_branch"),
-            os.path.join(testDataRoot, "actualdump/feature_branch"))
-        await analyzer.analyze(from_beginning=True)
+            os.path.join(testDataRoot, "baseline/feature_branch_first_parent"),
+            os.path.join(testDataRoot, "actualdump/feature_branch_first_parent"))
+        await analyzer.analyze()
+
 
 @pytest.mark.asyncio
 async def testCppTestRepo():
-    graphServer, analyzer = await createFeatureBranchAnalyzer("cpp_test_repo")
-    graphServer: CclsGraphServer
-    analyzer: Analyzer
+    repoPath = prepareRepo("cpp_test_repo")
+    graphServer = createCclsGraphServer()
+    analyzer = Analyzer(repoPath, graphServer)
     async with graphServer:
         analyzer.observer = GraphDumpAnalyzerObserver(
             os.path.join(testDataRoot, "baseline/cpp_test_repo"),
             os.path.join(testDataRoot, "actualdump/cpp_test_repo"))
-        await analyzer.analyze(from_beginning=True)
+        await analyzer.analyze()

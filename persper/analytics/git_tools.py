@@ -1,5 +1,6 @@
 from git.exc import InvalidGitRepositoryError, NoSuchPathError
-from git import Repo
+from git import Repo, Commit
+from typing import Union
 import sys
 
 EMPTY_TREE_SHA = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
@@ -14,6 +15,11 @@ def _diff_with_first_parent(commit):
     return commit.diff(prev_commit,
                        create_patch=True, R=True, indent_heuristic=True)
 
+def diff_with_commit(current_commit:Commit, base_commit:Union[Commit, str]=None):
+    localBaseCommit = base_commit
+    if not localBaseCommit:
+        localBaseCommit = EMPTY_TREE_SHA
+    return current_commit.diff(localBaseCommit, create_patch=True, R=True, indent_heuristic=True)
 
 def initialize_repo(repo_path):
     try:
@@ -29,4 +35,6 @@ def initialize_repo(repo_path):
 
 def get_contents(repo, commit, path):
     """Get contents of a path within a specific commit"""
-    return repo.git.show('{}:{}'.format(commit.hexsha, path))
+    if type(commit) == Commit:
+        commit = commit.hexsha
+    return repo.git.show('{}:{}'.format(commit, path))
