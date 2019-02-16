@@ -1,35 +1,23 @@
 {
     "edges": {
         "char *str_append_chr(char *string, char append)|->|int str_equals()": {
-            "addedBy": "D",
+            "addedBy": "C",
             "weight": null
         },
         "char *str_append_chr(char *string, char append)|->|int str_len(char *string)": {
-            "addedBy": "D",
+            "addedBy": "C",
             "weight": null
         },
         "char *str_replace(char *search, char *replace, char *subject)|->|char *str_append_chr(char *string, char append)": {
-            "addedBy": "G",
+            "addedBy": "D",
             "weight": null
         },
-        "char *str_replace(char *search, char *replace, char *subject)|->|int str_equals(char *equal1, char *eqaul2)": {
-            "addedBy": "G",
+        "char *str_replace(char *search, char *replace, char *subject)|->|int str_equals()": {
+            "addedBy": "D",
             "weight": null
         },
         "char *str_replace(char *search, char *replace, char *subject)|->|int str_len(char *string)": {
-            "addedBy": "G",
-            "weight": null
-        },
-        "void add(int num)|->|void append(int num)": {
-            "addedBy": "H",
-            "weight": null
-        },
-        "void insert(int num)|->|void add(int num)": {
-            "addedBy": "H",
-            "weight": null
-        },
-        "void insert(int num)|->|void append(int num)": {
-            "addedBy": "H",
+            "addedBy": "D",
             "weight": null
         }
     },
@@ -50,7 +38,13 @@
         },
         "char *str_replace(char *search, char *replace, char *subject)": {
             "history": {
-                "G": 26
+                "D": 26
+            },
+            "size": null
+        },
+        "int count()": {
+            "history": {
+                "F": 12
             },
             "size": null
         },
@@ -63,8 +57,7 @@
         "int str_equals(char *equal1, char *eqaul2)": {
             "history": {
                 "B": 11,
-                "C": 1,
-                "G": 2
+                "C": 1
             },
             "size": null
         },
@@ -76,22 +69,20 @@
         },
         "void add(int num)": {
             "history": {
-                "H": 16,
-                "I": 5
+                "E": 11
             },
             "size": null
         },
         "void append(int num)": {
             "history": {
-                "H": 12,
-                "I": 35
+                "E": 29
             },
             "size": null
         },
-        "void insert(int num)": {
+        "void display(struct node *r)": {
             "history": {
-                "H": 25,
-                "I": 25
+                "F": 14,
+                "K": 5
             },
             "size": null
         }

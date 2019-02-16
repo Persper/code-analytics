@@ -54,6 +54,12 @@
             },
             "size": null
         },
+        "int count()": {
+            "history": {
+                "J": 12
+            },
+            "size": null
+        },
         "int str_equals()": {
             "history": {
                 "C": 1
@@ -85,6 +91,12 @@
             "history": {
                 "H": 12,
                 "I": 35
+            },
+            "size": null
+        },
+        "void display(struct node *r)": {
+            "history": {
+                "J": 14
             },
             "size": null
         },

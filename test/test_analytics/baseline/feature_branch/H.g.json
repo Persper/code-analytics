@@ -76,22 +76,19 @@
         },
         "void add(int num)": {
             "history": {
-                "H": 16,
-                "I": 5
+                "H": 16
             },
             "size": null
         },
         "void append(int num)": {
             "history": {
-                "H": 12,
-                "I": 35
+                "H": 12
             },
             "size": null
         },
         "void insert(int num)": {
             "history": {
-                "H": 25,
-                "I": 25
+                "H": 25
             },
             "size": null
         }

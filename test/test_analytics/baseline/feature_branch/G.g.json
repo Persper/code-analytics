@@ -1,11 +1,11 @@
 {
     "edges": {
         "char *str_append_chr(char *string, char append)|->|int str_equals()": {
-            "addedBy": "D",
+            "addedBy": "C",
             "weight": null
         },
         "char *str_append_chr(char *string, char append)|->|int str_len(char *string)": {
-            "addedBy": "D",
+            "addedBy": "C",
             "weight": null
         },
         "char *str_replace(char *search, char *replace, char *subject)|->|char *str_append_chr(char *string, char append)": {
@@ -18,18 +18,6 @@
         },
         "char *str_replace(char *search, char *replace, char *subject)|->|int str_len(char *string)": {
             "addedBy": "G",
-            "weight": null
-        },
-        "void add(int num)|->|void append(int num)": {
-            "addedBy": "H",
-            "weight": null
-        },
-        "void insert(int num)|->|void add(int num)": {
-            "addedBy": "H",
-            "weight": null
-        },
-        "void insert(int num)|->|void append(int num)": {
-            "addedBy": "H",
             "weight": null
         }
     },
@@ -71,27 +59,6 @@
         "int str_len(char *string)": {
             "history": {
                 "A": 6
-            },
-            "size": null
-        },
-        "void add(int num)": {
-            "history": {
-                "H": 16,
-                "I": 5
-            },
-            "size": null
-        },
-        "void append(int num)": {
-            "history": {
-                "H": 12,
-                "I": 35
-            },
-            "size": null
-        },
-        "void insert(int num)": {
-            "history": {
-                "H": 25,
-                "I": 25
             },
             "size": null
         }
