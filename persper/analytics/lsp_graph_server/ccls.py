@@ -160,10 +160,9 @@ class CclsGraphServer(LspClientGraphServer):
     def __init__(self, workspaceRoot: str, cacheRoot: str = None,
                  languageServerCommand: Union[str, List[str]] = None,
                  dumpLogs: bool = False,
-                 dumpGraphs: bool = False,
                  graph: CallCommitGraph = None):
         super().__init__(workspaceRoot, languageServerCommand=languageServerCommand,
-                         dumpLogs=dumpLogs, dumpGraphs=dumpGraphs, graph=graph)
+                         dumpLogs=dumpLogs, graph=graph)
         self._cacheRoot = Path(cacheRoot).resolve() if cacheRoot else self._workspaceRoot.joinpath(".ccls-cache")
         self._c_requireScopeDefinitionMatch = True
 

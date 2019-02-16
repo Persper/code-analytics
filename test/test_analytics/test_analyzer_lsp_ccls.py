@@ -51,6 +51,9 @@ def createCclsGraphServer():
 
 @pytest.mark.asyncio
 async def testFeatureBranchFirstParent():
+    """
+    Tests test_feature_branch repos, only on topical branch.
+    """
     repoPath = prepareRepo("test_feature_branch")
     graphServer = createCclsGraphServer()
     analyzer = Analyzer(repoPath, graphServer, firstParentOnly=True)
@@ -63,6 +66,9 @@ async def testFeatureBranchFirstParent():
 
 @pytest.mark.asyncio
 async def testFeatureBranch():
+    """
+    Tests test_feature_branch repos, on all branches.
+    """
     repoPath = prepareRepo("test_feature_branch")
     graphServer = createCclsGraphServer()
     analyzer = Analyzer(repoPath, graphServer, firstParentOnly=False)

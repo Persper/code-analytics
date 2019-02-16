@@ -37,7 +37,6 @@ class LspClientGraphServer(GraphServer):
     def __init__(self, workspaceRoot: str,
                  languageServerCommand: Union[str, List[str]] = None,
                  dumpLogs: bool = False,
-                 dumpGraphs: bool = False,
                  graph: CallCommitGraph = None):
         """
         workspaceRoot:  root of the temporary workspace path. LSP workspace and intermediate repository files
@@ -65,7 +64,6 @@ class LspClientGraphServer(GraphServer):
         self._callGraphManager: CallGraphManager = None
         self._lastFileWrittenTime: datetime = None
         self._dumpLogs = dumpLogs
-        self._dumpGraphs = dumpGraphs
         # [(oldPath, newPath, addedLines, removedLines), ...]
         # added/removedLines := [[startLine, modifiedLines], ...]
         self._stashedPatches: List[Tuple[PurePath, PurePath, List[Tuple[int, int]], List[Tuple[int, int]]]] = []
@@ -168,8 +166,6 @@ class LspClientGraphServer(GraphServer):
         # update vetices & edges
         if self._commitSeekingMode != CommitSeekingMode.Rewind:
             await self.updateGraph()
-            if self._dumpGraphs:
-                self._callGraph.dumpTo("Graph-" + hexsha + ".txt")
 
         # calculate added lines
         if self._commitSeekingMode == CommitSeekingMode.NormalForward:

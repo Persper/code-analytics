@@ -1,10 +1,12 @@
 import asyncio
 from abc import ABC
-from typing import Union
+import collections.abc
+from typing import Union, Set
 
 from git import Commit, Diff, DiffIndex, Repo
 
-from persper.analytics.git_tools import EMPTY_TREE_SHA, diff_with_commit, get_contents
+from persper.analytics.git_tools import (EMPTY_TREE_SHA, diff_with_commit,
+                                         get_contents)
 from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 
 
@@ -19,7 +21,24 @@ class Analyzer:
         self._terminalCommit: Commit = self._repo.rev_parse(terminalCommit)
         self._firstParentOnly = firstParentOnly
         self._visitedCommits = set()
+        self._s_visitedCommits = _ReadOnlySet(self._visitedCommits)
         self._observer: AnalyzerObserver = emptyAnalyzerObserver
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state.pop("_repo", None)
+        state.pop("_s_visitedCommits", None)
+        state["_originCommit"] = self._originCommit.hexsha if self._originCommit else None
+        state["_terminalCommit"] = self._terminalCommit.hexsha if self._terminalCommit else None
+        state.pop("_observer", None)
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self._repo = Repo(self._repositoryRoot)
+        self.originCommit = state["_originCommit"]
+        self.terminalCommit = state["_terminalCommit"]
+        self._s_visitedCommits = _ReadOnlySet(self._visitedCommits)
 
     @property
     def observer(self):
@@ -71,6 +90,13 @@ class Analyzer:
     def graph(self):
         return self._graphServer.get_graph()
 
+    @property
+    def visitedCommits(self) -> Set[str]:
+        """
+        Gets a set of visited commits, identified by their their SHA.
+        """
+        return self._s_visitedCommits
+
     async def analyze(self):
         graphServerLastCommit = EMPTY_TREE_SHA
         commitSpec = self._terminalCommit
@@ -80,7 +106,8 @@ class Analyzer:
                                               topo_order=True, reverse=True, first_parent=self._firstParentOnly):
             def printCommitStatus(status: str):
                 message = commit.message.strip()[:32]
-                print("Commit {0} ({1}): {2}".format(commit.hexsha, message, status))
+                print("Commit {0} ({1}): {2}".format(
+                    commit.hexsha, message, status))
             if commit.hexsha in self._visitedCommits:
                 printCommitStatus("Already visited.")
                 continue
@@ -100,7 +127,8 @@ class Analyzer:
             else:
                 parent: Commit = commit.parents[0]
                 if graphServerLastCommit != parent.hexsha:
-                    printCommitStatus("Rewind to parent: {0}.".format(parent.hexsha))
+                    printCommitStatus(
+                        "Rewind to parent: {0}.".format(parent.hexsha))
                     # jumping to the parent commit first
                     await self._analyzeCommit(parent, graphServerLastCommit, CommitSeekingMode.Rewind)
                 # then go on with current commit
@@ -225,3 +253,17 @@ emptyAnalyzerObserver = _EmptyAnalyzerObserverType()
 """
 An AnalyzerObserver instance that does nothing in their notification methods.
 """
+
+
+class _ReadOnlySet(collections.abc.Set):
+    def __init__(self, underlyingSet: collections.abc.Set):
+        self._underlyingSet = underlyingSet
+
+    def __contains__(self, x):
+        return x in self._underlyingSet
+
+    def __len__(self):
+        return len(self._underlyingSet)
+
+    def __iter__(self):
+        return self._underlyingSet.__iter__()
