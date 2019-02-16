@@ -93,3 +93,5 @@ ENV/
 .ccls-cache
 /bin
 /bin-*
+.pytest_cache
+test/test_analytics/actualdump

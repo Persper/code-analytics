@@ -68,7 +68,7 @@ async def testFeatureBranch():
     analyzer = Analyzer(repoPath, graphServer, firstParentOnly=False)
     async with graphServer:
         analyzer.observer = GraphDumpAnalyzerObserver(
-            None,
+            os.path.join(testDataRoot, "baseline/feature_branch"),
             os.path.join(testDataRoot, "actualdump/feature_branch"))
         await analyzer.analyze()
 
