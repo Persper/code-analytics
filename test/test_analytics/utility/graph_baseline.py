@@ -35,8 +35,7 @@ def fixGraphDict(graphData: dict):
     if "nodes" in graphData:
         for id, attr in graphData["nodes"].items():
             if "history" in attr:
-                attr["history"] = dict((int(k), v)
-                                       for k, v in attr["history"].items())
+                attr["history"] = dict(attr["history"].items())
     return graphData
 
 

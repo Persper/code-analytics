@@ -13,7 +13,7 @@ from networkx import Graph
 from networkx.algorithms.isomorphism import is_isomorphic
 
 from persper.analytics.analyzer2 import Analyzer
-from persper.analytics.call_commit_graph import CallCommitGraph
+from persper.analytics.call_commit_graph import CallCommitGraph, CommitIdGenerators
 from persper.analytics.lsp_graph_server.ccls import CclsGraphServer
 from persper.util.path import root_path
 
@@ -43,13 +43,14 @@ def createCclsGraphServer():
     graphServer = CclsGraphServer(workspaceRoot, cacheRoot="./.ccls-cache",
                                   languageServerCommand=CCLS_COMMAND +
                                   (" -log-file=ccls.log" if DUMP_LOGS else ""),
-                                  dumpLogs=DUMP_LOGS)
+                                  dumpLogs=DUMP_LOGS,
+                                  graph=CallCommitGraph(commit_id_generator=CommitIdGenerators.fromComment))
     graphServer.reset_graph()
     return graphServer
 
 
 @pytest.mark.asyncio
-async def testFeatureBranch():
+async def testFeatureBranchFirstParent():
     repoPath = prepareRepo("test_feature_branch")
     graphServer = createCclsGraphServer()
     analyzer = Analyzer(repoPath, graphServer, firstParentOnly=True)
@@ -57,6 +58,18 @@ async def testFeatureBranch():
         analyzer.observer = GraphDumpAnalyzerObserver(
             os.path.join(testDataRoot, "baseline/feature_branch_first_parent"),
             os.path.join(testDataRoot, "actualdump/feature_branch_first_parent"))
+        await analyzer.analyze()
+
+
+@pytest.mark.asyncio
+async def testFeatureBranch():
+    repoPath = prepareRepo("test_feature_branch")
+    graphServer = createCclsGraphServer()
+    analyzer = Analyzer(repoPath, graphServer, firstParentOnly=False)
+    async with graphServer:
+        analyzer.observer = GraphDumpAnalyzerObserver(
+            None,
+            os.path.join(testDataRoot, "actualdump/feature_branch"))
         await analyzer.analyze()
 
 

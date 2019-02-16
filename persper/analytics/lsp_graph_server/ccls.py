@@ -12,6 +12,8 @@ from antlr4.FileStream import FileStream
 from jsonrpc.endpoint import Endpoint
 from jsonrpc.exceptions import JsonRpcException
 
+from persper.analytics.call_commit_graph import CallCommitGraph
+
 from . import LspClientGraphServer
 from .callgraph.builder import CallGraphBuilder
 from .callgraph.manager import CallGraphManager
@@ -24,7 +26,7 @@ _logger = logging.getLogger(__name__)
 
 
 class CclsInfo(LspContractObject):
-    def __init__(self, pendingIndexRequests: int, postIndexWorkItems:int, projectEntries: int):
+    def __init__(self, pendingIndexRequests: int, postIndexWorkItems: int, projectEntries: int):
         self.pendingIndexRequests = pendingIndexRequests
         self.postIndexWorkItems = postIndexWorkItems
         self.projectEntries = projectEntries
@@ -35,8 +37,8 @@ class CclsInfo(LspContractObject):
     @staticmethod
     def fromDict(d: dict):
         return CclsInfo(int(d["pipeline"]["pendingIndexRequests"]),
-        0,
-        int(d["project"]["entries"]))
+                        0,
+                        int(d["project"]["entries"]))
 
 
 class CclsLspServerStub(LspServerStub):
@@ -103,7 +105,7 @@ class CclsCallGraphBuilder(CallGraphBuilder):
         if not isinstance(lspClient, CclsLspClient):
             raise TypeError("lspClient should be an instance of CclsLspClient.")
         super().__init__(lspClient)
-        self._lspClient:CclsLspClient
+        self._lspClient: CclsLspClient
 
     def createLexer(self, fileStream: FileStream):
         return CPP14Lexer(fileStream)
@@ -120,7 +122,7 @@ class CclsCallGraphBuilder(CallGraphBuilder):
     async def _waitForJobs(self):
         lastJobs = None
         while True:
-            info:CclsInfo = await self._lspClient.server.cclsInfo()
+            info: CclsInfo = await self._lspClient.server.cclsInfo()
             curJobs = info.pendingIndexRequests + info.postIndexWorkItems
             if curJobs != lastJobs:
                 _logger.debug("Server jobs: %d.", curJobs)
@@ -158,8 +160,10 @@ class CclsGraphServer(LspClientGraphServer):
     def __init__(self, workspaceRoot: str, cacheRoot: str = None,
                  languageServerCommand: Union[str, List[str]] = None,
                  dumpLogs: bool = False,
-                 dumpGraphs: bool = False):
-        super().__init__(workspaceRoot, languageServerCommand=languageServerCommand, dumpLogs=dumpLogs, dumpGraphs=dumpGraphs)
+                 dumpGraphs: bool = False,
+                 graph: CallCommitGraph = None):
+        super().__init__(workspaceRoot, languageServerCommand=languageServerCommand,
+                         dumpLogs=dumpLogs, dumpGraphs=dumpGraphs, graph=graph)
         self._cacheRoot = Path(cacheRoot).resolve() if cacheRoot else self._workspaceRoot.joinpath(".ccls-cache")
         self._c_requireScopeDefinitionMatch = True
 

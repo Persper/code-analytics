@@ -15,6 +15,7 @@ class Analyzer:
         self._repositoryRoot = repositoryRoot
         self._graphServer = graphServer
         self._repo = Repo(repositoryRoot)
+        self._originCommit: Commit = None
         self._terminalCommit: Commit = self._repo.rev_parse(terminalCommit)
         self._firstParentOnly = firstParentOnly
         self._visitedCommits = set()
@@ -32,8 +33,39 @@ class Analyzer:
         self._observer = value or emptyAnalyzerObserver
 
     @property
+    def originCommit(self):
+        """
+        Gets/sets the first commit to visit. (exclusive)
+        Use None to start visiting from the first commit.
+        """
+        return self._originCommit
+
+    @originCommit.setter
+    def originCommit(self, value: Union[Commit, str]):
+        self._originCommit = self._repo.rev_parse(value) if value else None
+
+    @property
     def terminalCommit(self):
+        """
+        Gets/sets the last commit to visit. (inclusive)
+        """
         return self._terminalCommit
+
+    @terminalCommit.setter
+    def terminalCommit(self, value: Union[Commit, str]):
+        self._terminalCommit = self._repo.rev_parse(value)
+
+    @property
+    def firstParentOnly(self):
+        """
+        Whether to only visit each commit's first parent.
+        This is useful if you are only interested in the topical branch.
+        """
+        return self._firstParentOnly
+
+    @firstParentOnly.setter
+    def firstParentOnly(self, value: bool):
+        self._firstParentOnly = value
 
     @property
     def graph(self):
@@ -41,7 +73,10 @@ class Analyzer:
 
     async def analyze(self):
         graphServerLastCommit = EMPTY_TREE_SHA
-        for commit in self._repo.iter_commits(self._terminalCommit,
+        commitSpec = self._terminalCommit
+        if self._originCommit:
+            commitSpec = self._originCommit.hexsha + ".." + self._terminalCommit.hexsha
+        for commit in self._repo.iter_commits(commitSpec,
                                               topo_order=True, reverse=True, first_parent=self._firstParentOnly):
             def printCommitStatus(status: str):
                 message = commit.message.strip()[:32]
@@ -74,7 +109,7 @@ class Analyzer:
             graphServerLastCommit = commit.hexsha
 
     async def _analyzeCommit(self, commit: Union[Commit, str], parentCommit: Union[Commit, str],
-        seekingMode: CommitSeekingMode):
+                             seekingMode: CommitSeekingMode):
         """
         parentCommit can be None.
         """

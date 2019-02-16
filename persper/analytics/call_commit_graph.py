@@ -14,13 +14,29 @@ def normalize(devranks):
     return normalized_devranks
 
 
+class CommitIdGenerators:
+    @staticmethod
+    def fromOrdinal(ordinal: int, hexsha: str, message: str):
+        return ordinal
+
+    @staticmethod
+    def fromComment(ordinal: int, hexsha: str, message: str):
+        return message.strip()
+
+    @staticmethod
+    def fromHexsha(ordinal: int, hexsha: str, message: str):
+        return hexsha
+
+
 class CallCommitGraph:
 
-    def __init__(self, node_link_data=None):
+    def __init__(self, node_link_data=None, commit_id_generator=CommitIdGenerators.fromOrdinal):
         if node_link_data:
             self._digraph = json_graph.node_link_graph(node_link_data)
         else:
             self._digraph = nx.DiGraph(commitList=[])
+        self._commit_id_generator = commit_id_generator
+        self._current_commit_id = None
 
     # Read-only access
     def nodes(self, data=False):
@@ -36,7 +52,9 @@ class CallCommitGraph:
         return self._digraph.graph['commitList']
 
     def add_commit(self, hexsha, author_name, author_email, commit_message):
+        self._current_commit_id = self._commit_id_generator(self._cur_cindex(), hexsha, commit_message)
         self._digraph.graph['commitList'].append({
+            'id': self._current_commit_id,
             'hexsha': hexsha, 'authorName': author_name,
             'authorEmail': author_email, 'message': commit_message
         })
@@ -57,18 +75,16 @@ class CallCommitGraph:
     # add_node must be called on source and target first
     def add_edge(self, source, target):
         self._digraph.add_edge(source, target,
-                               addedBy=self._cur_cindex(),
+                               addedBy=self._current_commit_id,
                                weight=None)
 
     def update_node_history(self, node, size):
-        # Use current commit index
-        cc_idx = self._cur_cindex()
         node_history = self._get_node_history(node)
         # A commit might update a node's history more than once
-        if cc_idx in node_history:
-            node_history[cc_idx] += size
+        if self._current_commit_id in node_history:
+            node_history[self._current_commit_id] += size
         else:
-            node_history[cc_idx] = size
+            node_history[self._current_commit_id] = size
 
     # read/write access to node history are thourgh this function
     def _get_node_history(self, node):

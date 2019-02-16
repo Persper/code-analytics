@@ -26,20 +26,22 @@ GO_FILENAME_REGEXES = [
     r'.+\.go$'
 ]
 
-class CommitSeekingMode:
-    NormalForward = 0,
-    MergeCommit = 1,
+
+class CommitSeekingMode(Enum):
+    NormalForward = 0
+    MergeCommit = 1
     Rewind = 2
 
 
 class GraphServer(ABC):
 
-    @abstractmethod
     def register_commit(self, hexsha, author_name, author_email,
                         commit_message):
         """
+        Deprecated. Use start_commit instead.
         :return: a status code, success or failure
         """
+        raise NotImplementedError()
 
     @abstractmethod
     def update_graph(self, old_filename: str, old_src: str,
