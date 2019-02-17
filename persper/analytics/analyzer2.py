@@ -97,17 +97,21 @@ class Analyzer:
         """
         return self._s_visitedCommits
 
-    async def analyze(self):
+    async def analyze(self, maxAnalyzedCommits=1000):
         graphServerLastCommit = EMPTY_TREE_SHA
         commitSpec = self._terminalCommit
         if self._originCommit:
             commitSpec = self._originCommit.hexsha + ".." + self._terminalCommit.hexsha
+        analyzedCommits = 0
         for commit in self._repo.iter_commits(commitSpec,
                                               topo_order=True, reverse=True, first_parent=self._firstParentOnly):
             def printCommitStatus(status: str):
                 message = commit.message.strip()[:32]
-                print("Commit {0} ({1}): {2}".format(
-                    commit.hexsha, message, status))
+                # note the commit # here only indicates the ordinal of current commit in current analysis session
+                print("Commit #{0} {1} ({2}): {3}".format(analyzedCommits, commit.hexsha, message, status))
+
+            if maxAnalyzedCommits and analyzedCommits > maxAnalyzedCommits:
+                print("Max analyzed commits reached.")
             if commit.hexsha in self._visitedCommits:
                 printCommitStatus("Already visited.")
                 continue
@@ -135,6 +139,7 @@ class Analyzer:
                 printCommitStatus("Going forward.")
                 await self._analyzeCommit(commit, parent, CommitSeekingMode.NormalForward)
             graphServerLastCommit = commit.hexsha
+            analyzedCommits += 1
 
     async def _analyzeCommit(self, commit: Union[Commit, str], parentCommit: Union[Commit, str],
                              seekingMode: CommitSeekingMode):

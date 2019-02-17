@@ -84,6 +84,7 @@ class LspClientGraphServer(GraphServer):
 
     def start_commit(self, hexsha: str, seeking_mode: CommitSeekingMode, author_name: str,
                      author_email: str, commit_message: str):
+        _logger.info("Start commit: %s %s (%s)", hexsha, commit_message[:32].strip(), seeking_mode)
         self._commitSeekingMode = seeking_mode
         if seeking_mode != CommitSeekingMode.Rewind:
             self._ccgraph.add_commit(hexsha, author_name, author_email, commit_message)
