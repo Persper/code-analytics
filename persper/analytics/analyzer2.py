@@ -110,8 +110,9 @@ class Analyzer:
                 # note the commit # here only indicates the ordinal of current commit in current analysis session
                 print("Commit #{0} {1} ({2}): {3}".format(analyzedCommits, commit.hexsha, message, status))
 
-            if maxAnalyzedCommits and analyzedCommits > maxAnalyzedCommits:
+            if maxAnalyzedCommits and analyzedCommits >= maxAnalyzedCommits:
                 print("Max analyzed commits reached.")
+                break
             if commit.hexsha in self._visitedCommits:
                 printCommitStatus("Already visited.")
                 continue
