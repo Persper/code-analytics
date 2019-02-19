@@ -18,7 +18,12 @@ To try out the graph server backed by LSP, especially the [ccls](https://github.
 * Open a shell under `/test/test_analytics`, run
 
     ```powershell
+    # run all of the tests
     pipenv run pytest test_analyzer_lsp_ccls.py
+    # or run a single test
+    pipenv run pytest test_analyzer_lsp_ccls.py::testFeatureBranch
     ```
 
   * The test results are compared against baseline (by commit) in `/test/test_analytics/baseline`.
+
+  * If there are assertion errors during testing, you can see the actual run result in `/test/test_analytics/actualdump`.
