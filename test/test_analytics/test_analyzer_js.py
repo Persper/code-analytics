@@ -1,6 +1,7 @@
 import os
 import time
 import pytest
+import shutil
 import subprocess
 from persper.analytics.graph_server import JS_FILENAME_REGEXES
 from persper.analytics.graph_server_http import GraphServerHttp
@@ -27,9 +28,12 @@ def az():
     test_src_path = os.path.join(root_path, 'test/js_test_repo')
     server_addr = 'http://localhost:%d' % server_port
 
-    if not os.path.isdir(repo_path):
-        cmd = '{} {}'.format(script_path, test_src_path)
-        subprocess.call(cmd, shell=True)
+    # Always use latest source to create test repo
+    if os.path.exists(repo_path):
+        shutil.rmtree(repo_path)
+
+    cmd = '{} {}'.format(script_path, test_src_path)
+    subprocess.call(cmd, shell=True)
 
     return Analyzer(repo_path, GraphServerHttp(server_addr, JS_FILENAME_REGEXES))
 

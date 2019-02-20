@@ -1,6 +1,7 @@
 import os
 import pytest
 import subprocess
+import shutil
 from persper.analytics.c import CGraphServer
 from persper.analytics.analyzer import Analyzer
 from persper.analytics.graph_server import C_FILENAME_REGEXES
@@ -13,9 +14,13 @@ def az():
     repo_path = os.path.join(root_path, 'repos/test_feature_branch')
     script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
     test_src_path = os.path.join(root_path, 'test/test_feature_branch')
-    if not os.path.isdir(repo_path):
-        cmd = '{} {}'.format(script_path, test_src_path)
-        subprocess.call(cmd, shell=True)
+
+    # Always use latest source to create test repo
+    if os.path.exists(repo_path):
+        shutil.rmtree(repo_path)
+
+    cmd = '{} {}'.format(script_path, test_src_path)
+    subprocess.call(cmd, shell=True)
 
     return Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES))
 
