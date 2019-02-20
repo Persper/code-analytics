@@ -3,13 +3,15 @@ import time
 import pytest
 import shutil
 import subprocess
+import tempfile
 from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from persper.analytics.go import GoGraphServer
 from persper.analytics.analyzer import Analyzer
 from persper.util.path import root_path
 
 # TODO: Use a port other than the default 8080 in case of collision
-server_port = 8080
+server_port = 9089
+server_addr = ':%d' % server_port
 
 
 @pytest.fixture(scope='module')
@@ -35,41 +37,82 @@ def az():
 
     return Analyzer(repo_path, GoGraphServer(server_addr, GO_FILENAME_REGEXES))
 
+def build_graph_server():
+    temp_dir = tempfile.gettempdir()
+    graph_server_src = os.path.join(temp_dir, 'merico', 'src', 'graph-server')
+    graph_server_bin = os.path.join(temp_dir, 'merico', 'bin', 'graphserver')
+    if not os.path.isdir(graph_server_src):
+        ret = subprocess.call(
+            ["git", "clone", "git@gitlab.com:meri.co/golang/graph-server.git", graph_server_src])
+        if ret != 0:
+            print("git clone failed")
+            exit(1)
+        ret = subprocess.call(
+            ["git", "checkout", "-b", "graphserver-ra-v0.2.3", "origin/graphserver-ra-v0.2.3"],
+            cwd=graph_server_src)
+        if ret != 0:
+            print("git checkout failed")
+            exit(1)
+    print("graph server src location:", graph_server_src)
+    ret = subprocess.call(["git", "pull"], cwd=graph_server_src)
+    if ret != 0:
+        print("git pull failed")
+        exit(1)
+    ret = subprocess.call(
+        ["go", "build", "-o", graph_server_bin, "gitlab.com/meri.co/devrank/golang/gs/app/graphserver"],
+        cwd=graph_server_src)
+    if ret != 0:
+        print("go build failed")
+        exit(1)
+    print("graph server bin location:", graph_server_bin)
+    return graph_server_bin
+
+
+def run_graph_server(graph_server_bin):
+    p = subprocess.Popen([graph_server_bin, "-addr", server_addr])
+    print("graph server pid:", p.pid)
+    return p
+
 
 def test_analzyer_go(az):
-    az._graph_server.reset_graph()
-    az.analyze()
-    ccgraph = az.get_graph()
+    graph_server_bin = build_graph_server()
+    graph_server_proc = run_graph_server(graph_server_bin)
 
-    history_truth = {
-        'A': {'printInfo': 0,
-              'main': 10},
-        'B': {'printInfo': 1,
-              'main': 8, 
-              "invoke":3}
-    }
+    try:
+        az._graph_server.reset_graph()
+        az.analyze()
+        ccgraph = az.get_graph()
 
-    commits = ccgraph.commits()
-    for func, data in ccgraph.nodes(data=True):
-        history = data['history']
-        for cindex, csize in history.items():
-            commit_message = commits[int(cindex)]['message']
-            assert(csize == history_truth[commit_message.strip()][func])
+        history_truth = {
+            'A': {'printInfo': 0,
+                'main': 10},
+            'B': {'printInfo': 1,
+                'main': 8, 
+                "invoke":3}
+        }
 
-    edges_added_by_A = set([
-        ('main', 'printInfo'),
-        ('printInfo', 'Println'),
-    ])
 
-    edges_added_by_B = set([
-        ('invoke', 'printInfo'),
-        ('main', 'invoke'),
-    ])
+        commits = ccgraph.commits()
+        for func, data in ccgraph.nodes(data=True):
+            history = data['history']
+            for cindex, csize in history.items():
+                commit_message = commits[int(cindex)]['message']
+                assert (csize == history_truth[commit_message.strip()][func])
 
-    edges_added_by_C = set([
-        ('Abs', 'a'),
-        ('funcB', 'funcA')
-    ])
+        edges_added_by_A = set([
+            ('main', 'printInfo'),
+            ('printInfo', 'Println'),
+        ])
 
-    all_edges = edges_added_by_A.union(edges_added_by_B)
-    assert(set(az._graph_server.get_graph().edges()) == all_edges)
+        edges_added_by_B = set([
+            ('invoke', 'printInfo'),
+            ('main', 'invoke'),
+        ])
+
+
+        all_edges = edges_added_by_A.union(edges_added_by_B)
+        assert (set(az._graph_server.get_graph().edges()) == all_edges)
+
+    finally:
+        graph_server_proc.terminate()
+
