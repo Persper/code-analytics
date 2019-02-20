@@ -21,9 +21,9 @@ def az():
           script_path - A string, path to the repo creator script
         test_src_path - A string, path to the dir to be passed to repo creator
     """
-    repo_path = os.path.join(root_path, 'repos/go_test_repo')
+    repo_path = os.path.join(root_path, 'repos/go_test_repo_2')
     script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
-    test_src_path = os.path.join(root_path, 'test/go_test_repo')
+    test_src_path = os.path.join(root_path, 'test/go_test_repo_2')
     server_addr = 'http://localhost:%d' % server_port
 
     # Always use latest source to create test repo
@@ -42,21 +42,11 @@ def test_analzyer_go(az):
     ccgraph = az.get_graph()
 
     history_truth = {
-        'D': {'Abs': 6,
-              'funcA': 0,
-              'main': 8,
-              "Absp": 3},
-        'C': {'Abs': 5,
-              'funcA': 0,
-              'funcB': 1,
-              'main': 0},
-        'B': {'Abs': 3,
-              'funcA': 0,
-              'funcB': 3,
-              'main': 5},
-        'A': {'Abs': 3,
-              'funcA': 3,
-              'main': 6}
+        'A': {'printInfo': 0,
+              'main': 10},
+        'B': {'printInfo': 1,
+              'main': 8, 
+              "invoke":3}
     }
 
     commits = ccgraph.commits()
@@ -67,18 +57,13 @@ def test_analzyer_go(az):
             assert(csize == history_truth[commit_message.strip()][func])
 
     edges_added_by_A = set([
-        ('Abs', 'Sqrt'),
-        ('funcA', 'Println'),
-        ('main', 'a'),
-        ('main', 'Println'),
-        ('main', 'Abs'),
+        ('main', 'printInfo'),
+        ('printInfo', 'Println'),
     ])
 
     edges_added_by_B = set([
-        ('Abs', 'funcA'),
-        ('funcB', 'Println'),
-        ('main', 'b'),
-        ('main', 'c'),
+        ('invoke', 'printInfo'),
+        ('main', 'invoke'),
     ])
 
     edges_added_by_C = set([
@@ -86,11 +71,5 @@ def test_analzyer_go(az):
         ('funcB', 'funcA')
     ])
 
-    edges_added_by_D = set([
-        ("Absp", "Sqrt"),
-        ("main", "Absp")
-    ])
-
-    print(set(az._graph_server.get_graph().edges()))
-    all_edges = edges_added_by_A.union(edges_added_by_B).union(edges_added_by_C).union(edges_added_by_D)
+    all_edges = edges_added_by_A.union(edges_added_by_B)
     assert(set(az._graph_server.get_graph().edges()) == all_edges)
