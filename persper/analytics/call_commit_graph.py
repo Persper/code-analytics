@@ -52,7 +52,7 @@ class CallCommitGraph:
         return self._digraph.graph['commitList']
 
     def add_commit(self, hexsha, author_name, author_email, commit_message):
-        self._current_commit_id = self._commit_id_generator(self._cur_cindex(), hexsha, commit_message)
+        self._current_commit_id = self._commit_id_generator(self._next_cindex(), hexsha, commit_message)
         self._digraph.graph['commitList'].append({
             'id': self._current_commit_id,
             'hexsha': hexsha, 'authorName': author_name,
@@ -62,6 +62,9 @@ class CallCommitGraph:
     # The index of the commit being analyzed
     def _cur_cindex(self):
         return len(self.commits()) - 1
+
+    def _next_cindex(self):
+        return self._cur_cindex() + 1
 
     def reset(self):
         self._digraph = nx.DiGraph(commitList=[])
