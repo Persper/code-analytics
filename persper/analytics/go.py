@@ -42,7 +42,7 @@ class GoGraphServer(GraphServer):
         r = requests.get(graph_url)
         graph_data = r.json()
         graph_data['directed'] = True
-        graph_data['multigraph'] = True
+        graph_data['multigraph'] = False
         return CallCommitGraph(graph_data)
 
     def reset_graph(self):
