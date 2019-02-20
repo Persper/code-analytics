@@ -25,8 +25,9 @@ def az():
     return Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES))
 
 
-def test_az_basic(az):
-    az.analyze(from_beginning=True)
+@pytest.mark.asyncio
+async def test_az_basic(az):
+    await az.analyze(from_beginning=True)
     ccgraph = az.get_graph()
 
     history_truth = {
