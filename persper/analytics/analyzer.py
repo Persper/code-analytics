@@ -63,7 +63,7 @@ class Analyzer:
         self._ri = RepoIterator(repo_path)
         self._ccgraph = None
 
-    def analyze(self, repo_url,
+    def analyze(self, repo_url='Unknown',
                 pickle_path=None,
                 rev=None,
                 from_beginning=False,
@@ -174,7 +174,7 @@ class Analyzer:
             fname = repo_name + '-' + phase + '-' + str(idx) + '.pickle'
             self.save(fname)
 
-    def update_estimated_delay(self, repo_url, totoal_commits, analyzed_commits):
+    def update_estimated_delay(self, repo_url, total_commits, analyzed_commits):
         redis_conn = Redis()
-        estimation = 1.0 * analyzed_commits / totoal_commits
+        estimation = 0.8 * (total_commits - analyzed_commits)
         redis_conn.hmset(repo_url, {'estimation': estimation})

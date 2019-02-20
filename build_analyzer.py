@@ -14,8 +14,6 @@ def build_analyzer(repo_url, pickle_path, repo_path):
 
 
 def basic_stats(pickle_path, alpha=0.85, show_merge=True):
-    # Todo: Fake pickle for quick test
-    pickle_path = '/Users/zen/code-analytics/notebooks/bitcoin-finished-0.pickle'
     az = pickle.load(open(pickle_path, 'rb'))
 
     commit_share = az.get_graph().commit_devranks(alpha, black_set=[])
@@ -74,8 +72,6 @@ def share_distribution(commits, commit_share):
 
 
 def developer_profile(pickle_path, alpha=0.85, show_merge=True):
-    # Todo: Fake pickle for quick test
-    pickle_path = '/Users/zen/code-analytics/notebooks/bitcoin-finished-0.pickle'
     dev_share = {}
     az = pickle.load(open(pickle_path, 'rb'))
 
