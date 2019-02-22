@@ -18,6 +18,7 @@ pydot = "*"
 ipykernel = "*"
 matplotlib = "*"
 redis = "*"
+naked = "*"
 
 [dev-packages]
 

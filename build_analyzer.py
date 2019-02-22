@@ -1,17 +1,44 @@
+import sys
+import json
 import pickle
 from datetime import datetime, timedelta
+from Naked.toolshed.shell import muterun_rb
 from persper.analytics.cpp import CPPGraphServer
 from persper.analytics.analyzer import Analyzer
 from persper.analytics.graph_server import CPP_FILENAME_REGEXES
 
 ALPHA = 0.85
+LANGUAGE_LIST = ['C', 'C++']
 
 
 def build_analyzer(repo_url, pickle_path, repo_path):
-    az = Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES))
-    az.analyze(repo_url, pickle_path, from_beginning=True, into_branches=True)
-    return pickle_path
 
+    linguist = check_linguist(repo_path)
+    major_language = max(linguist, key=linguist.get)
+
+    # Fake data for testing
+    major_language = 'C++'
+    if major_language in LANGUAGE_LIST:
+        az = Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES))
+        az.analyze(repo_url, pickle_path, from_beginning=True, into_branches=True)
+        return pickle_path
+    else:
+        return None
+
+
+def check_linguist(repo_path):
+    response = muterun_rb('tools/linguist.rb', repo_path)
+
+    if response.exitcode == 0:
+        lang_dict = json.loads(response.stdout)
+        total_lines = sum(lang_dict.values())
+
+        for k in lang_dict.keys():
+            lang_dict[k] = lang_dict[k] * 1.0 / total_lines
+
+        return lang_dict
+    else:
+        return None
 
 def basic_stats(pickle_path, alpha=0.85, show_merge=True):
     az = pickle.load(open(pickle_path, 'rb'))
