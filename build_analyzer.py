@@ -1,4 +1,5 @@
 import sys
+import os
 import json
 import pickle
 from datetime import datetime, timedelta
@@ -11,19 +12,20 @@ ALPHA = 0.85
 LANGUAGE_LIST = ['C', 'C++']
 
 
-def build_analyzer(repo_url, pickle_path, repo_path):
+def build_analyzer(repo_url, repo_path, original_pickle_path, new_pickle_path):
 
     linguist = check_linguist(repo_path)
     major_language = max(linguist, key=linguist.get)
+    print('The major language is: ', major_language)
 
-    # Fake data for testing
-    major_language = 'C++'
     if major_language in LANGUAGE_LIST:
-        az = Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES))
-        az.analyze(repo_url, pickle_path, from_beginning=True, into_branches=True)
-        return pickle_path
-    else:
-        return None
+        # Todo: Choose the right server to do analyzing based on linguist
+        if os.path.exists(original_pickle_path):
+            az = pickle.load(open(original_pickle_path, 'rb'))
+            az.analyze(repo_url, new_pickle_path, continue_iter=True, end_commit_sha='master', into_branches=True)
+        else:
+            az = Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES))
+            az.analyze(repo_url, new_pickle_path, from_beginning=True, into_branches=True)
 
 
 def check_linguist(repo_path):
@@ -38,7 +40,8 @@ def check_linguist(repo_path):
 
         return lang_dict
     else:
-        return None
+        print('Analyzing Language Error')
+        return {}
 
 def basic_stats(pickle_path, alpha=0.85, show_merge=True):
     az = pickle.load(open(pickle_path, 'rb'))
