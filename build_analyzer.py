@@ -29,7 +29,8 @@ def build_analyzer(repo_url, repo_path, original_pickle_path, new_pickle_path):
 
 
 def check_linguist(repo_path):
-    response = muterun_rb('tools/linguist.rb', repo_path)
+    root_path = os.path.dirname(os.path.abspath(__file__))
+    response = muterun_rb(os.path.join(root_path, 'tools/linguist.rb'), repo_path)
 
     if response.exitcode == 0:
         lang_dict = json.loads(response.stdout)
