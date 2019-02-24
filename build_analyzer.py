@@ -80,10 +80,9 @@ def share_distribution(commits, commit_share):
     shares = {}
     for commit in commits:
         date = datetime.fromtimestamp(commit.authored_date).date()
+        share_value = 0.0
         if commit.hexsha in commit_share:
             share_value = commit_share[commit.hexsha]
-        else:
-            share_value = 0.0
 
         if date in shares:
             shares[date] += share_value
@@ -91,7 +90,6 @@ def share_distribution(commits, commit_share):
             shares[date] = share_value
 
     shares = dict(sorted(shares.items()))
-
     init_commit_date = list(shares.keys())[0]
     last_commit_date = list(shares.keys())[-1]
 
