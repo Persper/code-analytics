@@ -20,7 +20,7 @@ def build_analyzer(repo_url, repo_path, original_pickle_path, new_pickle_path):
 
     if major_language in LANGUAGE_LIST:
         # Todo: Choose the right server to do analyzing based on linguist
-        if os.path.exists(original_pickle_path):
+        if original_pickle_path and os.path.exists(original_pickle_path):
             az = pickle.load(open(original_pickle_path, 'rb'))
             az.analyze(repo_url, new_pickle_path, continue_iter=True, end_commit_sha='master', into_branches=True)
         else:
