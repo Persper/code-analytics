@@ -79,12 +79,16 @@ def daterange(start_date, end_date):
 def share_distribution(commits, commit_share):
     shares = {}
     for commit in commits:
+        date = datetime.fromtimestamp(commit.authored_date).date()
         if commit.hexsha in commit_share:
-            date = datetime.fromtimestamp(commit.authored_date).date()
-            if date in shares:
-                shares[date] += commit_share[commit.hexsha]
-            else:
-                shares[date] = commit_share[commit.hexsha]
+            share_value = commit_share[commit.hexsha]
+        else:
+            share_value = 0.0
+
+        if date in shares:
+            shares[date] += share_value
+        else:
+            shares[date] = share_value
 
     shares = dict(sorted(shares.items()))
 
