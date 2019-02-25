@@ -177,4 +177,4 @@ class Analyzer:
     def update_estimated_delay(self, repo_url, total_commits, analyzed_commits):
         redis_conn = Redis()
         estimation = 0.8 * (total_commits - analyzed_commits)
-        redis_conn.hmset(repo_url, {'estimation': estimation})
+        redis_conn.hmset(repo_url, {'estimated_delay': estimation})
