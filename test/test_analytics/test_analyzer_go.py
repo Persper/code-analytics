@@ -46,7 +46,7 @@ def build_graph_server():
             print("git clone failed")
             exit(1)
         ret = subprocess.call(
-            ["git", "checkout", "-b", "graphserver-ra-v0.2.3", "origin/graphserver-ra-v0.2.3"],
+            ["git", "checkout", "-b", "fix-patch", "fix-patch-parser"],
             cwd=graph_server_src)
         if ret != 0:
             print("git checkout failed")
@@ -57,7 +57,7 @@ def build_graph_server():
         print("git pull failed")
         exit(1)
     ret = subprocess.call(
-        ["go", "build", "-o", graph_server_bin, "gitlab.com/meri.co/devrank/golang/gs/app/graphserver"],
+        ["go", "build", "-o", graph_server_bin, "gitlab.com/meri.co/golang/gs/app/graphserver"],
         cwd=graph_server_src)
     if ret != 0:
         print("go build failed")
@@ -82,21 +82,22 @@ def test_analzyer_go(az):
         ccgraph = az.get_graph()
 
         history_truth = {
-            'D': {'Abs': 6,
-                'funcA': 0,
-                'main': 8,
-                "Absp": 3},
-            'C': {'Abs': 5,
-                'funcA': 0,
-                'funcB': 1,
-                'main': 0},
-            'B': {'Abs': 3,
-                'funcA': 0,
-                'funcB': 3,
-                'main': 5},
-            'A': {'Abs': 3,
-                'funcA': 3,
-                'main': 6}
+            'D': {'main.go:Vertex:Abs': 6,
+                'main.go::funcA': 0,
+                'main.go::main': 8,
+                'main.go::funcB': 5, ####
+                "main.go:Vertex:Absp": 3},
+            'C': {'main.go:Vertex:Abs': 5,
+                'main.go::funcA': 0,
+                'main.go::funcB': 1,
+                'main.go::main': 0},
+            'B': {'main.go:Vertex:Abs': 3,
+                'main.go::funcA': 0,
+                'main.go::funcB': 3,
+                'main.go::main': 5},
+            'A': {'main.go:Vertex:Abs': 3,
+                'main.go::funcA': 3,
+                'main.go::main': 6}
         }
 
 
@@ -105,33 +106,25 @@ def test_analzyer_go(az):
             history = data['history']
             for cindex, csize in history.items():
                 commit_message = commits[int(cindex)]['message']
+                print(func)
                 assert (csize == history_truth[commit_message.strip()][func])
 
         edges_added_by_A = set([
-            ('Abs', 'Sqrt'),
-            ('funcA', 'Println'),
-            ('main', 'a'),
-            ('main', 'Println'),
-            ('main', 'Abs'),
+            ('main.go::main', 'main.go:Vertex:Abs'),
         ])
 
         edges_added_by_B = set([
-            ('Abs', 'funcA'),
-            ('funcB', 'Println'),
-            ('main', 'b'),
-            ('main', 'c'),
+            ('main.go:Vertex:Abs', 'main.go::funcA'),
         ])
 
         edges_added_by_C = set([
-            ('Abs', 'a'),
-            ('funcB', 'funcA')
+            ('main.go::funcB', 'main.go::funcA')
         ])
 
         edges_added_by_D = set([
-            ("Absp", "Sqrt"),
-            ("main", "Absp")
+            ("main.go::main", "main.go:Vertex:Absp")
         ])
-
+        print(set(az._graph_server.get_graph().edges()))
         all_edges = edges_added_by_A.union(edges_added_by_B).union(edges_added_by_C).union(edges_added_by_D)
         assert (set(az._graph_server.get_graph().edges()) == all_edges)
 

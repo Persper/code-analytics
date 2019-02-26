@@ -48,7 +48,7 @@ def build_graph_server():
             print("git clone failed")
             exit(1)
         ret = subprocess.call(
-            ["git", "checkout", "-b", "graphserver-ra-v0.2.3", "origin/graphserver-ra-v0.2.3"],
+            ["git", "checkout", "-b", "fix-patch", "fix-patch-parser"],
             cwd=graph_server_src)
         if ret != 0:
             print("git checkout failed")
@@ -59,7 +59,7 @@ def build_graph_server():
         print("git pull failed")
         exit(1)
     ret = subprocess.call(
-        ["go", "build", "-o", graph_server_bin, "gitlab.com/meri.co/devrank/golang/gs/app/graphserver"],
+        ["go", "build", "-o", graph_server_bin, "gitlab.com/meri.co/golang/gs/app/graphserver"],
         cwd=graph_server_src)
     if ret != 0:
         print("go build failed")
@@ -84,11 +84,13 @@ def test_analzyer_go(az):
         ccgraph = az.get_graph()
 
         history_truth = {
-            'A': {'printInfo': 0,
-                'main': 10},
-            'B': {'printInfo': 1,
-                'main': 8, 
-                "invoke":3}
+            'A': {'main.go:cat:printInfo': 3,
+                'main.go:dog:printInfo': 3,
+                'main.go::main': 10},
+            'B': {'main.go:dog:printInfo': 2,
+                'main.go::main': 13, 
+                "main.go::invoke":3,
+                'main.go:cat:printInfo': 0}
         }
 
 
@@ -100,13 +102,15 @@ def test_analzyer_go(az):
                 assert (csize == history_truth[commit_message.strip()][func])
 
         edges_added_by_A = set([
-            ('main', 'printInfo'),
-            ('printInfo', 'Println'),
+            ('main.go::main', 'main.go:dog:printInfo'),
+            ('main.go::main', 'main.go:cat:printInfo'),
         ])
 
         edges_added_by_B = set([
-            ('invoke', 'printInfo'),
-            ('main', 'invoke'),
+            ('main.go::main', 'main.go::invoke'),
+            ('main.go::invoke', 'main.go:cat:printInfo'),
+            ('main.go::invoke', 'main.go:dog:printInfo')
+
         ])
 
 

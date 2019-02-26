@@ -49,7 +49,7 @@ def build_graph_server():
             print("git clone failed")
             exit(1)
         ret = subprocess.call(
-            ["git", "checkout", "-b", "graphserver-ra-v0.2.3", "origin/graphserver-ra-v0.2.3"],
+            ["git", "checkout", "-b", "fix-patch", "fix-patch-parser"],
             cwd=graph_server_src)
         if ret != 0:
             print("git checkout failed")
@@ -60,7 +60,7 @@ def build_graph_server():
         print("git pull failed")
         exit(1)
     ret = subprocess.call(
-        ["go", "build", "-o", graph_server_bin, "gitlab.com/meri.co/devrank/golang/gs/app/graphserver"],
+        ["go", "build", "-o", graph_server_bin, "gitlab.com/meri.co/golang/gs/app/graphserver"],
         cwd=graph_server_src)
     if ret != 0:
         print("go build failed")
@@ -87,17 +87,17 @@ def test_analzyer_go(az):
 
         history_truth = {
             'B': {
-                'TestAdd1': 0,
-                'Add': 0,
-                'TestSqrt1': 0,
-                'Sqrt': 0,
-                'main': 41,
-                'Usage': 4},
+                'calcproj/src/simplemath/add_test.go::TestAdd1': 0,
+                'calcproj/src/simplemath/add.go::Add': 0,
+                'calcproj/src/simplemath/sqrt_test.go::TestSqrt1': 0,
+                'calcproj/src/simplemath/sqrt.go::Sqrt': 0,
+                'calcproj/src/calc/calc.go::main': 41,
+                'calcproj/src/calc/calc.go::Usage': 4},
             'A': {
-                'TestAdd1': 7,
-                'Add': 3,
-                'TestSqrt1': 7,
-                'Sqrt': 4} #### maybe 3
+                'calcproj/src/simplemath/add_test.go::TestAdd1': 7,
+                'calcproj/src/simplemath/add.go::Add': 3,
+                'calcproj/src/simplemath/sqrt_test.go::TestSqrt1': 7,
+                'calcproj/src/simplemath/sqrt.go::Sqrt': 4} #### maybe 3
         }
 
 
@@ -109,24 +109,15 @@ def test_analzyer_go(az):
                 assert (csize == history_truth[commit_message.strip()][func])
 
         edges_added_by_A = set([
-            ('TestSqrt1', 'Sqrt'),
-            ('TestAdd1', 'Add'),
-            ('TestSqrt1','Errorf'),
-            ('Sqrt','float64'),
-            ('TestAdd1','Errorf'),
-            ('Sqrt', 'int'),
-            ('Sqrt', 'Sqrt'),
+            ('calcproj/src/simplemath/sqrt_test.go::TestSqrt1', 'calcproj/src/simplemath/sqrt.go::Sqrt'),
+            ('calcproj/src/simplemath/add_test.go::TestAdd1', 'calcproj/src/simplemath/add.go::Add'),
+            ('calcproj/src/simplemath/sqrt.go::Sqrt', 'calcproj/src/simplemath/sqrt.go::Sqrt'),
         ])
 
-        edges_added_by_B = set([
-            ('main', 'Println'),
-            ('main', 'Usage'),
-            ('main', 'Add'),
-            ('main', 'len'),
-            ('main', 'Sqrt'),
-            ('main', 'Atoi'),
-
-            
+        edges_added_by_B = set([      
+            ('calcproj/src/calc/calc.go::main', 'calcproj/src/calc/calc.go::Usage'),  #should have this edge
+            ('calcproj/src/calc/calc.go::main', 'calcproj/src/simplemath/add.go::Add'),    
+            ('calcproj/src/calc/calc.go::main', 'calcproj/src/simplemath/sqrt.go::Sqrt')   
         ])
 
         all_edges = edges_added_by_A.union(edges_added_by_B)
