@@ -69,13 +69,18 @@ def handle_call(call_node):
 
 def update_graph(ccgraph, ast_list, change_stats):
     for ast in ast_list:
+        filename = ast.attrib['filename']
         for function in ast.findall('./srcml:function', namespaces=ns):
             caller_name, _, _ = handle_function(function)
             if not caller_name:
                 continue
 
             if caller_name not in ccgraph:
-                ccgraph.add_node(caller_name)
+                ccgraph.add_node(caller_name, [filename])
+            else:
+                files = ccgraph.nodes()[caller_name]['files']
+                if filename not in files:
+                    ccgraph.update_node_files(caller_name, files + [filename])
 
             for call in function.xpath('.//srcml:call', namespaces=ns):
                 try:
@@ -87,7 +92,9 @@ def update_graph(ccgraph, ast_list, change_stats):
                     continue
 
                 if callee_name not in ccgraph:
-                    ccgraph.add_node(callee_name)
+                    # Pass [] to files argument since we don't know
+                    # which file this node belongs to
+                    ccgraph.add_node(callee_name, [])
                 ccgraph.add_edge(caller_name, callee_name)
 
     for func, fstat in change_stats.items():
