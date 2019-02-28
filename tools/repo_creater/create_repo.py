@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import stat
 import subprocess
 import sys
 import shutil
@@ -10,11 +11,29 @@ import networkx as nx
 from git import Repo
 from persper.util.path import root_path
 
+def rmtree_compat(top):
+    """
+    A Windows-compatible implementation of rmtree.
+    This implementation guarantees the files have appropriate permissions to delete,
+    and would avoid Access Denied errors.
+    """
+    if os.name != "nt":
+        shutil.rmtree(top)
+        return
+
+    for root, dirs, files in os.walk(top, topdown=False):
+        for name in files:
+            filename = os.path.join(root, name)
+            os.chmod(filename, stat.S_IWUSR)
+            os.remove(filename)
+        for name in dirs:
+            os.rmdir(os.path.join(root, name))
+    os.rmdir(top)
 
 def make_new_dir(dir_path):
     """delete old directory first if exists"""
     if os.path.exists(dir_path):
-        shutil.rmtree(dir_path)
+        rmtree_compat(dir_path)
     os.makedirs(dir_path)
 
 

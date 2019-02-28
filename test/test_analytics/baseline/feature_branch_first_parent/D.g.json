@@ -1,0 +1,65 @@
+{
+    "edges": {
+        "char *str_append_chr(char *string, char append)|->|int str_equals()": {
+            "addedBy": "C",
+            "weight": null
+        },
+        "char *str_append_chr(char *string, char append)|->|int str_len(char *string)": {
+            "addedBy": "C",
+            "weight": null
+        },
+        "char *str_replace(char *search, char *replace, char *subject)|->|char *str_append_chr(char *string, char append)": {
+            "addedBy": "D",
+            "weight": null
+        },
+        "char *str_replace(char *search, char *replace, char *subject)|->|int str_equals()": {
+            "addedBy": "D",
+            "weight": null
+        },
+        "char *str_replace(char *search, char *replace, char *subject)|->|int str_len(char *string)": {
+            "addedBy": "D",
+            "weight": null
+        }
+    },
+    "nodes": {
+        "char *str_append(char *string, char *append)": {
+            "history": {
+                "A": 7,
+                "B": 3
+            },
+            "size": null
+        },
+        "char *str_append_chr(char *string, char append)": {
+            "history": {
+                "B": 3,
+                "C": 34
+            },
+            "size": null
+        },
+        "char *str_replace(char *search, char *replace, char *subject)": {
+            "history": {
+                "D": 26
+            },
+            "size": null
+        },
+        "int str_equals()": {
+            "history": {
+                "C": 1
+            },
+            "size": null
+        },
+        "int str_equals(char *equal1, char *eqaul2)": {
+            "history": {
+                "B": 11,
+                "C": 1
+            },
+            "size": null
+        },
+        "int str_len(char *string)": {
+            "history": {
+                "A": 6
+            },
+            "size": null
+        }
+    }
+}

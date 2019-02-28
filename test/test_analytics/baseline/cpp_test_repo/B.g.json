@@ -1,0 +1,411 @@
+{
+    "edges": {
+        "ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)|->|TStream OpenAndValidate(const TPath arg1)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)|->|void ConfigurationParser::Load(std::istream &inputStream)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "ConfigurationParser::ConfigurationParser(std::istream &inputStream)|->|void ConfigurationParser::Load(std::istream &inputStream)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, bool &rhs)|->|RowReader &operator>>(RowReader &reader, int &rhs)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, bool &rhs)|->|RowReader &operator>>(RowReader &reader, std::string &rhs)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, bool &rhs)|->|bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, bool &rhs)|->|enum class StringComparison : int {}": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, double &rhs)|->|RowReader &operator>>(RowReader &reader, int &rhs)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, double &rhs)|->|RowReader &operator>>(RowReader &reader, std::string &rhs)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, float &rhs)|->|RowReader &operator>>(RowReader &reader, int &rhs)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, float &rhs)|->|RowReader &operator>>(RowReader &reader, std::string &rhs)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, int &rhs)|->|RowReader &operator>>(RowReader &reader, std::string &rhs)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, long &rhs)|->|RowReader &operator>>(RowReader &reader, int &rhs)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, long &rhs)|->|RowReader &operator>>(RowReader &reader, std::string &rhs)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const|->|bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const|->|enum class StringComparison : int {}": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const|->|std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "bool Confirm(const std::string &prompt)|->|bool Confirm(const std::string &prompt)": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)|->|bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)|->|enum class StringComparison : int {}": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "const char *FriendlyNameOf(const ReliabilityNetworkEntry &instance)|->|const char *FriendlyNameOf()": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "const char *FriendlyNameOf(const std::type_index &type)|->|const char *FriendlyNameOf()": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "const char *FriendlyNameOf(const type_info &type)|->|const char *FriendlyNameOf()": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "double ConfigurationParser::GetDouble(const std::string &key, double defaultValue) const|->|std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "int ConfigurationParser::GetInt(const std::string &key, int defaultValue) const|->|std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "int main(int argc, char *argv[])|->|TStream OpenAndValidate(const TPath arg1)": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "int main(int argc, char *argv[])|->|bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "int main(int argc, char *argv[])|->|double ConfigurationParser::GetDouble(const std::string &key, double defaultValue) const": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "int main(int argc, char *argv[])|->|std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "int main(int argc, char *argv[])|->|void ReportException(const std::exception &ex, int level)": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "void ConfigurationParser::Load(std::istream &inputStream)|->|RowReader &operator>>(RowReader &reader, int &rhs)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "void ReportException(const std::exception &ex, int level)|->|void ReportException(const std::exception &ex, int level)": {
+            "addedBy": "B",
+            "weight": null
+        }
+    },
+    "nodes": {
+        "ANSI_COLOR_BLUE": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_BRIGHT": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_CYAN": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_GREEN": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_MAGENTA": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_RED": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_RESET": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "ANSI_COLOR_YELLOW": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)": {
+            "history": {
+                "A": 5
+            },
+            "size": null
+        },
+        "ConfigurationParser::ConfigurationParser(std::istream &inputStream)": {
+            "history": {
+                "A": 4
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, bool &rhs)": {
+            "history": {
+                "A": 25
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, double &rhs)": {
+            "history": {
+                "A": 7
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, float &rhs)": {
+            "history": {
+                "A": 7
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, int &rhs)": {
+            "history": {
+                "A": 7
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, long &rhs)": {
+            "history": {
+                "A": 7
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, std::string &rhs)": {
+            "history": {
+                "A": 17
+            },
+            "size": null
+        },
+        "TDest safe_cast(TSrc obj)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "TEnum operator&(TEnum lhs, TEnum rhs)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "TEnum operator|(TEnum lhs, TEnum rhs)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "TStream &operator>>(TStream &s, RowReader &reader)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "TStream OpenAndValidate(const TPath arg1)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "_DECLARE_ENUM": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "_DECLARE_ENUM_DEFAULT": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "_RE_TRACE": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "_RangeToEnumerable<TIterator> RangeToEnumerable(const std::pair<TIterator, TIterator> range)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "_SILENCE_STDEXT_ALLOCATORS_DEPRECATION_WARNING": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const": {
+            "history": {
+                "A": 16
+            },
+            "size": null
+        },
+        "bool Confirm(const std::string &prompt)": {
+            "history": {
+                "A": 18
+            },
+            "size": null
+        },
+        "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
+            "history": {
+                "A": 30
+            },
+            "size": null
+        },
+        "bool dynamic_kind_of(const TSrc *obj)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "bool pointer_kind_of(const std::shared_ptr<TSrc> obj)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "const char *FriendlyNameOf()": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "const char *FriendlyNameOf(const ReliabilityNetworkEntry &instance)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "const char *FriendlyNameOf(const std::type_index &type)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "const char *FriendlyNameOf(const type_info &type)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "double ConfigurationParser::GetDouble(const std::string &key, double defaultValue) const": {
+            "history": {
+                "A": 12
+            },
+            "size": null
+        },
+        "enum class StringComparison : int {}": {
+            "history": {
+                "A": 6
+            },
+            "size": null
+        },
+        "inline std::string to_string(const std::pair<std::string, std::string> &value)": {
+            "history": {
+                "A": 4
+            },
+            "size": null
+        },
+        "int ConfigurationParser::GetInt(const std::string &key, int defaultValue) const": {
+            "history": {
+                "A": 12
+            },
+            "size": null
+        },
+        "int main(int argc, char *argv[])": {
+            "history": {
+                "A": 7,
+                "B": 4
+            },
+            "size": null
+        },
+        "std::shared_ptr<TDest> safe_pointer_cast(const std::shared_ptr<TSrc> &obj)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
+            "history": {
+                "A": 6
+            },
+            "size": null
+        },
+        "std::string StreamStatusToString(const TStream &stream)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        },
+        "void ConfigurationParser::Load(std::istream &inputStream)": {
+            "history": {
+                "A": 23
+            },
+            "size": null
+        },
+        "void ReportException(const std::exception &ex, int level)": {
+            "history": {
+                "A": 21
+            },
+            "size": null
+        },
+        "void ValidateStream(const TStream &stream)": {
+            "history": {
+                "A": 1
+            },
+            "size": null
+        }
+    }
+}

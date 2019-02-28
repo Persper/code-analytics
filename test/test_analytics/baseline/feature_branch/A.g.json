@@ -1,0 +1,17 @@
+{
+    "edges": {},
+    "nodes": {
+        "char *str_append(char *string, char *append)": {
+            "history": {
+                "A": 7
+            },
+            "size": null
+        },
+        "int str_len(char *string)": {
+            "history": {
+                "A": 6
+            },
+            "size": null
+        }
+    }
+}
