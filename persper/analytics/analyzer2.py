@@ -154,7 +154,7 @@ class Analyzer:
                                                 commit.author.name, commit.author.email, commit.message)
         if asyncio.iscoroutine(result):
             await result
-        diff_index = diff_with_commit(commit, parentCommit)
+        diff_index = diff_with_commit(self._repo, commit, parentCommit)
 
         for diff in diff_index:
             old_fname, new_fname = _get_fnames(diff)

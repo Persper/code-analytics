@@ -2,10 +2,11 @@ import os
 import time
 import pickle
 import asyncio
-from persper.analytics.git_tools import get_contents, _diff_with_first_parent
+from persper.analytics.git_tools import get_contents, diff_with_first_parent, initialize_repo
 from persper.analytics.iterator import RepoIterator
 from abc import ABC
 from git import Commit
+
 
 def print_overview(commits, branch_commits):
     print('----- Overview ------')
@@ -61,9 +62,11 @@ class Analyzer:
 
     def __init__(self, repo_path, graph_server):
         self._graph_server = graph_server
+        self._repo_path = repo_path
         self._ri = RepoIterator(repo_path)
+        self._repo = initialize_repo(repo_path)
         self._ccgraph = None
-        self._observer:AnalyzerObserver = emptyAnalyzerObserver
+        self._observer: AnalyzerObserver = emptyAnalyzerObserver
 
     @property
     def observer(self):
@@ -127,7 +130,7 @@ class Analyzer:
                                            commit.author.name,
                                            commit.author.email,
                                            commit.message)
-        diff_index = _diff_with_first_parent(commit)
+        diff_index = diff_with_first_parent(self._repo, commit)
 
         for diff in diff_index:
             old_fname, new_fname = _get_fnames(diff)
@@ -146,10 +149,10 @@ class Analyzer:
 
             if old_fname:
                 old_src = get_contents(
-                    self._ri.repo, commit.parents[0], old_fname)
+                    self._repo, commit.parents[0], old_fname)
 
             if new_fname:
-                new_src = get_contents(self._ri.repo, commit, new_fname)
+                new_src = get_contents(self._repo, commit, new_fname)
 
             if old_src or new_src:
                 # todo (hezheng) store the status somewhere for reporting later
@@ -182,7 +185,7 @@ class Analyzer:
 
     def autosave(self, phase, idx, checkpoint_interval):
         if idx % checkpoint_interval == 0:
-            repo_name = os.path.basename(self._ri.repo_path.rstrip('/'))
+            repo_name = os.path.basename(self._repo_path.rstrip('/'))
             fname = repo_name + '-' + phase + '-' + str(idx) + '.pickle'
             self.save(fname)
 
@@ -193,6 +196,7 @@ class Analyzer:
 
     def __setstate__(self, state):
         self.__dict__.update(state)
+
 
 class AnalyzerObserver(ABC):
     """

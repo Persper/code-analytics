@@ -2,24 +2,25 @@ from git.exc import InvalidGitRepositoryError, NoSuchPathError
 from git import Repo, Commit
 from typing import Union
 import sys
+import git
 
 EMPTY_TREE_SHA = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
-def _diff_with_first_parent(commit):
+def diff_with_first_parent(repo: Repo, commit: Commit):
     if len(commit.parents) == 0:
-        prev_commit = EMPTY_TREE_SHA
+        return diff_with_commit(repo, commit, None)
     else:
-        prev_commit = commit.parents[0]
-    # commit.diff automatically detect renames
-    return commit.diff(prev_commit,
-                       create_patch=True, R=True, indent_heuristic=True)
+        return diff_with_commit(repo, commit, commit.parents[0])
 
-def diff_with_commit(current_commit:Commit, base_commit:Union[Commit, str]=None):
-    localBaseCommit = base_commit
-    if not localBaseCommit:
-        localBaseCommit = EMPTY_TREE_SHA
-    return current_commit.diff(localBaseCommit, create_patch=True, R=True, indent_heuristic=True)
+
+def diff_with_commit(repo: Repo, current_commit: Commit, base_commit_sha: str):
+    if not base_commit_sha:
+        base_commit = repo.tree(EMPTY_TREE_SHA)
+    else:
+        base_commit = repo.commit(base_commit_sha)
+    return base_commit.diff(current_commit, create_patch=True, indent_heuristic=True)
+
 
 def initialize_repo(repo_path):
     try:
