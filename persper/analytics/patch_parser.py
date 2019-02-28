@@ -69,6 +69,9 @@ class PatchParser():
                     self.start_add()
                 else:
                     self.start_add()
+            elif line.startswith('\\'):
+                # Ignore \No newline at the end of file
+                pass
             else:
                 # print("in blank")
                 if self.in_add:
