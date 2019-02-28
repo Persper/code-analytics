@@ -21,6 +21,7 @@ antlr4-python3-runtime = "*"
 python-jsonrpc-server = "==0.0.2"
 pytest-asyncio = "*"
 aenum = "*"
+pytest-cov = "*"
 
 [dev-packages]
 

@@ -79,6 +79,22 @@ pipenv run pytest test/test_analytics
 
 You should see all tests passed.
 
+## Report Test Coverage
+
+We use [coverage.py](https://coverage.readthedocs.io/) and [pytest-cov](https://pytest-cov.readthedocs.io/en/latest/) to compute test coverage:
+
+```
+# Execution
+pytest --cov=persper/ test/test_analytics
+
+# Reporting
+coverage html
+
+# then visit htmlcov/index.html in your browser
+```
+
+
+
 ## Interactive mode with jupyter notebook
 
 1. Install Jupyter
