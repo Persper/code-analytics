@@ -90,11 +90,11 @@ def update_graph(ccgraph, ast_list, change_stats):
                     ccgraph.add_node(callee_name)
                 ccgraph.add_edge(caller_name, callee_name)
 
-    for func_name, change_size in change_stats.items():
-        if func_name not in ccgraph:
+    for func, fstat in change_stats.items():
+        if func not in ccgraph:
             print("%s in change_stats but not in ccgraph" % func_name)
             continue
-        ccgraph.update_node_history(func_name, change_size)
+        ccgraph.update_node_history(func, fstat['adds'], fstat['dels'])
 
 
 def get_func_ranges_c(root):

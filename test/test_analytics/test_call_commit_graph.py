@@ -24,9 +24,9 @@ def test_call_commit_graph():
                        first_commit['authorEmail'],
                        first_commit['message'])
     ccgraph.add_node('f1')
-    ccgraph.update_node_history('f1', 10)
+    ccgraph.update_node_history('f1', 10, 0)
     ccgraph.add_node('f2')
-    ccgraph.update_node_history('f2', 10)
+    ccgraph.update_node_history('f2', 10, 0)
     ccgraph.add_edge('f1', 'f2')
 
     func_drs = ccgraph.function_devranks(0.85)
@@ -48,7 +48,7 @@ def test_call_commit_graph():
                        second_commit['authorEmail'],
                        second_commit['message'])
     ccgraph.add_node('f3')
-    ccgraph.update_node_history('f3', 10)
+    ccgraph.update_node_history('f3', 10, 0)
     ccgraph.add_edge('f1', 'f3')
 
     func_drs2 = ccgraph.function_devranks(0.85)
@@ -73,11 +73,11 @@ def test_call_commit_graph():
                        third_commit['authorEmail'],
                        third_commit['message'])
     ccgraph.add_node('f4')
-    ccgraph.update_node_history('f4', 10)
+    ccgraph.update_node_history('f4', 10, 0)
     ccgraph.add_edge('f2', 'f4')
 
     ccgraph.add_node('f5')
-    ccgraph.update_node_history('f5', 10)
+    ccgraph.update_node_history('f5', 10, 0)
     ccgraph.add_edge('f2', 'f5')
 
     func_drs3 = ccgraph.function_devranks(0.85)
