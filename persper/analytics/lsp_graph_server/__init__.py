@@ -99,7 +99,7 @@ class LspClientGraphServer(GraphServer):
             if newPath is None:
                 # The file has been deleted
                 # We need to scan it before it's gone, instead of in end_commit
-                self._markWholeDocumentAsChanged(await self._callGraphBuilder.getTokenizedDocument(oldPath))
+                self._markWholeDocumentAsChanged(await self._callGraphBuilder.getTokenizedDocument(oldPath), True)
             elif oldPath is None:
                 # The file has been added
                 self._stashedPatches.append((oldPath, newPath, None, None))
@@ -114,7 +114,7 @@ class LspClientGraphServer(GraphServer):
                         for i in range(start - 1, end):
                             scope = oldDoc.scopeAt(i, 0)
                             if scope:
-                                self._safeUpdateNodeHistory(scope.name, 1)
+                                self._safeUpdateNodeHistory(scope.name, 0, 1)
                 self._stashedPatches.append((oldPath, newPath, added, None))
 
         # perform file operations
@@ -128,19 +128,21 @@ class LspClientGraphServer(GraphServer):
             self._invalidatedFiles.add(newPath)
         self._lastFileWrittenTime = datetime.now()
 
-    def _safeUpdateNodeHistory(self, name: str, changeOfLines: int):
+    def _safeUpdateNodeHistory(self, name: str, addedLines: int, removedLines: int):
         if name not in self._ccgraph.nodes():
             self._ccgraph.add_node(name)
-        self._ccgraph.update_node_history(name, changeOfLines)
+        self._ccgraph.update_node_history(name, addedLines, removedLines)
 
-    def _markWholeDocumentAsChanged(self, doc: TokenizedDocument):
+    def _markWholeDocumentAsChanged(self, doc: TokenizedDocument, markAsRemoved: bool):
+        # markAsRemoved: True: document has been deleted
+        #               False: document has been added
         parentScopes = []
         # print("_markWholeDocumentAsChanged: ", doc.fileName)
         for scope in doc.scopes:
             while parentScopes and parentScopes[-1][0].endPos <= scope.startPos:
                 # scope is out of parentScope, then the changed line count for parentScope is decided
                 s, c = parentScopes.pop()
-                self._safeUpdateNodeHistory(s.name, c)
+                self._safeUpdateNodeHistory(s.name, c, 0)
             thisScopeLines = scope.endPos.line - scope.startPos.line + 1
             if parentScopes:
                 # Subtract LOC from innermost scope to eliminate dups
@@ -161,7 +163,10 @@ class LspClientGraphServer(GraphServer):
             parentScopes.append([scope, thisScopeLines])
         while parentScopes:
             s, c = parentScopes.pop()
-            self._safeUpdateNodeHistory(s.name, c)
+            if markAsRemoved:
+                self._safeUpdateNodeHistory(s.name, 0, c)
+            else:
+                self._safeUpdateNodeHistory(s.name, c, 0)
 
     async def end_commit(self, hexsha):
         # update vetices & edges
@@ -178,17 +183,18 @@ class LspClientGraphServer(GraphServer):
                 newDoc: TokenizedDocument = await self._callGraphBuilder.getTokenizedDocument(newPath)
                 if not oldPath:
                     # file has been added
-                    self._markWholeDocumentAsChanged(newDoc)
+                    self._markWholeDocumentAsChanged(newDoc, False)
                 else:
                     assert added
                     for start, end in added:
                         for i in range(start - 1, end):
                             scope = newDoc.scopeAt(i, 0)
                             if scope:
-                                self._safeUpdateNodeHistory(scope.name, 1)
+                                self._safeUpdateNodeHistory(scope.name, 1, 0)
         self._stashedPatches.clear()
 
         # ensure the files in the next commit has a different timestamp from this commit.
+        
         if datetime.now() - self._lastFileWrittenTime < timedelta(seconds=1):
             await asyncio.sleep(1)
 

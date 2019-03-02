@@ -11,35 +11,64 @@
     },
     "nodes": {
         "char *str_append(char *string, char *append)": {
+            "files": [],
             "history": {
-                "A": 7,
-                "B": 3
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                },
+                "B": {
+                    "adds": 0,
+                    "dels": 3
+                }
             },
             "size": null
         },
         "char *str_append_chr(char *string, char append)": {
+            "files": [],
             "history": {
-                "B": 3,
-                "C": 34
+                "B": {
+                    "adds": 3,
+                    "dels": 0
+                },
+                "C": {
+                    "adds": 30,
+                    "dels": 4
+                }
             },
             "size": null
         },
         "int str_equals()": {
+            "files": [],
             "history": {
-                "C": 1
+                "C": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "int str_equals(char *equal1, char *eqaul2)": {
+            "files": [],
             "history": {
-                "B": 11,
-                "C": 1
+                "B": {
+                    "adds": 11,
+                    "dels": 0
+                },
+                "C": {
+                    "adds": 0,
+                    "dels": 1
+                }
             },
             "size": null
         },
         "int str_len(char *string)": {
+            "files": [],
             "history": {
-                "A": 6
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
             },
             "size": null
         }

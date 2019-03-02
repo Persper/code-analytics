@@ -12,14 +12,6 @@
             "addedBy": "D",
             "weight": null
         },
-        "RowReader &operator>>(RowReader &reader, bool &rhs)|->|RowReader &operator>>(RowReader &reader, int &rhs)": {
-            "addedBy": "D",
-            "weight": null
-        },
-        "RowReader &operator>>(RowReader &reader, bool &rhs)|->|RowReader &operator>>(RowReader &reader, std::string &rhs)": {
-            "addedBy": "D",
-            "weight": null
-        },
         "RowReader &operator>>(RowReader &reader, bool &rhs)|->|bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
             "addedBy": "D",
             "weight": null
@@ -28,43 +20,11 @@
             "addedBy": "D",
             "weight": null
         },
-        "RowReader &operator>>(RowReader &reader, double &rhs)|->|RowReader &operator>>(RowReader &reader, int &rhs)": {
-            "addedBy": "D",
-            "weight": null
-        },
-        "RowReader &operator>>(RowReader &reader, double &rhs)|->|RowReader &operator>>(RowReader &reader, std::string &rhs)": {
-            "addedBy": "D",
-            "weight": null
-        },
-        "RowReader &operator>>(RowReader &reader, float &rhs)|->|RowReader &operator>>(RowReader &reader, int &rhs)": {
-            "addedBy": "D",
-            "weight": null
-        },
-        "RowReader &operator>>(RowReader &reader, float &rhs)|->|RowReader &operator>>(RowReader &reader, std::string &rhs)": {
-            "addedBy": "D",
-            "weight": null
-        },
-        "RowReader &operator>>(RowReader &reader, int &rhs)|->|RowReader &operator>>(RowReader &reader, std::string &rhs)": {
-            "addedBy": "D",
-            "weight": null
-        },
-        "RowReader &operator>>(RowReader &reader, long &rhs)|->|RowReader &operator>>(RowReader &reader, int &rhs)": {
-            "addedBy": "D",
-            "weight": null
-        },
-        "RowReader &operator>>(RowReader &reader, long &rhs)|->|RowReader &operator>>(RowReader &reader, std::string &rhs)": {
-            "addedBy": "D",
-            "weight": null
-        },
         "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const|->|bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
             "addedBy": "D",
             "weight": null
         },
         "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const|->|enum class StringComparison : int {}": {
-            "addedBy": "D",
-            "weight": null
-        },
-        "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const|->|std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
             "addedBy": "D",
             "weight": null
         },
@@ -92,14 +52,6 @@
             "addedBy": "D",
             "weight": null
         },
-        "double ConfigurationParser::GetDouble(const std::string &key, double defaultValue) const|->|std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
-            "addedBy": "D",
-            "weight": null
-        },
-        "int ConfigurationParser::GetInt(const std::string &key, int defaultValue) const|->|std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
-            "addedBy": "D",
-            "weight": null
-        },
         "int main(int argc, char *argv[])|->|TStream OpenAndValidate(const TPath arg1)": {
             "addedBy": "C",
             "weight": null
@@ -120,10 +72,6 @@
             "addedBy": "B",
             "weight": null
         },
-        "void ConfigurationParser::Load(std::istream &inputStream)|->|RowReader &operator>>(RowReader &reader, int &rhs)": {
-            "addedBy": "D",
-            "weight": null
-        },
         "void ReportException(const std::exception &ex, int level)|->|void ReportException(const std::exception &ex, int level)": {
             "addedBy": "D",
             "weight": null
@@ -131,289 +79,506 @@
     },
     "nodes": {
         "ANSI_COLOR_BLUE": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "ANSI_COLOR_BRIGHT": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "ANSI_COLOR_CYAN": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "ANSI_COLOR_GREEN": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "ANSI_COLOR_MAGENTA": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "ANSI_COLOR_RED": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "ANSI_COLOR_RESET": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "ANSI_COLOR_YELLOW": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)": {
+            "files": [],
             "history": {
-                "A": 5
+                "A": {
+                    "adds": 5,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "ConfigurationParser::ConfigurationParser(std::istream &inputStream)": {
+            "files": [],
             "history": {
-                "A": 4
+                "A": {
+                    "adds": 4,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "RowReader &operator>>(RowReader &reader, bool &rhs)": {
+            "files": [],
             "history": {
-                "A": 25,
-                "C": 4,
-                "D": 4
+                "A": {
+                    "adds": 25,
+                    "dels": 0
+                },
+                "C": {
+                    "adds": 2,
+                    "dels": 2
+                },
+                "D": {
+                    "adds": 2,
+                    "dels": 2
+                }
             },
             "size": null
         },
         "RowReader &operator>>(RowReader &reader, double &rhs)": {
+            "files": [],
             "history": {
-                "A": 7
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "RowReader &operator>>(RowReader &reader, float &rhs)": {
+            "files": [],
             "history": {
-                "A": 7
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "RowReader &operator>>(RowReader &reader, int &rhs)": {
+            "files": [],
             "history": {
-                "A": 7
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "RowReader &operator>>(RowReader &reader, long &rhs)": {
+            "files": [],
             "history": {
-                "A": 7
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "RowReader &operator>>(RowReader &reader, std::string &rhs)": {
+            "files": [],
             "history": {
-                "A": 17
+                "A": {
+                    "adds": 17,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "TDest safe_cast(TSrc obj)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "TEnum operator&(TEnum lhs, TEnum rhs)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "TEnum operator|(TEnum lhs, TEnum rhs)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "TStream &operator>>(TStream &s, RowReader &reader)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "TStream OpenAndValidate(const TPath arg1)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "_DECLARE_ENUM": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "_DECLARE_ENUM_DEFAULT": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "_RE_TRACE": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "_RangeToEnumerable<TIterator> RangeToEnumerable(const std::pair<TIterator, TIterator> range)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "_SILENCE_STDEXT_ALLOCATORS_DEPRECATION_WARNING": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const": {
+            "files": [],
             "history": {
-                "A": 16,
-                "C": 4,
-                "D": 4
+                "A": {
+                    "adds": 16,
+                    "dels": 0
+                },
+                "C": {
+                    "adds": 2,
+                    "dels": 2
+                },
+                "D": {
+                    "adds": 2,
+                    "dels": 2
+                }
             },
             "size": null
         },
         "bool Confirm(const std::string &prompt)": {
+            "files": [],
             "history": {
-                "A": 18
+                "A": {
+                    "adds": 18,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
+            "files": [],
             "history": {
-                "A": 30,
-                "C": 2,
-                "D": 2
+                "A": {
+                    "adds": 30,
+                    "dels": 0
+                },
+                "C": {
+                    "adds": 1,
+                    "dels": 1
+                },
+                "D": {
+                    "adds": 1,
+                    "dels": 1
+                }
             },
             "size": null
         },
         "bool dynamic_kind_of(const TSrc *obj)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "bool pointer_kind_of(const std::shared_ptr<TSrc> obj)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "const char *FriendlyNameOf()": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "const char *FriendlyNameOf(const ReliabilityNetworkEntry &instance)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "const char *FriendlyNameOf(const std::type_index &type)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "const char *FriendlyNameOf(const type_info &type)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "double ConfigurationParser::GetDouble(const std::string &key, double defaultValue) const": {
+            "files": [],
             "history": {
-                "A": 12
+                "A": {
+                    "adds": 12,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "enum class StringComparison : int {}": {
+            "files": [],
             "history": {
-                "A": 6,
-                "C": 2,
-                "D": 2
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                },
+                "C": {
+                    "adds": 1,
+                    "dels": 1
+                },
+                "D": {
+                    "adds": 1,
+                    "dels": 1
+                }
             },
             "size": null
         },
         "inline std::string to_string(const std::pair<std::string, std::string> &value)": {
+            "files": [],
             "history": {
-                "A": 4
+                "A": {
+                    "adds": 4,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "int ConfigurationParser::GetInt(const std::string &key, int defaultValue) const": {
+            "files": [],
             "history": {
-                "A": 12
+                "A": {
+                    "adds": 12,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "int main(int argc, char *argv[])": {
+            "files": [],
             "history": {
-                "A": 7,
-                "B": 4,
-                "C": 4,
-                "D": 7
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                },
+                "B": {
+                    "adds": 4,
+                    "dels": 0
+                },
+                "C": {
+                    "adds": 0,
+                    "dels": 4
+                },
+                "D": {
+                    "adds": 4,
+                    "dels": 3
+                }
             },
             "size": null
         },
         "std::shared_ptr<TDest> safe_pointer_cast(const std::shared_ptr<TSrc> &obj)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
+            "files": [],
             "history": {
-                "A": 6
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "std::string StreamStatusToString(const TStream &stream)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "void ConfigurationParser::Load(std::istream &inputStream)": {
+            "files": [],
             "history": {
-                "A": 23
+                "A": {
+                    "adds": 23,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "void ReportException(const std::exception &ex, int level)": {
+            "files": [],
             "history": {
-                "A": 21
+                "A": {
+                    "adds": 21,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "void ValidateStream(const TStream &stream)": {
+            "files": [],
             "history": {
-                "A": 1
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         }

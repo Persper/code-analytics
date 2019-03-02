@@ -2,14 +2,22 @@
     "edges": {},
     "nodes": {
         "char *str_append(char *string, char *append)": {
+            "files": [],
             "history": {
-                "A": 7
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "int str_len(char *string)": {
+            "files": [],
             "history": {
-                "A": 6
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
             },
             "size": null
         }

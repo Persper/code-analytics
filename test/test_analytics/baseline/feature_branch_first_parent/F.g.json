@@ -23,65 +23,114 @@
     },
     "nodes": {
         "char *str_append(char *string, char *append)": {
+            "files": [],
             "history": {
-                "A": 7,
-                "B": 3
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                },
+                "B": {
+                    "adds": 0,
+                    "dels": 3
+                }
             },
             "size": null
         },
         "char *str_append_chr(char *string, char append)": {
+            "files": [],
             "history": {
-                "B": 3,
-                "C": 34
+                "B": {
+                    "adds": 3,
+                    "dels": 0
+                },
+                "C": {
+                    "adds": 30,
+                    "dels": 4
+                }
             },
             "size": null
         },
         "char *str_replace(char *search, char *replace, char *subject)": {
+            "files": [],
             "history": {
-                "D": 26
+                "D": {
+                    "adds": 26,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "int count()": {
+            "files": [],
             "history": {
-                "F": 12
+                "F": {
+                    "adds": 12,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "int str_equals()": {
+            "files": [],
             "history": {
-                "C": 1
+                "C": {
+                    "adds": 1,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "int str_equals(char *equal1, char *eqaul2)": {
+            "files": [],
             "history": {
-                "B": 11,
-                "C": 1
+                "B": {
+                    "adds": 11,
+                    "dels": 0
+                },
+                "C": {
+                    "adds": 0,
+                    "dels": 1
+                }
             },
             "size": null
         },
         "int str_len(char *string)": {
+            "files": [],
             "history": {
-                "A": 6
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "void add(int num)": {
+            "files": [],
             "history": {
-                "E": 11
+                "E": {
+                    "adds": 11,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "void append(int num)": {
+            "files": [],
             "history": {
-                "E": 29
+                "E": {
+                    "adds": 29,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "void display(struct node *r)": {
+            "files": [],
             "history": {
-                "F": 14
+                "F": {
+                    "adds": 14,
+                    "dels": 0
+                }
             },
             "size": null
         }
