@@ -1,4 +1,5 @@
 import os
+import pytest
 import shutil
 import subprocess
 from math import isclose
@@ -23,9 +24,9 @@ def test_call_commit_graph():
                        first_commit['authorEmail'],
                        first_commit['message'])
     ccgraph.add_node('f1')
-    ccgraph.update_node_history('f1', 10)
+    ccgraph.update_node_history('f1', 10, 0)
     ccgraph.add_node('f2')
-    ccgraph.update_node_history('f2', 10)
+    ccgraph.update_node_history('f2', 10, 0)
     ccgraph.add_edge('f1', 'f2')
 
     func_drs = ccgraph.function_devranks(0.85)
@@ -47,7 +48,7 @@ def test_call_commit_graph():
                        second_commit['authorEmail'],
                        second_commit['message'])
     ccgraph.add_node('f3')
-    ccgraph.update_node_history('f3', 10)
+    ccgraph.update_node_history('f3', 10, 0)
     ccgraph.add_edge('f1', 'f3')
 
     func_drs2 = ccgraph.function_devranks(0.85)
@@ -72,11 +73,11 @@ def test_call_commit_graph():
                        third_commit['authorEmail'],
                        third_commit['message'])
     ccgraph.add_node('f4')
-    ccgraph.update_node_history('f4', 10)
+    ccgraph.update_node_history('f4', 10, 0)
     ccgraph.add_edge('f2', 'f4')
 
     ccgraph.add_node('f5')
-    ccgraph.update_node_history('f5', 10)
+    ccgraph.update_node_history('f5', 10, 0)
     ccgraph.add_edge('f2', 'f5')
 
     func_drs3 = ccgraph.function_devranks(0.85)
@@ -94,7 +95,8 @@ def test_call_commit_graph():
     assert(isclose(dev_drs3[second_commit['authorEmail']], 0.201, rel_tol=1e-2))
 
 
-def test_black_set():
+@pytest.mark.asyncio
+async def test_black_set():
     """
     The CRLF commit: https://github.com/bitcoin/bitcoin/commit/0a61b0df1224a5470bcddab302bc199ca5a9e356
     Its parent: https://github.com/bitcoin/bitcoin/commit/5b721607b1057df4dfe97f80d235ed372312f398
@@ -109,7 +111,7 @@ def test_black_set():
     crlf_sha = '0a61b0df1224a5470bcddab302bc199ca5a9e356'
     ggparent_sha = '7d7797b141dbd4ed9db1dda94684beb3395c2534'
     rev = ggparent_sha + '..' + crlf_sha
-    az.analyze(rev=rev)
+    await az.analyze(rev=rev)
     ccgraph = az.get_graph()
     devdict = ccgraph.commit_devranks(0.85)
     devdict2 = ccgraph.commit_devranks(0.85, black_set=set([crlf_sha]))

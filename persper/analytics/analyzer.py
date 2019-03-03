@@ -2,8 +2,11 @@ import os
 import time
 import pickle
 from redis import Redis
-from persper.analytics.git_tools import get_contents, _diff_with_first_parent
+import asyncio
+from persper.analytics.git_tools import get_contents, diff_with_first_parent, initialize_repo
 from persper.analytics.iterator import RepoIterator
+from abc import ABC
+from git import Commit
 
 
 def print_overview(commits, branch_commits):
@@ -60,10 +63,24 @@ class Analyzer:
 
     def __init__(self, repo_path, graph_server):
         self._graph_server = graph_server
+        self._repo_path = repo_path
         self._ri = RepoIterator(repo_path)
+        self._repo = initialize_repo(repo_path)
         self._ccgraph = None
+        self._observer: AnalyzerObserver = emptyAnalyzerObserver
 
-    def analyze(self, repo_url='Unknown',
+    @property
+    def observer(self):
+        """
+        The AnalyzerObserver used to observe current Analyzer.
+        """
+        return self._observer
+
+    @observer.setter
+    def observer(self, value):
+        self._observer = value or emptyAnalyzerObserver
+
+    async def analyze(self, repo_url='Unknown',
                 pickle_path=None,
                 rev=None,
                 from_beginning=False,
@@ -99,30 +116,44 @@ class Analyzer:
         for idx, commit in enumerate(reversed(commits), 1):
             phase = 'main'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self.analyze_master_commit(commit)
+# <<<<<<< HEAD
+#             self.analyze_master_commit(commit)
 
-            analyzed_commits += 1
-            self.update_estimated_delay(repo_url, totoal_commits, analyzed_commits)
+#             analyzed_commits += 1
+#             self.update_estimated_delay(repo_url, totoal_commits, analyzed_commits)
+# =======
+            self._observer.onBeforeCommit(self, idx, commit, True)
+            await self.analyze_master_commit(commit)
+            self._observer.onAfterCommit(self, idx, commit, True)
+            self.autosave(phase, idx, checkpoint_interval)
+# >>>>>>> master
 
         for idx, commit in enumerate(branch_commits, 1):
             phase = 'branch'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self.analyze_branch_commit(commit)
+# <<<<<<< HEAD
+#             self.analyze_branch_commit(commit)
+# =======
+            self._observer.onBeforeCommit(self, idx, commit, False)
+            await self.analyze_branch_commit(commit)
+            self._observer.onAfterCommit(self, idx, commit, False)
+            self.autosave(phase, idx, checkpoint_interval)
+# >>>>>>> master
 
-            analyzed_commits += 1
-            self.update_estimated_delay(repo_url, totoal_commits, analyzed_commits)
+            # analyzed_commits += 1
+            # self.update_estimated_delay(repo_url, totoal_commits, analyzed_commits)
 
         if pickle_path:
             self.save(pickle_path)
         else:
             self.autosave('finished', 0, 1)
 
-    def _analyze_commit(self, commit, server_func):
+    async def _analyze_commit(self, commit, server_func):
         self._graph_server.register_commit(commit.hexsha,
                                            commit.author.name,
                                            commit.author.email,
                                            commit.message)
-        diff_index = _diff_with_first_parent(commit)
+        diff_index = diff_with_first_parent(self._repo, commit)
 
         for diff in diff_index:
             old_fname, new_fname = _get_fnames(diff)
@@ -141,21 +172,28 @@ class Analyzer:
 
             if old_fname:
                 old_src = get_contents(
-                    self._ri.repo, commit.parents[0], old_fname)
+                    self._repo, commit.parents[0], old_fname)
 
             if new_fname:
-                new_src = get_contents(self._ri.repo, commit, new_fname)
+                new_src = get_contents(self._repo, commit, new_fname)
 
             if old_src or new_src:
                 # todo (hezheng) store the status somewhere for reporting later
-                status = server_func(old_fname, old_src, new_fname, new_src, diff.diff)
+                result = server_func(old_fname, old_src, new_fname, new_src, diff.diff)
+                if asyncio.iscoroutine(result):
+                    result = await result
+                status = result
 
-    def analyze_master_commit(self, commit):
-        self._analyze_commit(commit, self._graph_server.update_graph)
+        result = self._graph_server.end_commit(commit.hexsha)
+        if asyncio.iscoroutine(result):
+            result = await result
+
+    async def analyze_master_commit(self, commit):
+        await self._analyze_commit(commit, self._graph_server.update_graph)
 
     # todo (hezheng) implement correct analysis for branches
-    def analyze_branch_commit(self, commit):
-        self._analyze_commit(commit, self._graph_server.update_graph)
+    async def analyze_branch_commit(self, commit):
+        await self._analyze_commit(commit, self._graph_server.update_graph)
 
     def reset_state(self):
         self._ccgraph = None
@@ -170,7 +208,7 @@ class Analyzer:
 
     def autosave(self, phase, idx, checkpoint_interval):
         if idx % checkpoint_interval == 0:
-            repo_name = os.path.basename(self._ri.repo_path.rstrip('/'))
+            repo_name = os.path.basename(self._repo_path.rstrip('/'))
             fname = repo_name + '-' + phase + '-' + str(idx) + '.pickle'
             self.save(fname)
 
@@ -178,3 +216,55 @@ class Analyzer:
         redis_conn = Redis()
         estimation = 0.8 * (total_commits - analyzed_commits)
         redis_conn.hmset(repo_url, {'estimated_delay': estimation})
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state.pop("_observer", None)
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
+
+class AnalyzerObserver(ABC):
+    """
+    Used to observe the progress of `Analyzer` during its analysis of the target repository.
+    You need to derive your own observer class from it before assigning your observer instance
+    to `Analyzer.observer`.
+    """
+    def __init__(self):
+        pass
+
+    def onBeforeCommit(self, analyzer:Analyzer, index:int, commit:Commit, isMaster:bool):
+        """
+        Called before the observed Analyzer is about to analyze a commit.
+        Params:
+            analyzer: the observed Analyzer instance.
+            index: the index of the commit, depending on the behavior of the analyzer.
+                    This is usually a series of 1-based ordinal index for master commits,
+                    and another series of 1-based ordinal index for branch commits.
+            commit: the commit to be analyzed.
+            isMaster: whether the current commit is one of the master commits.
+        """
+        pass
+
+    def onAfterCommit(self, analyzer:Analyzer, index:int, commit:Commit, isMaster:bool):
+        """
+        Called after the observed Analyzer has finished analyzing a commit.
+        Params:
+            analyzer: the observed Analyzer instance.
+            index: the index of the commit, depending on the behavior of the analyzer.
+                    This is usually a series of 1-based ordinal index for master commits,
+                    and another series of 1-based ordinal index for branch commits.
+            commit: the commit that has just been analyzed.
+            isMaster: whether the current commit is one of the master commits.
+        """
+        pass
+
+class _EmptyAnalyzerObserverType(AnalyzerObserver):
+    pass
+
+emptyAnalyzerObserver = _EmptyAnalyzerObserverType()
+"""
+An AnalyzerObserver instance that does nothing in their notification methods.
+"""

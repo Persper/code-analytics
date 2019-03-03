@@ -1,0 +1,30 @@
+{
+    "edges": {},
+    "nodes": {
+        "char *str_append(char *string, char *append)": {
+            "history": {
+                "A": 7,
+                "B": 3
+            },
+            "size": null
+        },
+        "char *str_append_chr(char *string, char append)": {
+            "history": {
+                "B": 3
+            },
+            "size": null
+        },
+        "int str_equals(char *equal1, char *eqaul2)": {
+            "history": {
+                "B": 11
+            },
+            "size": null
+        },
+        "int str_len(char *string)": {
+            "history": {
+                "A": 6
+            },
+            "size": null
+        }
+    }
+}

@@ -1,6 +1,7 @@
 import os
 import time
 import pytest
+import shutil
 import subprocess
 from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from persper.analytics.go import GoGraphServer
@@ -25,9 +26,12 @@ def az():
     test_src_path = os.path.join(root_path, 'test/go_test_repo')
     server_addr = 'http://localhost:%d' % server_port
 
-    if not os.path.isdir(repo_path):
-        cmd = '{} {}'.format(script_path, test_src_path)
-        subprocess.call(cmd, shell=True)
+    # Always use latest source to create test repo
+    if os.path.exists(repo_path):
+        shutil.rmtree(repo_path)
+
+    cmd = '{} {}'.format(script_path, test_src_path)
+    subprocess.call(cmd, shell=True)
 
     return Analyzer(repo_path, GoGraphServer(server_addr, GO_FILENAME_REGEXES))
 
@@ -38,6 +42,10 @@ def test_analzyer_go(az):
     ccgraph = az.get_graph()
 
     history_truth = {
+        'D': {'Abs': 6,
+              'funcA': 0,
+              'main': 8,
+              "Absp": 3},
         'C': {'Abs': 5,
               'funcA': 0,
               'funcB': 1,
@@ -78,5 +86,11 @@ def test_analzyer_go(az):
         ('funcB', 'funcA')
     ])
 
-    all_edges = edges_added_by_A.union(edges_added_by_B).union(edges_added_by_C)
+    edges_added_by_D = set([
+        ("Absp", "Sqrt"),
+        ("main", "Absp")
+    ])
+
+    print(set(az._graph_server.get_graph().edges()))
+    all_edges = edges_added_by_A.union(edges_added_by_B).union(edges_added_by_C).union(edges_added_by_D)
     assert(set(az._graph_server.get_graph().edges()) == all_edges)

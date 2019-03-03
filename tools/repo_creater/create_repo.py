@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import stat
 import subprocess
 import sys
 import shutil
@@ -10,24 +11,55 @@ import networkx as nx
 from git import Repo
 from persper.util.path import root_path
 
+def rmtree_compat(top):
+    """
+    A Windows-compatible implementation of rmtree.
+    This implementation guarantees the files have appropriate permissions to delete,
+    and would avoid Access Denied errors.
+    """
+    if os.name != "nt":
+        shutil.rmtree(top)
+        return
+
+    for root, dirs, files in os.walk(top, topdown=False):
+        for name in files:
+            filename = os.path.join(root, name)
+            os.chmod(filename, stat.S_IWUSR)
+            os.remove(filename)
+        for name in dirs:
+            os.rmdir(os.path.join(root, name))
+    os.rmdir(top)
 
 def make_new_dir(dir_path):
     """delete old directory first if exists"""
     if os.path.exists(dir_path):
-        shutil.rmtree(dir_path)
+        rmtree_compat(dir_path)
     os.makedirs(dir_path)
 
 
-def delete_files_under_dir(dir_path):
-    for e in os.scandir(dir_path):
-        if e.is_file():
-            os.remove(e.path)
+def remove_all_except_git(dir_path):
+    for item in os.listdir(dir_path):
+        # Do not delete the .git directory
+        if item == ".git":
+            continue
+        path = os.path.join(dir_path, item)
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+        else:
+            os.remove(path)
 
 
-def copy_files(src_dir_path, dest_dir_path):
-    for e in os.scandir(src_dir_path):
-        if e.is_file():
-            shutil.copyfile(e.path, os.path.join(dest_dir_path, e.name))
+def copy_tree(src, dst, symlinks=False, ignore=None):
+    """
+    Copy all files/dirs under src to dst, a wrapper around shutil.copytree
+    """
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, symlinks, ignore)
+        else:
+            shutil.copy2(s, d)
 
 
 def find_first_commit(graph):
@@ -63,8 +95,8 @@ def simple_commit(repo, commit_dir, repo_path, commit_msg):
     :param commit_msg:
     :return: the SHA of newly created commit
     """
-    delete_files_under_dir(repo_path)
-    copy_files(commit_dir, repo_path)
+    remove_all_except_git(repo_path)
+    copy_tree(commit_dir, repo_path)
     repo.git.add("*")
     repo.git.commit("-m {}".format(commit_msg))
     sha = repo.git.rev_parse("HEAD")

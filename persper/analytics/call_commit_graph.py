@@ -14,13 +14,37 @@ def normalize(devranks):
     return normalized_devranks
 
 
+class CommitIdGenerators:
+    @staticmethod
+    def fromOrdinal(ordinal: int, hexsha: str, message: str):
+        return ordinal
+
+    @staticmethod
+    def fromComment(ordinal: int, hexsha: str, message: str):
+        return message.strip()
+
+    @staticmethod
+    def fromHexsha(ordinal: int, hexsha: str, message: str):
+        return hexsha
+
+
 class CallCommitGraph:
 
-    def __init__(self, node_link_data=None):
+    def __init__(self, node_link_data=None, commit_id_generator=CommitIdGenerators.fromHexsha):
         if node_link_data:
             self._digraph = json_graph.node_link_graph(node_link_data)
         else:
-            self._digraph = nx.DiGraph(commitList=[])
+            self._digraph = self._new_graph()
+        self._commit_id_generator = commit_id_generator
+        self._current_commit_id = None
+
+    def reset(self):
+        self._digraph = self._new_graph()
+
+    def _new_graph(self):
+        """Create a new nx.DiGraph for underlying storage
+           with appropriate arguments"""
+        return nx.DiGraph(commits={})
 
     # Read-only access
     def nodes(self, data=False):
@@ -33,47 +57,62 @@ class CallCommitGraph:
     # Read-only access
     def commits(self):
         # https://networkx.github.io/documentation/stable/tutorial.html#graph-attributes
-        return self._digraph.graph['commitList']
+        return self._digraph.graph['commits']
 
-    def add_commit(self, hexsha, author_name, author_email, commit_message):
-        self._digraph.graph['commitList'].append({
-            'hexsha': hexsha, 'authorName': author_name,
-            'authorEmail': author_email, 'message': commit_message
-        })
+    # Read-only access
+    def __contains__(self, node):
+        return node in self._digraph
+
+    def add_commit(self, hexsha, author_name, author_email, message):
+        # TODO: remove `id` in a commit object
+        self._current_commit_id = self._commit_id_generator(self._next_cindex(), hexsha, message)
+        self._digraph.graph['commits'][hexsha] = {
+            'id': self._current_commit_id,
+            'hexsha': hexsha,
+            'authorName': author_name,
+            'authorEmail': author_email,
+            'message': message
+        }
 
     # The index of the commit being analyzed
     def _cur_cindex(self):
         return len(self.commits()) - 1
 
-    def reset(self):
-        self._digraph = nx.DiGraph(commitList=[])
+    def _next_cindex(self):
+        return self._cur_cindex() + 1
 
-    def __contains__(self, node):
-        return node in self._digraph
-
-    def add_node(self, node):
-        self._digraph.add_node(node, size=None, history={})
+    # TODO: remove the default value of files
+    def add_node(self, node, files=[]):
+        self._digraph.add_node(node, size=None, history={}, files=files)
 
     # add_node must be called on source and target first
     def add_edge(self, source, target):
+        if source not in self._digraph:
+            raise ValueError("Error: caller %s does not exist in call-commit graph." % source)
+        if target not in self._digraph:
+            raise ValueError("Error: callee %s does not exist in call-commit graph." % target)
         self._digraph.add_edge(source, target,
-                               addedBy=self._cur_cindex(),
+                               addedBy=self._current_commit_id,
                                weight=None)
 
-    def update_node_history(self, node, size):
-        # Use current commit index
-        cc_idx = self._cur_cindex()
+    def update_node_history(self, node, num_adds, num_dels):
         node_history = self._get_node_history(node)
-        # A commit might update a node's history more than once
-        if cc_idx in node_history:
-            node_history[cc_idx] += size
+        # A commit might update a node's history more than once when
+        # a single FunctionNode corresponds to more than one actual functions
+        if self._current_commit_id in node_history:
+            node_history[self._current_commit_id]['adds'] += num_adds
+            node_history[self._current_commit_id]['dels'] += num_dels
         else:
-            node_history[cc_idx] = size
+            node_history[self._current_commit_id] = {'adds': num_adds, 'dels': num_dels}
 
     # read/write access to node history are thourgh this function
     def _get_node_history(self, node):
         return self._digraph.nodes[node]['history']
 
+    def update_node_files(self, node, new_files):
+        self._digraph.nodes[node]['files'] = new_files
+
+    # TODO: provide other options for computing a node's size
     def _set_all_nodes_size(self, black_set=None):
         """ Compute node size after nodes have been added to the graph
         node size is currently defined as the total number lines of edits
@@ -84,12 +123,12 @@ class CallCommitGraph:
             node_history = self._get_node_history(node)
             if black_set is not None:
                 size = 0
-                for cindex, csize in node_history.items():
-                    sha = self.commits()[cindex]['hexsha']
+                for cid, chist in node_history.items():
+                    sha = self.commits()[cid]['hexsha']
                     if sha not in black_set:
-                        size += csize
+                        size += (chist['adds'] + chist['dels'])
             else:
-                size = sum(node_history.values())
+                size = sum([chist['adds'] + chist['dels'] for chist in node_history.values()])
 
             # set default size to 1 to avoid zero division error
             if size == 0:
@@ -130,8 +169,9 @@ class CallCommitGraph:
             if len(history) == 0:
                 continue
 
-            for cindex, csize in history.items():
-                sha = self.commits()[cindex]['hexsha']
+            for cid, chist in history.items():
+                csize = chist['adds'] + chist['dels']
+                sha = self.commits()[cid]['hexsha']
                 if black_set is None or sha not in black_set:
                     dr = (csize / size) * func_devranks[func]
                     if sha in commit_devranks:
@@ -150,7 +190,7 @@ class CallCommitGraph:
         developer_devranks = {}
         commit_devranks = self.commit_devranks(alpha, black_set=black_set)
 
-        for commit in self.commits():
+        for commit in self.commits().values():
             sha = commit['hexsha']
             email = commit['authorEmail']
 
