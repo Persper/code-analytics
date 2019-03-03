@@ -91,13 +91,14 @@ class Analyzer:
                 max_branch_length=100,
                 min_branch_date=None,
                 checkpoint_interval=1000,
-                verbose=False):
+                verbose=False,
+                autosave=False):
 
         if not continue_iter:
             self.reset_state()
             self._graph_server.reset_graph()
 
-        commits, branch_commits = \
+        self.commits, branch_commits = \
             self._ri.iter(rev=rev,
                           from_beginning=from_beginning,
                           num_commits=num_commits,
@@ -116,32 +117,22 @@ class Analyzer:
         for idx, commit in enumerate(reversed(commits), 1):
             phase = 'main'
             print_commit_info(phase, idx, commit, start_time, verbose)
-# <<<<<<< HEAD
-#             self.analyze_master_commit(commit)
-
-#             analyzed_commits += 1
-#             self.update_estimated_delay(repo_url, totoal_commits, analyzed_commits)
-# =======
-            self._observer.onBeforeCommit(self, idx, commit, True)
+            self._observer.onBeforeCommit(self, idx, commit, totoal_commits_num, True)
             await self.analyze_master_commit(commit)
-            self._observer.onAfterCommit(self, idx, commit, True)
-            self.autosave(phase, idx, checkpoint_interval)
-# >>>>>>> master
+            self._observer.onAfterCommit(self, idx, commit, totoal_commits_num, True)
+
+            if autosave:
+                self.autosave(phase, idx, checkpoint_interval)
 
         for idx, commit in enumerate(branch_commits, 1):
             phase = 'branch'
             print_commit_info(phase, idx, commit, start_time, verbose)
-# <<<<<<< HEAD
-#             self.analyze_branch_commit(commit)
-# =======
-            self._observer.onBeforeCommit(self, idx, commit, False)
+            self._observer.onBeforeCommit(self, idx, commit, totoal_commits_num, False)
             await self.analyze_branch_commit(commit)
-            self._observer.onAfterCommit(self, idx, commit, False)
-            self.autosave(phase, idx, checkpoint_interval)
-# >>>>>>> master
+            self._observer.onAfterCommit(self, idx, commit, totoal_commits_num, False)
 
-            # analyzed_commits += 1
-            # self.update_estimated_delay(repo_url, totoal_commits, analyzed_commits)
+            if autosave:
+                self.autosave(phase, idx, checkpoint_interval)
 
         if pickle_path:
             self.save(pickle_path)
@@ -212,11 +203,6 @@ class Analyzer:
             fname = repo_name + '-' + phase + '-' + str(idx) + '.pickle'
             self.save(fname)
 
-    def update_estimated_delay(self, repo_url, total_commits, analyzed_commits):
-        redis_conn = Redis()
-        estimation = 0.8 * (total_commits - analyzed_commits)
-        redis_conn.hmset(repo_url, {'estimated_delay': estimation})
-
     def __getstate__(self):
         state = self.__dict__.copy()
         state.pop("_observer", None)
@@ -235,7 +221,7 @@ class AnalyzerObserver(ABC):
     def __init__(self):
         pass
 
-    def onBeforeCommit(self, analyzer:Analyzer, index:int, commit:Commit, isMaster:bool):
+    def onBeforeCommit(self, analyzer:Analyzer, index:int, commit:Commit, totoal_commits_num:int, isMaster:bool):
         """
         Called before the observed Analyzer is about to analyze a commit.
         Params:
@@ -248,7 +234,7 @@ class AnalyzerObserver(ABC):
         """
         pass
 
-    def onAfterCommit(self, analyzer:Analyzer, index:int, commit:Commit, isMaster:bool):
+    def onAfterCommit(self, analyzer:Analyzer, index:int, commit:Commit, totoal_commits_num:int, isMaster:bool):
         """
         Called after the observed Analyzer has finished analyzing a commit.
         Params:

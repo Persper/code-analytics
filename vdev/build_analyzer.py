@@ -7,12 +7,20 @@ from Naked.toolshed.shell import muterun_rb
 from persper.analytics.cpp import CPPGraphServer
 from persper.analytics.analyzer import Analyzer
 from persper.analytics.graph_server import CPP_FILENAME_REGEXES
+from vdev.analyzer_observer_vdev import AnalyzerObserverVdev
+import redis
+from utils import get_config_from_yaml
 
+config = get_config_from_yaml('config.yaml')['redis']
 ALPHA = 0.85
 LANGUAGE_LIST = ['C', 'C++']
 
 
-def build_analyzer(repo_url, repo_path, original_pickle_path, new_pickle_path):
+def observer(redis_address, redis_port, git_url):
+    return AnalyzerObserverVdev(redis_address, redis_port, git_url)
+
+
+def build_analyzer(git_url, repo_path, original_pickle_path, new_pickle_path):
 
     linguist = check_linguist(repo_path)
     major_language = max(linguist, key=linguist.get)
@@ -22,15 +30,16 @@ def build_analyzer(repo_url, repo_path, original_pickle_path, new_pickle_path):
         # Todo: Choose the right server to do analyzing based on linguist
         if original_pickle_path and os.path.exists(original_pickle_path):
             az = pickle.load(open(original_pickle_path, 'rb'))
-            az.analyze(repo_url, new_pickle_path, continue_iter=True, end_commit_sha='master', into_branches=True)
+            await az.analyze(git_url, new_pickle_path, continue_iter=True, end_commit_sha='master', into_branches=True)
         else:
             az = Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES))
-            az.analyze(repo_url, new_pickle_path, from_beginning=True, into_branches=True)
+            az.observer = observer(config['host'], port=config['port'], git_url)
+            await az.analyze(git_url, new_pickle_path, from_beginning=True, into_branches=True)
 
 
 def check_linguist(repo_path):
     root_path = os.path.dirname(os.path.abspath(__file__))
-    response = muterun_rb(os.path.join(root_path, 'tools/linguist.rb'), repo_path)
+    response = muterun_rb(os.path.join(root_path, 'vdev/linguist.rb'), repo_path)
 
     if response.exitcode == 0:
         lang_dict = json.loads(response.stdout)
