@@ -112,8 +112,8 @@ class LspClientGraphServer(GraphServer):
                     # start, end are inclusive, 1-based
                     for start, end in removed:
                         for i in range(start - 1, end):
-                            scope = oldDoc.scopeAt(i, 0)
-                            if scope:
+                            # print("Removed L", i + 1, list((s.name, s.startPos, s.endPos) for s in oldDoc.scopesOnLine(i)))
+                            for scope in oldDoc.scopesOnLine(i):
                                 self._safeUpdateNodeHistory(scope.name, 0, 1)
                 self._stashedPatches.append((oldPath, newPath, added, None))
 
@@ -188,8 +188,8 @@ class LspClientGraphServer(GraphServer):
                     assert added
                     for start, end in added:
                         for i in range(start - 1, end):
-                            scope = newDoc.scopeAt(i, 0)
-                            if scope:
+                            # print("Added L", i + 1, list((s.name, s.startPos, s.endPos) for s in newDoc.scopesOnLine(i)))
+                            for scope in newDoc.scopesOnLine(i):
                                 self._safeUpdateNodeHistory(scope.name, 1, 0)
         self._stashedPatches.clear()
 
