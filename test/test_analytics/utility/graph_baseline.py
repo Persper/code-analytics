@@ -24,8 +24,14 @@ def formatEdgeId(u: str, v: str):
 
 
 def graphToDict(ccg: CallCommitGraph):
+    nodes = ccg.nodes(data=True)
+    for name, attr in nodes:
+        if "files" in attr:
+            files = list(attr["files"])
+            files.sort()
+            attr["files"] = files
     result = {
-        "nodes": dict(ccg.nodes(data=True)),
+        "nodes": dict(nodes),
         "edges": dict(((formatEdgeId(u, v), data) for (u, v, data) in ccg.edges(data=True)))
     }
     return result
@@ -34,8 +40,8 @@ def graphToDict(ccg: CallCommitGraph):
 def fixGraphDict(graphData: dict):
     if "nodes" in graphData:
         for id, attr in graphData["nodes"].items():
-            if "history" in attr:
-                attr["history"] = dict(attr["history"].items())
+            if "files" in attr:
+                attr["files"] = set(attr["files"])
     return graphData
 
 
