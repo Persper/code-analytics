@@ -67,6 +67,7 @@ class LspClientGraphServer(GraphServer):
         # [(oldPath, newPath, addedLines, removedLines), ...]
         # added/removedLines := [[startLine, modifiedLines], ...]
         self._stashedPatches: List[Tuple[PurePath, PurePath, List[Tuple[int, int]], List[Tuple[int, int]]]] = []
+        self._symbolPaths = dict()
         self._commitSeekingMode: CommitSeekingMode = None
 
     def __getstate__(self):
@@ -88,6 +89,7 @@ class LspClientGraphServer(GraphServer):
         self._commitSeekingMode = seeking_mode
         if seeking_mode != CommitSeekingMode.Rewind:
             self._ccgraph.add_commit(hexsha, author_name, author_email, commit_message)
+        self._symbolPaths.clear()
 
     async def update_graph(self, old_filename: str, old_src: str, new_filename: str, new_src: str, patch: bytes):
         oldPath = self._workspaceRoot.joinpath(old_filename).resolve() if old_filename else None
@@ -114,7 +116,7 @@ class LspClientGraphServer(GraphServer):
                         for i in range(start - 1, end):
                             # print("Removed L", i + 1, list((s.name, s.startPos, s.endPos) for s in oldDoc.scopesOnLine(i)))
                             for scope in oldDoc.scopesOnLine(i):
-                                self._safeUpdateNodeHistory(scope.name, 0, 1)
+                                self._safeUpdateNodeHistory(scope, 0, 1)
                 self._stashedPatches.append((oldPath, newPath, added, None))
 
         # perform file operations
@@ -128,10 +130,10 @@ class LspClientGraphServer(GraphServer):
             self._invalidatedFiles.add(newPath)
         self._lastFileWrittenTime = datetime.now()
 
-    def _safeUpdateNodeHistory(self, name: str, addedLines: int, removedLines: int):
-        if name not in self._ccgraph.nodes():
-            self._ccgraph.add_node(name)
-        self._ccgraph.update_node_history(name, addedLines, removedLines)
+    def _safeUpdateNodeHistory(self, scope: CallGraphScope, addedLines: int, removedLines: int):
+        if scope.name not in self._ccgraph.nodes():
+            self._ccgraph.add_node(scope.name)
+        self._ccgraph.update_node_history(scope.name, addedLines, removedLines)
 
     def _markWholeDocumentAsChanged(self, doc: TokenizedDocument, markAsRemoved: bool):
         # markAsRemoved: True: document has been deleted
@@ -142,7 +144,7 @@ class LspClientGraphServer(GraphServer):
             while parentScopes and parentScopes[-1][0].endPos <= scope.startPos:
                 # scope is out of parentScope, then the changed line count for parentScope is decided
                 s, c = parentScopes.pop()
-                self._safeUpdateNodeHistory(s.name, c, 0)
+                self._safeUpdateNodeHistory(s, c, 0)
             thisScopeLines = scope.endPos.line - scope.startPos.line + 1
             if parentScopes:
                 # Subtract LOC from innermost scope to eliminate dups
@@ -164,9 +166,9 @@ class LspClientGraphServer(GraphServer):
         while parentScopes:
             s, c = parentScopes.pop()
             if markAsRemoved:
-                self._safeUpdateNodeHistory(s.name, 0, c)
+                self._safeUpdateNodeHistory(s, 0, c)
             else:
-                self._safeUpdateNodeHistory(s.name, c, 0)
+                self._safeUpdateNodeHistory(s, c, 0)
 
     async def end_commit(self, hexsha):
         # update vetices & edges
@@ -190,7 +192,12 @@ class LspClientGraphServer(GraphServer):
                         for i in range(start - 1, end):
                             # print("Added L", i + 1, list((s.name, s.startPos, s.endPos) for s in newDoc.scopesOnLine(i)))
                             for scope in newDoc.scopesOnLine(i):
-                                self._safeUpdateNodeHistory(scope.name, 1, 0)
+                                self._safeUpdateNodeHistory(scope, 1, 0)
+
+        # update node files
+        for nodeName, nodeFiles in self._symbolPaths.items():
+            self._ccgraph.update_node_files(nodeName, [str(f.relative_to(self._workspaceRoot)).replace("\\", "/") for f in nodeFiles])
+
         self._stashedPatches.clear()
 
         # ensure the files in the next commit has a different timestamp from this commit.
@@ -287,6 +294,11 @@ class LspClientGraphServer(GraphServer):
                 scope: CallGraphScope
                 if scope.name not in self._ccgraph.nodes().data():
                     self._ccgraph.add_node(scope.name)
+                symbolPaths = self._symbolPaths.get(scope.name, None)
+                if not symbolPaths:
+                    symbolPaths = set()
+                    self._symbolPaths[scope.name] = symbolPaths
+                symbolPaths.add(scope.file)
         # update edges
         await self._callGraphManager.buildGraph(fileNames=affectedFiles)
         self._invalidatedFiles.clear()
