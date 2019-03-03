@@ -98,7 +98,7 @@ class Analyzer:
             self.reset_state()
             self._graph_server.reset_graph()
 
-        self.commits, branch_commits = \
+        commits, branch_commits = \
             self._ri.iter(rev=rev,
                           from_beginning=from_beginning,
                           num_commits=num_commits,
@@ -112,14 +112,14 @@ class Analyzer:
         start_time = time.time()
 
         analyzed_commits = 0
-        totoal_commits = len(commits) + len(branch_commits)
+        total_commits_num = len(commits) + len(branch_commits)
 
         for idx, commit in enumerate(reversed(commits), 1):
             phase = 'main'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self._observer.onBeforeCommit(self, idx, commit, totoal_commits_num, True)
+            self._observer.onBeforeCommit(self, idx, commit, total_commits_num, True)
             await self.analyze_master_commit(commit)
-            self._observer.onAfterCommit(self, idx, commit, totoal_commits_num, True)
+            self._observer.onAfterCommit(self, idx, commit, total_commits_num, True)
 
             if autosave:
                 self.autosave(phase, idx, checkpoint_interval)
@@ -127,9 +127,9 @@ class Analyzer:
         for idx, commit in enumerate(branch_commits, 1):
             phase = 'branch'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self._observer.onBeforeCommit(self, idx, commit, totoal_commits_num, False)
+            self._observer.onBeforeCommit(self, idx, commit, total_commits_num, False)
             await self.analyze_branch_commit(commit)
-            self._observer.onAfterCommit(self, idx, commit, totoal_commits_num, False)
+            self._observer.onAfterCommit(self, idx, commit, total_commits_num, False)
 
             if autosave:
                 self.autosave(phase, idx, checkpoint_interval)
@@ -221,7 +221,7 @@ class AnalyzerObserver(ABC):
     def __init__(self):
         pass
 
-    def onBeforeCommit(self, analyzer:Analyzer, index:int, commit:Commit, totoal_commits_num:int, isMaster:bool):
+    def onBeforeCommit(self, analyzer:Analyzer, index:int, commit:Commit, total_commits_num:int, isMaster:bool):
         """
         Called before the observed Analyzer is about to analyze a commit.
         Params:
@@ -234,7 +234,7 @@ class AnalyzerObserver(ABC):
         """
         pass
 
-    def onAfterCommit(self, analyzer:Analyzer, index:int, commit:Commit, totoal_commits_num:int, isMaster:bool):
+    def onAfterCommit(self, analyzer:Analyzer, index:int, commit:Commit, total_commits_num:int, isMaster:bool):
         """
         Called after the observed Analyzer has finished analyzing a commit.
         Params:
