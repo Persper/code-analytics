@@ -79,7 +79,9 @@
     },
     "nodes": {
         "ANSI_COLOR_BLUE": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -89,7 +91,9 @@
             "size": null
         },
         "ANSI_COLOR_BRIGHT": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -99,7 +103,9 @@
             "size": null
         },
         "ANSI_COLOR_CYAN": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -109,7 +115,9 @@
             "size": null
         },
         "ANSI_COLOR_GREEN": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -119,7 +127,9 @@
             "size": null
         },
         "ANSI_COLOR_MAGENTA": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -129,7 +139,9 @@
             "size": null
         },
         "ANSI_COLOR_RED": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -139,7 +151,9 @@
             "size": null
         },
         "ANSI_COLOR_RESET": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -149,7 +163,9 @@
             "size": null
         },
         "ANSI_COLOR_YELLOW": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -159,7 +175,9 @@
             "size": null
         },
         "ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 5,
@@ -169,7 +187,9 @@
             "size": null
         },
         "ConfigurationParser::ConfigurationParser(std::istream &inputStream)": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 4,
@@ -179,7 +199,10 @@
             "size": null
         },
         "RowReader &operator>>(RowReader &reader, bool &rhs)": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
+            ],
             "history": {
                 "A": {
                     "adds": 25,
@@ -189,7 +212,10 @@
             "size": null
         },
         "RowReader &operator>>(RowReader &reader, double &rhs)": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
+            ],
             "history": {
                 "A": {
                     "adds": 7,
@@ -199,7 +225,10 @@
             "size": null
         },
         "RowReader &operator>>(RowReader &reader, float &rhs)": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
+            ],
             "history": {
                 "A": {
                     "adds": 7,
@@ -209,7 +238,10 @@
             "size": null
         },
         "RowReader &operator>>(RowReader &reader, int &rhs)": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
+            ],
             "history": {
                 "A": {
                     "adds": 7,
@@ -219,7 +251,10 @@
             "size": null
         },
         "RowReader &operator>>(RowReader &reader, long &rhs)": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
+            ],
             "history": {
                 "A": {
                     "adds": 7,
@@ -229,7 +264,10 @@
             "size": null
         },
         "RowReader &operator>>(RowReader &reader, std::string &rhs)": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
+            ],
             "history": {
                 "A": {
                     "adds": 17,
@@ -239,7 +277,9 @@
             "size": null
         },
         "TDest safe_cast(TSrc obj)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -249,7 +289,9 @@
             "size": null
         },
         "TEnum operator&(TEnum lhs, TEnum rhs)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -259,7 +301,9 @@
             "size": null
         },
         "TEnum operator|(TEnum lhs, TEnum rhs)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -269,7 +313,9 @@
             "size": null
         },
         "TStream &operator>>(TStream &s, RowReader &reader)": {
-            "files": [],
+            "files": [
+                "TextFileParsers.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -279,7 +325,9 @@
             "size": null
         },
         "TStream OpenAndValidate(const TPath arg1)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -289,7 +337,9 @@
             "size": null
         },
         "_DECLARE_ENUM": {
-            "files": [],
+            "files": [
+                "Utility-1.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -299,7 +349,9 @@
             "size": null
         },
         "_DECLARE_ENUM_DEFAULT": {
-            "files": [],
+            "files": [
+                "Utility-1.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -309,7 +361,9 @@
             "size": null
         },
         "_RE_TRACE": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -319,7 +373,9 @@
             "size": null
         },
         "_RangeToEnumerable<TIterator> RangeToEnumerable(const std::pair<TIterator, TIterator> range)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -329,7 +385,9 @@
             "size": null
         },
         "_SILENCE_STDEXT_ALLOCATORS_DEPRECATION_WARNING": {
-            "files": [],
+            "files": [
+                "stdafx.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -339,7 +397,9 @@
             "size": null
         },
         "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 16,
@@ -349,7 +409,9 @@
             "size": null
         },
         "bool Confirm(const std::string &prompt)": {
-            "files": [],
+            "files": [
+                "Utility-1.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 18,
@@ -359,7 +421,9 @@
             "size": null
         },
         "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
-            "files": [],
+            "files": [
+                "Utility-1.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 30,
@@ -369,7 +433,9 @@
             "size": null
         },
         "bool dynamic_kind_of(const TSrc *obj)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -379,7 +445,9 @@
             "size": null
         },
         "bool pointer_kind_of(const std::shared_ptr<TSrc> obj)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -389,7 +457,9 @@
             "size": null
         },
         "const char *FriendlyNameOf()": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -399,7 +469,9 @@
             "size": null
         },
         "const char *FriendlyNameOf(const ReliabilityNetworkEntry &instance)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -409,7 +481,9 @@
             "size": null
         },
         "const char *FriendlyNameOf(const std::type_index &type)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -419,7 +493,9 @@
             "size": null
         },
         "const char *FriendlyNameOf(const type_info &type)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -429,7 +505,9 @@
             "size": null
         },
         "double ConfigurationParser::GetDouble(const std::string &key, double defaultValue) const": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 12,
@@ -439,7 +517,9 @@
             "size": null
         },
         "enum class StringComparison : int {}": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 6,
@@ -449,7 +529,9 @@
             "size": null
         },
         "inline std::string to_string(const std::pair<std::string, std::string> &value)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 4,
@@ -459,7 +541,9 @@
             "size": null
         },
         "int ConfigurationParser::GetInt(const std::string &key, int defaultValue) const": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 12,
@@ -469,7 +553,9 @@
             "size": null
         },
         "int main(int argc, char *argv[])": {
-            "files": [],
+            "files": [
+                "main.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 7,
@@ -483,7 +569,9 @@
             "size": null
         },
         "std::shared_ptr<TDest> safe_pointer_cast(const std::shared_ptr<TSrc> &obj)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -493,7 +581,9 @@
             "size": null
         },
         "std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 6,
@@ -503,7 +593,9 @@
             "size": null
         },
         "std::string StreamStatusToString(const TStream &stream)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,
@@ -513,7 +605,9 @@
             "size": null
         },
         "void ConfigurationParser::Load(std::istream &inputStream)": {
-            "files": [],
+            "files": [
+                "TextFileParsers.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 23,
@@ -523,7 +617,9 @@
             "size": null
         },
         "void ReportException(const std::exception &ex, int level)": {
-            "files": [],
+            "files": [
+                "Utility-1.cpp"
+            ],
             "history": {
                 "A": {
                     "adds": 21,
@@ -533,7 +629,9 @@
             "size": null
         },
         "void ValidateStream(const TStream &stream)": {
-            "files": [],
+            "files": [
+                "Utility.h"
+            ],
             "history": {
                 "A": {
                     "adds": 1,

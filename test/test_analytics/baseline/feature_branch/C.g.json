@@ -11,7 +11,9 @@
     },
     "nodes": {
         "char *str_append(char *string, char *append)": {
-            "files": [],
+            "files": [
+                "main.c"
+            ],
             "history": {
                 "A": {
                     "adds": 7,
@@ -25,7 +27,9 @@
             "size": null
         },
         "char *str_append_chr(char *string, char append)": {
-            "files": [],
+            "files": [
+                "main.c"
+            ],
             "history": {
                 "B": {
                     "adds": 3,
@@ -39,31 +43,28 @@
             "size": null
         },
         "int str_equals()": {
-            "files": [],
-            "history": {
-                "C": {
-                    "adds": 1,
-                    "dels": 0
-                }
-            },
+            "files": [
+                "main.c"
+            ],
+            "history": {},
             "size": null
         },
         "int str_equals(char *equal1, char *eqaul2)": {
-            "files": [],
+            "files": [
+                "main.c"
+            ],
             "history": {
                 "B": {
                     "adds": 11,
                     "dels": 0
-                },
-                "C": {
-                    "adds": 0,
-                    "dels": 1
                 }
             },
             "size": null
         },
         "int str_len(char *string)": {
-            "files": [],
+            "files": [
+                "main.c"
+            ],
             "history": {
                 "A": {
                     "adds": 6,
