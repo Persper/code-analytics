@@ -24,6 +24,7 @@ pytest-asyncio = "*"
 aenum = "*"
 pytest-cov = "*"
 gitpython = "*"
+sphinx = "*"
 
 [dev-packages]
 

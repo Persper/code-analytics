@@ -135,6 +135,19 @@ class TokenizedDocument:
                 return tokenM
         return None
 
+    def scopesOnLine(self, line: int) -> List[CallGraphScope]:
+        """
+        Gets all the instances of CallGraphScope from the specified 0-base line number.
+        """
+        scopes = []
+        for scope in self._scopes:
+            # This is inefficient (yet correct)
+            if scope.startPos.line > line:
+                break
+            if scope.endPos.line >= line:
+                scopes.append(scope)
+        return scopes
+
     def scopeAt(self, line: int, character: int) -> CallGraphScope:
         """
         Gets the CallGraphScope from the specified 0-base line and character position

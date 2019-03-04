@@ -1,6 +1,6 @@
 import re
 from persper.analytics.inverse_diff import inverse_diff
-from persper.analytics.srcml import transform_src_to_tree
+from persper.analytics.srcml import src_to_tree
 from persper.analytics.call_graph.c import update_graph, get_func_ranges_c
 from persper.analytics.detect_change import get_changed_functions
 from persper.analytics.patch_parser import PatchParser
@@ -55,12 +55,12 @@ class CGraphServer(GraphServer):
 
         # Parse source codes into ASTs
         if old_src:
-            old_ast = transform_src_to_tree(old_src)
+            old_ast = src_to_tree(old_filename, old_src)
             if old_ast is None:
                 return -1
 
         if new_src:
-            new_ast = transform_src_to_tree(new_src)
+            new_ast = src_to_tree(new_filename, new_src)
             if new_ast is None:
                 return -1
             ast_list = [new_ast]
