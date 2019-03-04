@@ -50,33 +50,38 @@ def transform_dir(input_dir, output_dir, extensions=('.c', '.h')):
     print("Tranformation completed, {} processed.".format(counter))
 
 
-def transform_src_to_tree(source_code, ext='.c'):
-    root = None
+def src_to_tree(filename, src):
+    """
+    Assume src is UTF-8 encoded.
+    the temp file needs to have the right ext so that srcml can open it
+    """
+    _, ext = os.path.splitext(filename)
+    if ext == '':
+        print("ERROR: src_to_tree can't extract file extension.")
+        return None
+
     try:
-        f = tempfile.NamedTemporaryFile(mode='wb+', delete=False)
-        f.write(source_code.encode('utf-8', 'replace'))
+        f = tempfile.NamedTemporaryFile(mode='wb+', suffix=ext, delete=False)
+        f.write(src.encode('utf-8', 'replace'))
         f.close()
     except UnicodeEncodeError as e:
-        print("UnicodeEncodeError in transform_src_to_tree!")
+        print("ERROR: src_to_tree encounters UnicodeEncodeError.")
         if not f.closed:
             f.close()
         os.remove(f.name)
         return None
 
-    # rename so that srcml can open it
-    new_fname = f.name + ext
-    os.rename(f.name, new_fname)
     xml_path = f.name + ".xml"
-    cmd = 'srcml {} --position -o {}'.format(new_fname, xml_path)
+    cmd = 'srcml {} --position --filename {} -o {}'.format(f.name, '\"/' + filename + '\"', xml_path)
     subprocess.call(cmd, shell=True)
     try:
         root = etree.parse(xml_path).getroot()
     except:
-        print("Unable to parse xml file!")
+        print("ERROR: src_to_tree unable to parse xml file.")
     finally:
         if not f.closed:
             f.close()
-        os.remove(new_fname)
+        os.remove(f.name)
         if os.path.exists(xml_path):
             os.remove(xml_path)
 
