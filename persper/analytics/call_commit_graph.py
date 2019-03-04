@@ -83,7 +83,7 @@ class CallCommitGraph:
 
     # TODO: remove the default value of files
     def add_node(self, node, files=[]):
-        self._digraph.add_node(node, size=None, history={}, files=files)
+        self._digraph.add_node(node, size=None, history={}, files=set(files))
 
     # add_node must be called on source and target first
     def add_edge(self, source, target):
@@ -110,7 +110,7 @@ class CallCommitGraph:
         return self._digraph.nodes[node]['history']
 
     def update_node_files(self, node, new_files):
-        self._digraph.nodes[node]['files'] = new_files
+        self._digraph.nodes[node]['files'] = set(new_files)
 
     # TODO: provide other options for computing a node's size
     def _set_all_nodes_size(self, black_set=None):

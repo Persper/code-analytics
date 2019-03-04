@@ -20,10 +20,6 @@
             "addedBy": "G",
             "weight": null
         },
-        "void add(int num)|->|void append(int num)": {
-            "addedBy": "H",
-            "weight": null
-        },
         "void insert(int num)|->|void add(int num)": {
             "addedBy": "H",
             "weight": null
@@ -35,75 +31,149 @@
     },
     "nodes": {
         "char *str_append(char *string, char *append)": {
+            "files": [
+                "main.c"
+            ],
             "history": {
-                "A": 7,
-                "B": 3
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                },
+                "B": {
+                    "adds": 0,
+                    "dels": 3
+                }
             },
             "size": null
         },
         "char *str_append_chr(char *string, char append)": {
+            "files": [
+                "main.c"
+            ],
             "history": {
-                "B": 3,
-                "C": 34
+                "B": {
+                    "adds": 3,
+                    "dels": 0
+                },
+                "C": {
+                    "adds": 30,
+                    "dels": 4
+                }
             },
             "size": null
         },
         "char *str_replace(char *search, char *replace, char *subject)": {
+            "files": [
+                "feature-G.c"
+            ],
             "history": {
-                "G": 26
+                "G": {
+                    "adds": 26,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "int count()": {
+            "files": [
+                "feature-J.c"
+            ],
             "history": {
-                "J": 12
+                "J": {
+                    "adds": 12,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "int str_equals()": {
-            "history": {
-                "C": 1
-            },
+            "files": [
+                "main.c"
+            ],
+            "history": {},
             "size": null
         },
         "int str_equals(char *equal1, char *eqaul2)": {
+            "files": [
+                "main.c"
+            ],
             "history": {
-                "B": 11,
-                "C": 1,
-                "G": 2
+                "B": {
+                    "adds": 11,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "int str_len(char *string)": {
+            "files": [
+                "main.c"
+            ],
             "history": {
-                "A": 6
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "void add(int num)": {
+            "files": [
+                "feature-H.c"
+            ],
             "history": {
-                "H": 16,
-                "I": 5
+                "H": {
+                    "adds": 16,
+                    "dels": 0
+                },
+                "I": {
+                    "adds": 0,
+                    "dels": 5
+                }
             },
             "size": null
         },
         "void append(int num)": {
+            "files": [
+                "feature-H.c"
+            ],
             "history": {
-                "H": 12,
-                "I": 35
+                "H": {
+                    "adds": 12,
+                    "dels": 0
+                },
+                "I": {
+                    "adds": 26,
+                    "dels": 9
+                }
             },
             "size": null
         },
         "void display(struct node *r)": {
+            "files": [
+                "feature-J.c"
+            ],
             "history": {
-                "J": 14
+                "J": {
+                    "adds": 14,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "void insert(int num)": {
+            "files": [
+                "feature-H.c"
+            ],
             "history": {
-                "H": 25,
-                "I": 25
+                "H": {
+                    "adds": 25,
+                    "dels": 0
+                },
+                "I": {
+                    "adds": 0,
+                    "dels": 25
+                }
             },
             "size": null
         }

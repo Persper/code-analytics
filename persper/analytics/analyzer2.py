@@ -5,8 +5,7 @@ from typing import Union, Set
 
 from git import Commit, Diff, DiffIndex, Repo
 
-from persper.analytics.git_tools import (EMPTY_TREE_SHA, diff_with_commit,
-                                         get_contents)
+from persper.analytics.git_tools import (diff_with_commit, get_contents)
 from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 
 
@@ -61,7 +60,7 @@ class Analyzer:
 
     @originCommit.setter
     def originCommit(self, value: Union[Commit, str]):
-        self._originCommit = self._repo.rev_parse(value) if value else None
+        self._originCommit = self._repo.commit(value) if value else None
 
     @property
     def terminalCommit(self):
@@ -72,7 +71,7 @@ class Analyzer:
 
     @terminalCommit.setter
     def terminalCommit(self, value: Union[Commit, str]):
-        self._terminalCommit = self._repo.rev_parse(value)
+        self._terminalCommit = self._repo.commit(value)
 
     @property
     def firstParentOnly(self):
@@ -98,7 +97,7 @@ class Analyzer:
         return self._s_visitedCommits
 
     async def analyze(self, maxAnalyzedCommits=1000):
-        graphServerLastCommit = EMPTY_TREE_SHA
+        graphServerLastCommit:str = None
         commitSpec = self._terminalCommit
         if self._originCommit:
             commitSpec = self._originCommit.hexsha + ".." + self._terminalCommit.hexsha

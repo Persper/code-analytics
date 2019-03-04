@@ -19,7 +19,8 @@ def diff_with_commit(repo: Repo, current_commit: Commit, base_commit_sha: str):
         base_commit = repo.tree(EMPTY_TREE_SHA)
     else:
         base_commit = repo.commit(base_commit_sha)
-    return base_commit.diff(current_commit, create_patch=True, indent_heuristic=True)
+    return base_commit.diff(current_commit, create_patch=True, indent_heuristic=True,
+                            ignore_blank_lines=True, ignore_space_change=True)
 
 
 def initialize_repo(repo_path):

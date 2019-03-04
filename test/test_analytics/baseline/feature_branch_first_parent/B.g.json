@@ -2,27 +2,54 @@
     "edges": {},
     "nodes": {
         "char *str_append(char *string, char *append)": {
+            "files": [
+                "main.c"
+            ],
             "history": {
-                "A": 7,
-                "B": 3
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                },
+                "B": {
+                    "adds": 0,
+                    "dels": 3
+                }
             },
             "size": null
         },
         "char *str_append_chr(char *string, char append)": {
+            "files": [
+                "main.c"
+            ],
             "history": {
-                "B": 3
+                "B": {
+                    "adds": 3,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "int str_equals(char *equal1, char *eqaul2)": {
+            "files": [
+                "main.c"
+            ],
             "history": {
-                "B": 11
+                "B": {
+                    "adds": 11,
+                    "dels": 0
+                }
             },
             "size": null
         },
         "int str_len(char *string)": {
+            "files": [
+                "main.c"
+            ],
             "history": {
-                "A": 6
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
             },
             "size": null
         }
