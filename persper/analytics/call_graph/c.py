@@ -1,5 +1,5 @@
 import networkx as nx
-from persper.graphs.call_graph.utils import remove_edges_of_node, ns, line_attr
+from persper.analytics.call_graph.utils import remove_edges_of_node, ns, line_attr
 
 
 class NotFunctionCallError(Exception):
