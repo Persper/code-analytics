@@ -1,3 +1,8 @@
+"""
+call_commit_graph.py
+====================================
+CallCommitGraph stores all relevant analysis results
+"""
 import networkx as nx
 from networkx.readwrite import json_graph
 from persper.analytics.devrank import devrank
@@ -29,6 +34,10 @@ class CommitIdGenerators:
 
 
 class CallCommitGraph:
+    """
+    The key data structure that stores all functions' call relationships
+    and edit histories across commits.
+    """
 
     def __init__(self, node_link_data=None, commit_id_generator=CommitIdGenerators.fromHexsha):
         if node_link_data:
@@ -39,6 +48,7 @@ class CallCommitGraph:
         self._current_commit_id = None
 
     def reset(self):
+        """Reset all internal states"""
         self._digraph = self._new_graph()
 
     def _new_graph(self):
@@ -46,21 +56,21 @@ class CallCommitGraph:
            with appropriate arguments"""
         return nx.DiGraph(commits={})
 
-    # Read-only access
     def nodes(self, data=False):
+        """Provide read-only access for nodes"""
         return self._digraph.nodes(data=data)
 
-    # Read-only access
     def edges(self, data=False):
+        """Provide read-only access for edges"""
         return self._digraph.edges(data=data)
 
-    # Read-only access
     def commits(self):
+        """Provide read-only access for commits"""
         # https://networkx.github.io/documentation/stable/tutorial.html#graph-attributes
         return self._digraph.graph['commits']
 
-    # Read-only access
     def __contains__(self, node):
+        """Implement membership check"""
         return node in self._digraph
 
     def add_commit(self, hexsha, author_name, author_email, message):
