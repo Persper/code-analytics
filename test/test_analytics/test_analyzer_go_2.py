@@ -84,13 +84,78 @@ def test_analzyer_go(az):
         ccgraph = az.get_graph()
 
         history_truth = {
-            'A': {'main.go:cat:printInfo': 3,
-                'main.go:dog:printInfo': 3,
-                'main.go::main': 10},
-            'B': {'main.go:dog:printInfo': 2,
-                'main.go::main': 13, 
-                "main.go::invoke":3,
-                'main.go:cat:printInfo': 0}
+            'A': {'main.go:Vertex:Abs': 3,
+                'main.go::funcA': 3,
+                'main.go::main': 5},
+            'B': {'main.go:Vertex:Abs': 0,
+                'main.go::funcA': 0,
+                'main.go::funcB': 3,
+                'main.go::main': 1},
+            'C': {'main.go:Vertex:Abs': 1,
+                'main.go::funcA': 0,
+                'main.go::main': 1,
+                'main.go::funcB':3},
+            'D': {'main.go:Vertex:Abs': 4, # should have to 1, because of git problems
+                'main.go::funcA': 0,
+                'main.go::main': 2,
+                'main.go:Vertex:Absp': 1  #3 should have to 1, because of git problems
+                },
+            'E': {
+                'main.go:Vertex:Abs': 0,
+                'main.go::funcA': 0,
+                'main.go::main': 5, be
+                'main.go:Vertex:Absp':0,
+                'main.go:rectangle:printInfo':3,
+                'main.go:square:printInfo':3,
+            },
+            'F': {
+                'main.go:Vertex:Abs': 1, ##should 0
+                'main.go::funcA': 0,
+                'main.go::main': 2,
+                'main.go:Vertex:Absp':0,
+                'main.go:rectangle:printInfo':0,
+                'main.go:square:printInfo':0,
+                'main.go::invoke':3,
+            },
+            'G': {
+                'main.go:Vertex:Abs': 0,
+                'main.go::funcA': 0,
+                'main.go::main': 0, 
+                'main.go:Vertex:Absp':0,
+                'main.go:rectangle:printInfo':0,
+                'main.go:square:printInfo':0,
+                'main.go::invoke':0,
+            },            
+            'H': {
+                'main.go:Vertex:Abs': 0,
+                'main.go:Rect:Abs': 3,                
+                'main.go::funcA': 0,
+                'main.go::main': 2,
+                'main.go:Vertex:Absp':0,
+                'main.go:rectangle:printInfo':0,
+                'main.go:square:printInfo':0,
+                'main.go::invoke':0,
+            },            
+            'I': {
+                'main.go:Vertex:Abs': 0,
+                'main.go:Rect:Abs': 3,                
+                'main.go::funcA': 0,
+                'main.go::main': 2,
+                'main.go:Vertex:Absp':0,
+                'main.go:rectangle:printInfo':0,
+                'main.go:square:printInfo':0,
+                'main.go::invoke':0,
+            },           
+            'J': {
+                'main.go:Vertex:Abs': 1, #should 0 unknown problems
+                'main.go:Rect:Abs': 3,                
+                'main.go::funcA': 1, #should 0 unknown problems
+                'main.go::main': 3, #2 unknown problems
+                'main.go:Vertex:Absp':0, 
+                'main.go:rectangle:printInfo':0,
+                'main.go:square:printInfo':0,
+                'main.go::invoke':1,
+            },     
         }
 
 
@@ -102,19 +167,44 @@ def test_analzyer_go(az):
                 assert (csize == history_truth[commit_message.strip()][func])
 
         edges_added_by_A = set([
-            ('main.go::main', 'main.go:dog:printInfo'),
-            ('main.go::main', 'main.go:cat:printInfo'),
+            ('main.go::main', 'main.go::funcA'),
+            ('main.go::main', 'main.go:Vertex:Abs')
         ])
 
         edges_added_by_B = set([
-            ('main.go::main', 'main.go::invoke'),
-            ('main.go::invoke', 'main.go:cat:printInfo'),
-            ('main.go::invoke', 'main.go:dog:printInfo')
-
+           ('main.go::main','main.go::funcB'),
+           ('main.go:Vertex:Abs','main.go::funcA')
         ])
 
+        edges_added_by_C = set([
+        ])
+        
+        edges_added_by_D = set([
+            ('main.go::main','main.go:Vertex:Absp')
+        ])
 
-        all_edges = edges_added_by_A.union(edges_added_by_B)
+        edges_added_by_E = set([
+            ('main.go::main','main.go:square:printInfo'),
+            ('main.go::main','main.go:rectangle:printInfo')
+        ])
+        edges_added_by_F = set([
+            ('main.go::main','main.go::invoke'),
+            ('main.go::invoke','main.go:rectangle:printInfo'),
+            ('main.go::invoke','main.go:square:printInfo')
+        ])
+        edges_added_by_G = set([
+            ('main.go::main','main.go:Rect:Abs'),
+        ])        
+
+        edges_added_by_H = set([
+            ('main.go:Rect:Abs', 'main.go::funcA'),
+        ]) 
+        edges_added_by_I = set([
+        ])  
+        edges_added_by_J = set([
+        ])     
+        all_edges = edges_added_by_A.union(edges_added_by_B).union(edges_added_by_C).union(edges_added_by_D).union(edges_added_by_E).union(edges_added_by_F) \
+        .union(edges_added_by_G).union(edges_added_by_H).union(edges_added_by_I).union(edges_added_by_J)
         assert (set(az._graph_server.get_graph().edges()) == all_edges)
 
     finally:
