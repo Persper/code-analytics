@@ -1,6 +1,0 @@
-digraph test_processor {
-    A -> B -> C ->                D;
-         B ->      E -> F -> G -> D;
-    A -> H -> I -> J ->      G     ;
-    A -> K -> L -> J               ; 
-}
