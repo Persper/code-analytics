@@ -41,7 +41,7 @@ git --version
 Add the following line to your `~/.bashrc` file.
 
 ```
-export PATH=$PATH:/path/to/dir
+export PYTHONPATH=$PYTHONPATH:/path/to/dir
 ```
 
 To update your path for the remainder of the session.
