@@ -2,7 +2,7 @@ import os
 from persper.analytics.patch_parser import PatchParser
 from persper.analytics.detect_change import get_changed_functions
 from persper.analytics.call_graph.cpp import get_func_ranges_cpp
-from persper.analytics.srcml import transform_src_to_tree
+from persper.analytics.srcml import src_to_tree
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -40,7 +40,7 @@ def test_detect_change():
         assert(parsing_result == parsing_truth)
 
     with open(os.path.join(dir_path, 'example.cc'), 'r') as f:
-        root = transform_src_to_tree(f.read(), ext='.cc')
+        root = src_to_tree('example.cc', f.read())
         func_ranges_result = get_func_ranges_cpp(root)
         assert(func_ranges_result == func_ranges_truth)
 
