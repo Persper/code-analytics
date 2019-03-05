@@ -102,6 +102,7 @@ async def test_black_set():
     Its parent: https://github.com/bitcoin/bitcoin/commit/5b721607b1057df4dfe97f80d235ed372312f398
     Its grandparent: https://github.com/bitcoin/bitcoin/commit/2ef9cfa5b81877b1023f2fcb82f5a638b1eb013c
     Its great grandparent: https://github.com/bitcoin/bitcoin/commit/7d7797b141dbd4ed9db1dda94684beb3395c2534
+    Its great great grandparent: https://github.com/bitcoin/bitcoin/commit/401926283a200994ecd7df8eae8ced8e0b067c46
     """
     repo_path = os.path.join(root_path, 'repos/bitcoin')
     bitcoin_url = 'https://github.com/bitcoin/bitcoin'
@@ -109,13 +110,14 @@ async def test_black_set():
         Repo.clone_from(bitcoin_url, repo_path)
     az = Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES))
     crlf_sha = '0a61b0df1224a5470bcddab302bc199ca5a9e356'
-    ggparent_sha = '7d7797b141dbd4ed9db1dda94684beb3395c2534'
-    rev = ggparent_sha + '..' + crlf_sha
+    parent_sha = '5b721607b1057df4dfe97f80d235ed372312f398'
+    gggparent_sha = '401926283a200994ecd7df8eae8ced8e0b067c46'
+    rev = gggparent_sha + '..' + crlf_sha
     await az.analyze(rev=rev)
     ccgraph = az.get_graph()
     devdict = ccgraph.commit_devranks(0.85)
-    devdict2 = ccgraph.commit_devranks(0.85, black_set=set([crlf_sha]))
+    devdict2 = ccgraph.commit_devranks(0.85, black_set=set([parent_sha]))
     assert(len(devdict) == 3)
     assert(len(devdict2) == 2)
-    assert(crlf_sha in devdict)
-    assert(crlf_sha not in devdict2)
+    assert(parent_sha in devdict)
+    assert(parent_sha not in devdict2)
