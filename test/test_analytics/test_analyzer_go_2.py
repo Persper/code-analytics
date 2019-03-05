@@ -23,9 +23,9 @@ def az():
           script_path - A string, path to the repo creator script
         test_src_path - A string, path to the dir to be passed to repo creator
     """
-    repo_path = os.path.join(root_path, 'repos/go_test_repo_2')
+    repo_path = os.path.join(root_path, 'repos/go_test_repo_temp')
     script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
-    test_src_path = os.path.join(root_path, 'test/go_test_repo_2')
+    test_src_path = os.path.join(root_path, 'test/go_test_repo_temp')
     server_addr = 'http://localhost:%d' % server_port
 
     # Always use latest source to create test repo
