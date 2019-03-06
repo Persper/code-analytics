@@ -143,4 +143,45 @@ def developer_profile(pickle_path, alpha=0.85, show_merge=True):
         }
         item['dev_value'] = sum(values)
 
+    dev_share = module_contrib(az.get_graph(), dev_share)
+
     return dev_share
+
+
+def module_contrib(ccgraph, dev_share):
+    for email in dev_share.keys():
+        dev_share[email]['modules'] = modules_on_dev(ccgraph, email)
+
+    return dev_share
+
+
+def modules_on_dev(ccgraph, email, alpha=0.85, black_set=[]):
+    commits = []
+    for commit in ccgraph.commits().values():
+        if commit['authorEmail'] == email:
+            commits.append(commit['hexsha'])
+
+    print(len(commits))
+    modules_share = {}
+    func_devranks = ccgraph.function_devranks(alpha, black_set=black_set)
+
+    for func, data in ccgraph.nodes(data=True):
+        size = data['size']
+        history = data['history']
+        files = data['files']
+
+        if len(history) == 0:
+            continue
+
+        for cid, chist in history.items():
+            csize = chist['adds'] + chist['dels']
+            sha = ccgraph.commits()[cid]['hexsha']
+            if (sha not in black_set) and (sha in commits) :
+                dr = (csize / size) * func_devranks[func]
+                for file in files:
+                    if file in modules_share:
+                        modules_share[file] += dr/len(files)*1.0
+                    else:
+                        modules_share[file] = dr/len(files)*1.0
+
+    return modules_share
