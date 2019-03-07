@@ -1,17 +1,23 @@
 import sys
 import os
 import json
+import redis
 import pickle
 from datetime import datetime, timedelta
 from Naked.toolshed.shell import muterun_rb
 from persper.analytics.cpp import CPPGraphServer
 from persper.analytics.analyzer import Analyzer
+from persper.analytics.go import GoGraphServer
 from persper.analytics.graph_server import CPP_FILENAME_REGEXES
-from vdev.analyzer_observer_vdev import AnalyzerObserverVdev
-import redis
+from persper.analytics.graph_server import C_FILENAME_REGEXES
+from persper.analytics.graph_server import JS_FILENAME_REGEXES
+from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from utils import get_config_from_yaml
+from vdev.analyzer_observer_vdev import AnalyzerObserverVdev
 
-config = get_config_from_yaml('config.yaml')['redis']
+
+root_path = os.path.dirname(os.path.abspath(__file__))
+config = get_config_from_yaml(os.path.join(root_path, 'config.yaml'))
 ALPHA = 0.85
 LANGUAGE_LIST = ['C', 'C++']
 
@@ -20,8 +26,31 @@ def observer(redis_address, redis_port, git_url):
     return AnalyzerObserverVdev(redis_address, redis_port, git_url)
 
 
-def build_analyzer(git_url, repo_path, original_pickle_path, new_pickle_path):
+async def build_analyzer2(git_url, repo_path, original_pickle_path, new_pickle_path):
+    linguist = check_linguist(repo_path)
+    major_language = max(linguist, key=linguist.get)
+    print('The major language is: ', major_language)
 
+    if major_language not in LANGUAGE_LIST:
+        return
+
+    if original_pickle_path and os.path.exists(original_pickle_path):
+        az = pickle.load(open(original_pickle_path, 'rb'))
+        await az.analyze(git_url, new_pickle_path, continue_iter=True, end_commit_sha='master', into_branches=True)
+        return
+
+    analyzer_dict = {
+        'C':   Analyzer(repo_path, CPPGraphServer(C_FILENAME_REGEXES)),
+        'C++': Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES)),
+        'Go':  Analyzer(repo_path, GoGraphServer(config['go_server_addr'], GO_FILENAME_REGEXES))
+    }
+
+    az = analyzer_dict['major_language']
+    az.observer = observer(config['redis']['host'], config['redis']['port'], git_url)
+    await az.analyze(git_url, new_pickle_path, from_beginning=True, into_branches=True)
+
+
+async def build_analyzer(git_url, repo_path, original_pickle_path, new_pickle_path):
     linguist = check_linguist(repo_path)
     major_language = max(linguist, key=linguist.get)
     print('The major language is: ', major_language)
@@ -33,13 +62,12 @@ def build_analyzer(git_url, repo_path, original_pickle_path, new_pickle_path):
             await az.analyze(git_url, new_pickle_path, continue_iter=True, end_commit_sha='master', into_branches=True)
         else:
             az = Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES))
-            az.observer = observer(config['host'], port=config['port'], git_url)
+            az.observer = observer(config['redis']['host'], config['redis']['port'], git_url)
             await az.analyze(git_url, new_pickle_path, from_beginning=True, into_branches=True)
 
 
 def check_linguist(repo_path):
-    root_path = os.path.dirname(os.path.abspath(__file__))
-    response = muterun_rb(os.path.join(root_path, 'vdev/linguist.rb'), repo_path)
+    response = muterun_rb(os.path.join(root_path, 'linguist.rb'), repo_path)
 
     if response.exitcode == 0:
         lang_dict = json.loads(response.stdout)

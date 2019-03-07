@@ -1,0 +1,6 @@
+# Redis
+redis:
+  host: 127.0.0.1
+  port: 6379
+
+go_server_addr: 0.0.0.0:8008
