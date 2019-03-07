@@ -28,27 +28,7 @@
             "addedBy": "C",
             "weight": null
         },
-        "bool Confirm(const std::string &prompt)|->|bool Confirm(const std::string &prompt)": {
-            "addedBy": "C",
-            "weight": null
-        },
-        "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)|->|bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
-            "addedBy": "C",
-            "weight": null
-        },
         "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)|->|enum class StringComparison : int {}": {
-            "addedBy": "C",
-            "weight": null
-        },
-        "const char *FriendlyNameOf(const ReliabilityNetworkEntry &instance)|->|const char *FriendlyNameOf()": {
-            "addedBy": "C",
-            "weight": null
-        },
-        "const char *FriendlyNameOf(const std::type_index &type)|->|const char *FriendlyNameOf()": {
-            "addedBy": "C",
-            "weight": null
-        },
-        "const char *FriendlyNameOf(const type_info &type)|->|const char *FriendlyNameOf()": {
             "addedBy": "C",
             "weight": null
         },
@@ -70,10 +50,6 @@
         },
         "int main(int argc, char *argv[])|->|void ReportException(const std::exception &ex, int level)": {
             "addedBy": "B",
-            "weight": null
-        },
-        "void ReportException(const std::exception &ex, int level)|->|void ReportException(const std::exception &ex, int level)": {
-            "addedBy": "C",
             "weight": null
         }
     },
@@ -204,7 +180,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 25,
+                    "adds": 24,
                     "dels": 0
                 },
                 "C": {
@@ -220,7 +196,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 7,
+                    "adds": 6,
                     "dels": 0
                 }
             },
@@ -232,7 +208,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 7,
+                    "adds": 6,
                     "dels": 0
                 }
             },
@@ -244,7 +220,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 7,
+                    "adds": 6,
                     "dels": 0
                 }
             },
@@ -256,7 +232,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 7,
+                    "adds": 6,
                     "dels": 0
                 }
             },
@@ -268,7 +244,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 17,
+                    "adds": 16,
                     "dels": 0
                 }
             },
@@ -412,12 +388,11 @@
         },
         "bool Confirm(const std::string &prompt)": {
             "files": [
-                "Utility.cpp",
-                "Utility.h"
+                "Utility.cpp"
             ],
             "history": {
                 "A": {
-                    "adds": 18,
+                    "adds": 17,
                     "dels": 0
                 }
             },
@@ -425,12 +400,11 @@
         },
         "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
             "files": [
-                "Utility.cpp",
-                "Utility.h"
+                "Utility.cpp"
             ],
             "history": {
                 "A": {
-                    "adds": 30,
+                    "adds": 29,
                     "dels": 0
                 },
                 "C": {
@@ -465,42 +439,6 @@
             "size": null
         },
         "const char *FriendlyNameOf()": {
-            "files": [
-                "Utility.h"
-            ],
-            "history": {
-                "A": {
-                    "adds": 1,
-                    "dels": 0
-                }
-            },
-            "size": null
-        },
-        "const char *FriendlyNameOf(const ReliabilityNetworkEntry &instance)": {
-            "files": [
-                "Utility.h"
-            ],
-            "history": {
-                "A": {
-                    "adds": 1,
-                    "dels": 0
-                }
-            },
-            "size": null
-        },
-        "const char *FriendlyNameOf(const std::type_index &type)": {
-            "files": [
-                "Utility.h"
-            ],
-            "history": {
-                "A": {
-                    "adds": 1,
-                    "dels": 0
-                }
-            },
-            "size": null
-        },
-        "const char *FriendlyNameOf(const type_info &type)": {
             "files": [
                 "Utility.h"
             ],
@@ -634,12 +572,11 @@
         },
         "void ReportException(const std::exception &ex, int level)": {
             "files": [
-                "Utility.cpp",
-                "Utility.h"
+                "Utility.cpp"
             ],
             "history": {
                 "A": {
-                    "adds": 21,
+                    "adds": 20,
                     "dels": 0
                 }
             },

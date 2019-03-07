@@ -4,7 +4,7 @@
             "addedBy": "F",
             "weight": null
         },
-        "char *str_append_chr(char *string, char append)|->|int str_equals()": {
+        "char *str_append_chr(char *string, char append)|->|int str_equals(char *equal1, char *eqaul2)": {
             "addedBy": "F",
             "weight": null
         },
@@ -16,12 +16,8 @@
             "addedBy": "F",
             "weight": null
         },
-        "char *str_replace(char *search, char *replace, char *subject)|->|int str_equals()": {
-            "addedBy": "F",
-            "weight": null
-        },
         "char *str_replace(char *search, char *replace, char *subject)|->|int str_equals(char *equal1, char *eqaul2)": {
-            "addedBy": "G",
+            "addedBy": "F",
             "weight": null
         },
         "char *str_replace(char *search, char *replace, char *subject)|->|int str_len(char *string)": {
@@ -92,13 +88,6 @@
                     "dels": 0
                 }
             },
-            "size": null
-        },
-        "int str_equals()": {
-            "files": [
-                "main.c"
-            ],
-            "history": {},
             "size": null
         },
         "int str_equals(char *equal1, char *eqaul2)": {

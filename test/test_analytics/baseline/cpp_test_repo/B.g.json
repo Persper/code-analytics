@@ -28,28 +28,8 @@
             "addedBy": "A",
             "weight": null
         },
-        "bool Confirm(const std::string &prompt)|->|bool Confirm(const std::string &prompt)": {
-            "addedBy": "B",
-            "weight": null
-        },
-        "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)|->|bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
-            "addedBy": "B",
-            "weight": null
-        },
         "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)|->|enum class StringComparison : int {}": {
             "addedBy": "B",
-            "weight": null
-        },
-        "const char *FriendlyNameOf(const ReliabilityNetworkEntry &instance)|->|const char *FriendlyNameOf()": {
-            "addedBy": "A",
-            "weight": null
-        },
-        "const char *FriendlyNameOf(const std::type_index &type)|->|const char *FriendlyNameOf()": {
-            "addedBy": "A",
-            "weight": null
-        },
-        "const char *FriendlyNameOf(const type_info &type)|->|const char *FriendlyNameOf()": {
-            "addedBy": "A",
             "weight": null
         },
         "int main(int argc, char *argv[])|->|TStream OpenAndValidate(const TPath arg1)": {
@@ -69,10 +49,6 @@
             "weight": null
         },
         "int main(int argc, char *argv[])|->|void ReportException(const std::exception &ex, int level)": {
-            "addedBy": "B",
-            "weight": null
-        },
-        "void ReportException(const std::exception &ex, int level)|->|void ReportException(const std::exception &ex, int level)": {
             "addedBy": "B",
             "weight": null
         }
@@ -200,12 +176,11 @@
         },
         "RowReader &operator>>(RowReader &reader, bool &rhs)": {
             "files": [
-                "TextFileParsers.cpp",
-                "TextFileParsers.h"
+                "TextFileParsers.cpp"
             ],
             "history": {
                 "A": {
-                    "adds": 25,
+                    "adds": 24,
                     "dels": 0
                 }
             },
@@ -213,12 +188,11 @@
         },
         "RowReader &operator>>(RowReader &reader, double &rhs)": {
             "files": [
-                "TextFileParsers.cpp",
-                "TextFileParsers.h"
+                "TextFileParsers.cpp"
             ],
             "history": {
                 "A": {
-                    "adds": 7,
+                    "adds": 6,
                     "dels": 0
                 }
             },
@@ -226,12 +200,11 @@
         },
         "RowReader &operator>>(RowReader &reader, float &rhs)": {
             "files": [
-                "TextFileParsers.cpp",
-                "TextFileParsers.h"
+                "TextFileParsers.cpp"
             ],
             "history": {
                 "A": {
-                    "adds": 7,
+                    "adds": 6,
                     "dels": 0
                 }
             },
@@ -239,12 +212,11 @@
         },
         "RowReader &operator>>(RowReader &reader, int &rhs)": {
             "files": [
-                "TextFileParsers.cpp",
-                "TextFileParsers.h"
+                "TextFileParsers.cpp"
             ],
             "history": {
                 "A": {
-                    "adds": 7,
+                    "adds": 6,
                     "dels": 0
                 }
             },
@@ -252,12 +224,11 @@
         },
         "RowReader &operator>>(RowReader &reader, long &rhs)": {
             "files": [
-                "TextFileParsers.cpp",
-                "TextFileParsers.h"
+                "TextFileParsers.cpp"
             ],
             "history": {
                 "A": {
-                    "adds": 7,
+                    "adds": 6,
                     "dels": 0
                 }
             },
@@ -265,12 +236,11 @@
         },
         "RowReader &operator>>(RowReader &reader, std::string &rhs)": {
             "files": [
-                "TextFileParsers.cpp",
-                "TextFileParsers.h"
+                "TextFileParsers.cpp"
             ],
             "history": {
                 "A": {
-                    "adds": 17,
+                    "adds": 16,
                     "dels": 0
                 }
             },
@@ -414,7 +384,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 18,
+                    "adds": 17,
                     "dels": 0
                 }
             },
@@ -426,7 +396,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 30,
+                    "adds": 29,
                     "dels": 0
                 }
             },
@@ -457,42 +427,6 @@
             "size": null
         },
         "const char *FriendlyNameOf()": {
-            "files": [
-                "Utility.h"
-            ],
-            "history": {
-                "A": {
-                    "adds": 1,
-                    "dels": 0
-                }
-            },
-            "size": null
-        },
-        "const char *FriendlyNameOf(const ReliabilityNetworkEntry &instance)": {
-            "files": [
-                "Utility.h"
-            ],
-            "history": {
-                "A": {
-                    "adds": 1,
-                    "dels": 0
-                }
-            },
-            "size": null
-        },
-        "const char *FriendlyNameOf(const std::type_index &type)": {
-            "files": [
-                "Utility.h"
-            ],
-            "history": {
-                "A": {
-                    "adds": 1,
-                    "dels": 0
-                }
-            },
-            "size": null
-        },
-        "const char *FriendlyNameOf(const type_info &type)": {
             "files": [
                 "Utility.h"
             ],
@@ -622,7 +556,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 21,
+                    "adds": 20,
                     "dels": 0
                 }
             },
