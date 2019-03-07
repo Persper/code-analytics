@@ -74,11 +74,11 @@ def update_graph(ccgraph, ast_list, change_stats):
         for function in get_all_function_caller(tree):
 
             if function not in ccgraph:
-                ccgraph.add_node(caller_name, [filename])
+                ccgraph.add_node(function, [filename])
             else:
-                files = ccgraph.nodes()[caller_name]['files']
+                files = ccgraph.nodes()[function]['files']
                 if filename not in files:
-                    ccgraph.update_node_files(caller_name, files + [filename])
+                    ccgraph.update_node_files(function, files + [filename])
 
         for call, callee in get_caller_callee_map(tree).items():
             for callee_name in callee:
