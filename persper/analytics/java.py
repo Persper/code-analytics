@@ -31,12 +31,16 @@ class JavaGraphServer(GraphServer):
         # Parse source codes into ASTs
         # TODO: Should we use filepath or file source
         if old_src:
-            ast_obj = ASTCreater(Java8Parser, Java8Lexer, old_filename)
+            ast_obj = ASTCreater(Java8Parser, Java8Lexer,
+                                 old_filename, old_src)
             ast_obj()
             old_ast = ast_obj.tree
+            if old_ast is None:
+                return -1
 
         if new_src:
-            ast_obj = ASTCreater(Java8Parser, Java8Lexer, new_filename)
+            ast_obj = ASTCreater(Java8Parser, Java8Lexer,
+                                 new_filename, new_src)
             ast_obj()
             new_ast = ast_obj.tree
             if new_ast is None:

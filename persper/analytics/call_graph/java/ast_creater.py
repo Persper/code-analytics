@@ -1,20 +1,17 @@
 from os.path import isfile, join, isdir
-from antlr4 import FileStream, CommonTokenStream
-from multi_file_stream import MultiFileStream
+from antlr4 import FileStream, CommonTokenStream, InputStream
 
 
 class ASTCreater:
-    def __init__(self, parser, lexer, path):
+    def __init__(self, parser, lexer, filename, file_source):
         self.parser = parser
         self.lexer = lexer
-        self.path = path
+        self.filename = filename
+        self.file_source = file_source
         self.tree = None
 
     def __call__(self):
-        if isfile(self.path):
-            input_stream = FileStream(self.path)
-        elif isdir(self.path):
-            input_stream = MultiFileStream(self.path)
+        input_stream = InputStream(self.file_source)
         lexer = self.lexer(input_stream)
         token_stream = CommonTokenStream(lexer)
         parser = self.parser(token_stream)
