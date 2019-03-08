@@ -1,3 +1,4 @@
+from collections import defaultdict
 from antlr4 import *
 from persper.analytics.call_graph.java.Java8Listener import Java8Listener
 from persper.analytics.call_graph.java.Java8Parser import Java8Parser
@@ -14,7 +15,7 @@ class FunctionStatsListener(Java8Listener):
         name = declator.getText()
         self.current_function_name = name
         self.function_names.append(name)
-        self.function_range.append([ctx.start.line, ctx.stop.line])
+        self.function_ranges.append([ctx.start.line, ctx.stop.line])
 
 
 class FunctionCallerListener(Java8Listener):
