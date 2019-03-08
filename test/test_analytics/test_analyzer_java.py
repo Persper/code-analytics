@@ -32,12 +32,15 @@ async def test_analyzer_master_only(az):
 
     history_truth = {
         'A': {
-            'main': {'adds': 4, 'dels': 0},
+            'main': {'adds': 3, 'dels': 0},
             'doStuff': {'adds': 3, 'dels': 0}
         },
         'B': {
-            'foo': {'adds': 3, 'dels': 0},
-            'bar': {'adds': 3, 'dels': 0}
+            'doStuff': {'adds': 4, 'dels': 0},
+            'addFunction': {'adds': 3, 'dels': 0}
+        },
+        'C':{
+            'addFunction': {'adds': 0, 'dels': 3}
         }
     }
     commits = ccgraph.commits()

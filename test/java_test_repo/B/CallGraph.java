@@ -2,26 +2,15 @@ package testers;
 
 public class CallGraphs
 {
-    static private A field;
-
     public static void main(String[] args) {
-	field = new B();
-	doStuff();
+	    doStuff();
     }
 
     public static void doStuff() {
-	new A().foo();
-    }
-}
-
-class A
-{
-    public void foo() {
-	System.out.println("A.foo() executed.");
-	bar();
+	    new A().foo();
     }
 
-    public void bar() {
-	System.out.println("A.bar() executed.");
+    public static void addFunction(){
+        doStuff();
     }
 }
