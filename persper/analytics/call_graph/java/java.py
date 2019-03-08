@@ -69,7 +69,7 @@ def get_caller_callee_map(tree):
 def update_graph(ccgraph, ast_list, change_stats):
 
     for ast in ast_list:
-        filename = ast.path
+        filename = ast.filename
         tree = ast.tree
         for function in get_all_function_caller(tree):
 
