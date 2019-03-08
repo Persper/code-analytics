@@ -12,7 +12,7 @@ class FunctionStatsListener(Java8Listener):
     def enterMethodDeclaration(self, ctx=Java8Parser.MethodDeclarationContext):
         header = ctx.methodHeader()
         declator = header.methodDeclarator()
-        name = declator.getText()
+        name = declator.Identifier().getText()
         self.current_function_name = name
         self.function_names.append(name)
         self.function_ranges.append([ctx.start.line, ctx.stop.line])
@@ -25,7 +25,7 @@ class FunctionCallerListener(Java8Listener):
     def enterMethodDeclaration(self, ctx=Java8Parser.MethodDeclarationContext):
         header = ctx.methodHeader()
         declator = header.methodDeclarator()
-        name = declator.getText()
+        name = declator.Identifier().getText()
         self.function_names.append(name)
 
 
@@ -37,7 +37,7 @@ class FunctionCalleeListener(Java8Listener):
     def enterMethodDeclaration(self, ctx=Java8Parser.MethodDeclarationContext):
         header = ctx.methodHeader()
         declator = header.methodDeclarator()
-        name = declator.getText()
+        name = declator.Identifier().getText()
         self.current_function_name = name
 
     def enterMethodInvocation(self, ctx=Java8Parser.MethodInvocationContext):
