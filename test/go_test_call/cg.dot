@@ -1,0 +1,7 @@
+digraph go_test_repo {
+	A -> B -> C -> D -> E;  //1.2.1.1. Function Call
+	A -> F -> G -> H; //1.2.1.2. Embedded Expression
+	A -> F -> G -> H ; //1.2.2.1. Conditional Statement
+	A -> I -> J ;  //1.2.2.1.1. if statement
+	A -> M -> N ; //1.2.2.1. Conditional Statement
+}
