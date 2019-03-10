@@ -42,6 +42,7 @@ class CallGraphManager():
         branchCounter = 0       # with dups
         fileCounter = 0
         await self._builder.waitForFileSystem()
+
         def pushBranch(branch):
             nonlocal branchCounter
             try:
@@ -64,7 +65,7 @@ class CallGraphManager():
                     pushBranch(b)
         if globPattern or not fileNames:
             async for b in self._builder.buildCallGraphInFiles(globPattern):
-                pushBranch(b)        
+                pushBranch(b)
         if fileNames and not globPattern:
             _logger.info("Added %d branches from %d files.", branchCounter, fileCounter)
         else:
