@@ -4,7 +4,6 @@ import os
 import subprocess
 from pathlib import Path
 from tempfile import mkdtemp
-from .utility.graph_baseline import GraphDumpAnalyzerObserver
 
 import networkx.readwrite.json_graph
 import pytest
@@ -16,6 +15,11 @@ from persper.analytics.analyzer2 import Analyzer
 from persper.analytics.call_commit_graph import CallCommitGraph, CommitIdGenerators
 from persper.analytics.lsp_graph_server.ccls import CclsGraphServer
 from persper.util.path import root_path
+
+from .utility.graph_baseline import GraphDumpAnalyzerObserver
+
+# Whether we are generating graph dump baseline, rather than testing for regression.
+IS_GENERATING_BASELINE = True
 
 _logger = logging.getLogger()
 
@@ -49,6 +53,14 @@ def createCclsGraphServer():
     return graphServer
 
 
+def createGraphDumpAnalyzerObserver(testName: str):
+    return GraphDumpAnalyzerObserver(
+        None if IS_GENERATING_BASELINE else
+        os.path.join(testDataRoot, "baseline/" + testName),
+        os.path.join(testDataRoot, "actualdump/" + testName),
+        dumpNaming=CommitIdGenerators.fromComment)
+
+
 @pytest.mark.asyncio
 async def testFeatureBranchFirstParent():
     """
@@ -58,9 +70,8 @@ async def testFeatureBranchFirstParent():
     graphServer = createCclsGraphServer()
     analyzer = Analyzer(repoPath, graphServer, firstParentOnly=True)
     async with graphServer:
-        analyzer.observer = GraphDumpAnalyzerObserver(
-            os.path.join(testDataRoot, "baseline/feature_branch_first_parent"),
-            os.path.join(testDataRoot, "actualdump/feature_branch_first_parent"))
+        analyzer.observer = createGraphDumpAnalyzerObserver(
+            "feature_branch_first_parent")
         await analyzer.analyze()
 
 
@@ -73,9 +84,7 @@ async def testFeatureBranch():
     graphServer = createCclsGraphServer()
     analyzer = Analyzer(repoPath, graphServer, firstParentOnly=False)
     async with graphServer:
-        analyzer.observer = GraphDumpAnalyzerObserver(
-            os.path.join(testDataRoot, "baseline/feature_branch"),
-            os.path.join(testDataRoot, "actualdump/feature_branch"))
+        analyzer.observer = createGraphDumpAnalyzerObserver("feature_branch")
         await analyzer.analyze()
 
 
@@ -85,7 +94,5 @@ async def testCppTestRepo():
     graphServer = createCclsGraphServer()
     analyzer = Analyzer(repoPath, graphServer)
     async with graphServer:
-        analyzer.observer = GraphDumpAnalyzerObserver(
-            os.path.join(testDataRoot, "baseline/cpp_test_repo"),
-            os.path.join(testDataRoot, "actualdump/cpp_test_repo"))
+        analyzer.observer = createGraphDumpAnalyzerObserver("cpp_test_repo")
         await analyzer.analyze()
