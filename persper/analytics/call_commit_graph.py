@@ -7,7 +7,7 @@ import networkx as nx
 from networkx.readwrite import json_graph
 from persper.analytics.devrank import devrank
 from persper.analytics.score import normalize
-from typing import Union, Set, List, Dict
+from typing import Union, Set, List, Dict, Optional
 
 
 class CommitIdGenerators:
@@ -30,13 +30,22 @@ class CallCommitGraph:
     and edit histories across commits.
     """
 
-    def __init__(self, node_link_data=None, commit_id_generator=CommitIdGenerators.fromHexsha):
-        if node_link_data:
-            self._digraph = json_graph.node_link_graph(node_link_data)
+    def __init__(self, graph_data: Optional[Dict] = None, commit_id_generator=CommitIdGenerators.fromHexsha):
+        if graph_data:
+            self._digraph = json_graph.node_link_graph(
+                CallCommitGraph._to_networkx_format(graph_data))
         else:
             self._digraph = self._new_graph()
         self._commit_id_generator = commit_id_generator
         self._current_commit_id = None
+
+    @staticmethod
+    def _to_networkx_format(graph_data: Dict) -> Dict:
+        graph_data['multigraph'] = False
+        graph_data['directed'] = True
+        for node in graph_data['nodes']:
+            node['files'] = set(node['files'])
+        return graph_data
 
     def reset(self):
         """Reset all internal states"""
