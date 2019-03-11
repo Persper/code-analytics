@@ -1,5 +1,4 @@
 import os
-import time
 import pytest
 import shutil
 import subprocess
@@ -35,7 +34,7 @@ def az():
 
     return Analyzer(repo_path, GoGraphServer(server_addr, GO_FILENAME_REGEXES))
 
-
+# DO NOT RUN THIS TEST
 def test_analzyer_go(az):
     az._graph_server.reset_graph()
     az.analyze()

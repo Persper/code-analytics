@@ -1,10 +1,11 @@
 import os
+import time
 import pytest
 import shutil
 import subprocess
 from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from persper.analytics.go import GoGraphServer
-from persper.analytics.analyzer import Analyzer
+from persper.analytics.analyzer2 import Analyzer
 from persper.util.path import root_path
 
 # TODO: Use a port other than the default 8080 in case of collision
@@ -37,9 +38,9 @@ def az():
 
 @pytest.mark.asyncio
 async def test_analzyer_go(az):
-    az._graph_server.reset_graph()
+    az._graphServer.reset_graph()
     await az.analyze()
-    ccgraph = az.get_graph()
+    ccgraph = az.graph
 
     history_truth = {
         'D': {
