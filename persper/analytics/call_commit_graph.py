@@ -7,6 +7,7 @@ import networkx as nx
 from networkx.readwrite import json_graph
 from persper.analytics.devrank import devrank
 from persper.analytics.score import normalize
+from typing import Union, Set, List, Dict
 
 
 class CommitIdGenerators:
@@ -59,6 +60,10 @@ class CallCommitGraph:
         # https://networkx.github.io/documentation/stable/tutorial.html#graph-attributes
         return self._digraph.graph['commits']
 
+    def files(self, node: str) -> Set[str]:
+        """Provide read-only access to `files` attribute of a node"""
+        return self.nodes()[node]['files']
+
     def __contains__(self, node):
         """Implement membership check"""
         return node in self._digraph
@@ -82,7 +87,7 @@ class CallCommitGraph:
         return self._cur_cindex() + 1
 
     # TODO: remove the default value of files
-    def add_node(self, node, files=[]):
+    def add_node(self, node: str, files: Union[Set[str], List[str]] = []):
         self._digraph.add_node(node, size=None, history={}, files=set(files))
 
     # add_node must be called on source and target first
@@ -106,10 +111,10 @@ class CallCommitGraph:
             node_history[self._current_commit_id] = {'adds': num_adds, 'dels': num_dels}
 
     # read/write access to node history are thourgh this function
-    def _get_node_history(self, node):
+    def _get_node_history(self, node: str) -> Dict[str, Dict[str, int]]:
         return self._digraph.nodes[node]['history']
 
-    def update_node_files(self, node, new_files):
+    def update_node_files(self, node: str, new_files: Union[Set[str], List[str]]):
         self._digraph.nodes[node]['files'] = set(new_files)
 
     # TODO: provide other options for computing a node's size
