@@ -1,4 +1,4 @@
-
+from abc import ABC, abstractmethod
 from git import Commit, DiffIndex
 
 

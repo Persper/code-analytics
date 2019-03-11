@@ -6,7 +6,7 @@ CallCommitGraph stores all relevant analysis results
 import networkx as nx
 from networkx.readwrite import json_graph
 from persper.analytics.devrank import devrank
-from persper.util.score import normalize
+from persper.analytics.score import normalize
 
 
 class CommitIdGenerators:
