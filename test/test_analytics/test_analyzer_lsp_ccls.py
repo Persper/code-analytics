@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import pickle
 import subprocess
 from pathlib import Path
 from tempfile import mkdtemp
@@ -96,3 +97,28 @@ async def testCppTestRepo():
     async with graphServer:
         analyzer.observer = createGraphDumpAnalyzerObserver("cpp_test_repo")
         await analyzer.analyze()
+
+
+@pytest.mark.asyncio
+async def testAnalyzerWithPickle():
+    repoPath = prepareRepo("test_feature_branch")
+    graphServer = createCclsGraphServer()
+    analyzer = Analyzer(repoPath, graphServer)
+    pickleContent = None
+    async with graphServer:
+        analyzer.observer = createGraphDumpAnalyzerObserver(
+            "analyzer_pickling")
+        assert len(analyzer.visitedCommits) == 0
+        await analyzer.analyze(2)
+        assert len(analyzer.visitedCommits) == 2
+        await analyzer.analyze(2)
+        assert len(analyzer.visitedCommits) == 4
+        pickleContent = pickle.dumps(analyzer)
+
+    analyzer1: Analyzer = pickle.loads(pickleContent)
+    # Perhaps we need to set another temp folder for this.
+    graphServer1 = analyzer1.graphServer
+    analyzer1.observer = analyzer.observer
+    async with graphServer1:
+        assert analyzer1.visitedCommits == analyzer.visitedCommits
+        await analyzer1.analyze()

@@ -40,6 +40,10 @@ class Analyzer:
         self._s_visitedCommits = _ReadOnlySet(self._visitedCommits)
 
     @property
+    def graphServer(self):
+        return self._graphServer
+
+    @property
     def observer(self):
         """
         The AnalyzerObserver used to observe current Analyzer.
@@ -97,7 +101,7 @@ class Analyzer:
         return self._s_visitedCommits
 
     async def analyze(self, maxAnalyzedCommits=1000):
-        graphServerLastCommit:str = None
+        graphServerLastCommit: str = None
         commitSpec = self._terminalCommit
         if self._originCommit:
             commitSpec = self._originCommit.hexsha + ".." + self._terminalCommit.hexsha
@@ -138,6 +142,7 @@ class Analyzer:
                 # then go on with current commit
                 printCommitStatus("Going forward.")
                 await self._analyzeCommit(commit, parent, CommitSeekingMode.NormalForward)
+            self._visitedCommits.add(commit.hexsha)
             graphServerLastCommit = commit.hexsha
             analyzedCommits += 1
 
