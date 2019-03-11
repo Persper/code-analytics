@@ -8,6 +8,7 @@ from git import Commit, Diff, DiffIndex, Repo
 from persper.analytics.git_tools import (diff_with_commit, get_contents)
 from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.commit_classifier import CommitClassifier
+from persper.util.score import commit_overall_scores
 
 
 class Analyzer:
@@ -99,6 +100,17 @@ class Analyzer:
         Gets a set of visited commits, identified by their their SHA.
         """
         return self._s_visitedCommits
+
+    def compute_commit_scores(self, alpha: float, label_weights: List[float],
+                              top_one=False):
+        """
+        Compute the overall scores for all commits by combining DevRank and
+        commit classification.
+        """
+        return commit_overall_scores(self.graph.commit_devranks(alpha),
+                                     self._clf_results,
+                                     label_weights,
+                                     top_one=top_one)
 
     async def analyze(self, maxAnalyzedCommits=1000):
         graphServerLastCommit: str = None
