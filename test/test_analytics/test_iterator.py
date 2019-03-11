@@ -29,37 +29,37 @@ def test_iterator(ri):
     commits, branch_commits = ri.iter(from_beginning=True, into_branches=True)
     # from A to L
     # use `git log --graph` to view ground truth
-    assert(len(ri.visited) == 12)
-    assert(len(commits) == 4)
-    assert(len(branch_commits) == 8)
-    assert(serialized_messages(commits) == 'D C B A')
-    assert(serialized_messages(branch_commits) == 'G F E J I H L K')
+    assert len(ri.visited) == 12
+    assert len(commits) == 4
+    assert len(branch_commits) == 8
+    assert serialized_messages(commits) == 'D C B A'
+    assert serialized_messages(branch_commits) == 'G F E J I H L K'
 
 
 def test_continue_iter(ri):
     commits, branch_commits = ri.iter(
         from_beginning=True, num_commits=2, into_branches=True)
-    assert(serialized_messages(commits) == 'B A')
-    assert(serialized_messages(branch_commits) == '')
+    assert serialized_messages(commits) == 'B A'
+    assert serialized_messages(branch_commits) == ''
     commits2, branch_commits2 = ri.iter(
         continue_iter=True, num_commits=2, into_branches=True)
-    assert(serialized_messages(commits2) == 'D C')
-    assert(serialized_messages(branch_commits2) == 'G F E J I H L K')
+    assert serialized_messages(commits2) == 'D C'
+    assert serialized_messages(branch_commits2) == 'G F E J I H L K'
 
 
 def test_rev(ri):
     commits, branch_commits = ri.iter(rev='C', into_branches=True)
-    assert(serialized_messages(commits) == 'C B A')
-    assert(serialized_messages(branch_commits) == '')
+    assert serialized_messages(commits) == 'C B A'
+    assert serialized_messages(branch_commits) == ''
     commits2, branch_commits2 = ri.iter(
         continue_iter=True, end_commit_sha='D', into_branches=True)
-    assert(serialized_messages(commits2) == 'D')
-    assert(serialized_messages(branch_commits2) == 'G F E J I H L K')
+    assert serialized_messages(commits2) == 'D'
+    assert serialized_messages(branch_commits2) == 'G F E J I H L K'
 
 
 def test_iter_twice(ri):
     commits, branch_commits = ri.iter(from_beginning=True, into_branches=True)
     commits2, branch_commits2 = ri.iter(
         from_beginning=True, into_branches=True)
-    assert(commits == commits2)
-    assert(branch_commits == branch_commits2)
+    assert commits == commits2
+    assert branch_commits == branch_commits2

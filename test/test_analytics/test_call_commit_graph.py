@@ -32,10 +32,10 @@ def test_call_commit_graph():
     func_drs = ccgraph.function_devranks(0.85)
     commit_drs = ccgraph.commit_devranks(0.85)
     dev_drs = ccgraph.developer_devranks(0.85)
-    assert(isclose(func_drs['f1'], 0.35, rel_tol=1e-2))
-    assert(isclose(func_drs['f2'], 0.65, rel_tol=1e-2))
-    assert(isclose(commit_drs[first_commit['hexsha']], 1))
-    assert(isclose(dev_drs[first_commit['authorEmail']], 1))
+    assert isclose(func_drs['f1'], 0.35, rel_tol=1e-2)
+    assert isclose(func_drs['f2'], 0.65, rel_tol=1e-2)
+    assert isclose(commit_drs[first_commit['hexsha']], 1)
+    assert isclose(dev_drs[first_commit['authorEmail']], 1)
 
     second_commit = {
         'hexsha': '0x02',
@@ -54,13 +54,13 @@ def test_call_commit_graph():
     func_drs2 = ccgraph.function_devranks(0.85)
     commit_drs2 = ccgraph.commit_devranks(0.85)
     dev_drs2 = ccgraph.developer_devranks(0.85)
-    assert(isclose(func_drs2['f1'], 0.26, rel_tol=1e-2))
-    assert(isclose(func_drs2['f2'], 0.37, rel_tol=1e-2))
-    assert(isclose(func_drs2['f3'], 0.37, rel_tol=1e-2))
-    assert(isclose(commit_drs2[first_commit['hexsha']], 0.63, rel_tol=1e-2))
-    assert(isclose(commit_drs2[second_commit['hexsha']], 0.37, rel_tol=1e-2))
-    assert(isclose(dev_drs2[first_commit['authorEmail']], 0.63, rel_tol=1e-2))
-    assert(isclose(dev_drs2[second_commit['authorEmail']], 0.37, rel_tol=1e-2))
+    assert isclose(func_drs2['f1'], 0.26, rel_tol=1e-2)
+    assert isclose(func_drs2['f2'], 0.37, rel_tol=1e-2)
+    assert isclose(func_drs2['f3'], 0.37, rel_tol=1e-2)
+    assert isclose(commit_drs2[first_commit['hexsha']], 0.63, rel_tol=1e-2)
+    assert isclose(commit_drs2[second_commit['hexsha']], 0.37, rel_tol=1e-2)
+    assert isclose(dev_drs2[first_commit['authorEmail']], 0.63, rel_tol=1e-2)
+    assert isclose(dev_drs2[second_commit['authorEmail']], 0.37, rel_tol=1e-2)
 
     third_commit = {
         'hexsha': '0x03',
@@ -83,16 +83,16 @@ def test_call_commit_graph():
     func_drs3 = ccgraph.function_devranks(0.85)
     commit_drs3 = ccgraph.commit_devranks(0.85)
     dev_drs3 = ccgraph.developer_devranks(0.85)
-    assert(isclose(func_drs3['f1'], 0.141, rel_tol=1e-2))
-    assert(isclose(func_drs3['f2'], 0.201, rel_tol=1e-2))
-    assert(isclose(func_drs3['f3'], 0.201, rel_tol=1e-2))
-    assert(isclose(func_drs3['f4'], 0.227, rel_tol=1e-2))
-    assert(isclose(func_drs3['f5'], 0.227, rel_tol=1e-2))
-    assert(isclose(commit_drs3[first_commit['hexsha']], 0.343, rel_tol=1e-2))
-    assert(isclose(commit_drs3[second_commit['hexsha']], 0.201, rel_tol=1e-2))
-    assert(isclose(commit_drs3[third_commit['hexsha']], 0.454, rel_tol=1e-2))
-    assert(isclose(dev_drs3[first_commit['authorEmail']], 0.798, rel_tol=1e-2))
-    assert(isclose(dev_drs3[second_commit['authorEmail']], 0.201, rel_tol=1e-2))
+    assert isclose(func_drs3['f1'], 0.141, rel_tol=1e-2)
+    assert isclose(func_drs3['f2'], 0.201, rel_tol=1e-2)
+    assert isclose(func_drs3['f3'], 0.201, rel_tol=1e-2)
+    assert isclose(func_drs3['f4'], 0.227, rel_tol=1e-2)
+    assert isclose(func_drs3['f5'], 0.227, rel_tol=1e-2)
+    assert isclose(commit_drs3[first_commit['hexsha']], 0.343, rel_tol=1e-2)
+    assert isclose(commit_drs3[second_commit['hexsha']], 0.201, rel_tol=1e-2)
+    assert isclose(commit_drs3[third_commit['hexsha']], 0.454, rel_tol=1e-2)
+    assert isclose(dev_drs3[first_commit['authorEmail']], 0.798, rel_tol=1e-2)
+    assert isclose(dev_drs3[second_commit['authorEmail']], 0.201, rel_tol=1e-2)
 
 
 @pytest.mark.asyncio
@@ -117,7 +117,7 @@ async def test_black_set():
     ccgraph = az.get_graph()
     devdict = ccgraph.commit_devranks(0.85)
     devdict2 = ccgraph.commit_devranks(0.85, black_set=set([parent_sha]))
-    assert(len(devdict) == 3)
-    assert(len(devdict2) == 2)
-    assert(parent_sha in devdict)
-    assert(parent_sha not in devdict2)
+    assert len(devdict) == 3
+    assert len(devdict2) == 2
+    assert parent_sha in devdict
+    assert parent_sha not in devdict2

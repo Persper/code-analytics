@@ -67,7 +67,7 @@ def test_az(az: Analyzer):
             history = data['history']
             for cindex, csize in history.items():
                 commit_message = commits[cindex]['message']
-                assert(csize == history_truth[commit_message.strip()][func])
+                assert csize == history_truth[commit_message.strip()][func]
 
         edges_truth = [
             ('main.js:funcB:9:12', 'Native:Window_prototype_print'),
@@ -77,7 +77,7 @@ def test_az(az: Analyzer):
             ('main.js:main:7:16', 'main.js:funcA:3:5'),
             ('main.js:global', 'main.js:main:7:16')
         ]
-        assert(set(az.graph_server.get_graph().edges()) == set(edges_truth))
+        assert set(az.graph_server.get_graph().edges()) == set(edges_truth)
 
     finally:
         p.terminate()
