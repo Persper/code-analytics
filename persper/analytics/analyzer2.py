@@ -1,18 +1,21 @@
 import asyncio
 from abc import ABC
 import collections.abc
-from typing import Union, Set
+from typing import Union, Set, Optional, List
 
 from git import Commit, Diff, DiffIndex, Repo
 
 from persper.analytics.git_tools import (diff_with_commit, get_contents)
 from persper.analytics.graph_server import CommitSeekingMode, GraphServer
+from persper.analytics.commit_classifier import CommitClassifier
+from persper.analytics.score import commit_overall_scores
 
 
 class Analyzer:
     def __init__(self, repositoryRoot: str, graphServer: GraphServer,
                  terminalCommit: str = "master",
-                 firstParentOnly: bool = False):
+                 firstParentOnly: bool = False,
+                 commit_classifier: Optional[CommitClassifier] = None):
         self._repositoryRoot = repositoryRoot
         self._graphServer = graphServer
         self._repo = Repo(repositoryRoot)
@@ -22,6 +25,8 @@ class Analyzer:
         self._visitedCommits = set()
         self._s_visitedCommits = _ReadOnlySet(self._visitedCommits)
         self._observer: AnalyzerObserver = emptyAnalyzerObserver
+        self._commit_classifier = commit_classifier
+        self._clf_results: Dict[str, List[float]] = {}
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -100,11 +105,23 @@ class Analyzer:
         """
         return self._s_visitedCommits
 
-    async def analyze(self, maxAnalyzedCommits=1000):
+    def compute_commit_scores(self, alpha: float, label_weights: List[float],
+                              top_one=False):
+        """
+        Compute the overall scores for all commits by combining DevRank and
+        commit classification.
+        """
+        return commit_overall_scores(self.graph.commit_devranks(alpha),
+                                     self._clf_results,
+                                     label_weights,
+                                     top_one=top_one)
+
+    async def analyze(self, maxAnalyzedCommits=None):
         graphServerLastCommit: str = None
         commitSpec = self._terminalCommit
         if self._originCommit:
             commitSpec = self._originCommit.hexsha + ".." + self._terminalCommit.hexsha
+
         analyzedCommits = 0
         for commit in self._repo.iter_commits(commitSpec,
                                               topo_order=True, reverse=True, first_parent=self._firstParentOnly):
@@ -153,12 +170,18 @@ class Analyzer:
         """
         if type(commit) != Commit:
             commit = self._repo.commit(commit)
+
         self._observer.onBeforeCommit(self, commit, seekingMode)
         result = self._graphServer.start_commit(commit.hexsha, seekingMode,
                                                 commit.author.name, commit.author.email, commit.message)
         if asyncio.iscoroutine(result):
             await result
         diff_index = diff_with_commit(self._repo, commit, parentCommit)
+
+        # commit classification
+        if self._commit_classifier and commit.hexsha not in self._clf_results:
+            prob = self._commit_classifier.predict(commit, diff_index)
+            self._clf_results[commit.hexsha] = prob
 
         for diff in diff_index:
             old_fname, new_fname = _get_fnames(diff)
