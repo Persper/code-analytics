@@ -237,7 +237,7 @@ class DocumentSymbol(LspContractObject):
         return self.selectionRange
 
     def __str__(self):
-        return self.name + "[" + self.kind + "]"
+        return str.format("{0}({1}){2}", self.name, self.kind, self.children or "")
 
     def toDict(self):
         raise NotImplementedError()

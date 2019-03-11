@@ -1,6 +1,6 @@
 {
     "edges": {
-        "char *str_append_chr(char *string, char append)|->|int str_equals()": {
+        "char *str_append_chr(char *string, char append)|->|int str_equals(char *equal1, char *eqaul2)": {
             "addedBy": "D",
             "weight": null
         },
@@ -84,13 +84,6 @@
                     "dels": 0
                 }
             },
-            "size": null
-        },
-        "int str_equals()": {
-            "files": [
-                "main.c"
-            ],
-            "history": {},
             "size": null
         },
         "int str_equals(char *equal1, char *eqaul2)": {

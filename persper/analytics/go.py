@@ -40,10 +40,7 @@ class GoGraphServer(GraphServer):
     def get_graph(self):
         graph_url = self.server_addr + '/callgraph'
         r = requests.get(graph_url)
-        graph_data = r.json()
-        graph_data['directed'] = True
-        graph_data['multigraph'] = False
-        return CallCommitGraph(graph_data)
+        return CallCommitGraph(graph_data=r.json())
 
     def reset_graph(self):
         reset_url = urllib.parse.urljoin(self.server_addr, '/reset')
