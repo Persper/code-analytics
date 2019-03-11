@@ -1,13 +1,13 @@
 import asyncio
-from abc import ABC
 import collections.abc
-from typing import Union, Set, Optional, List
+from abc import ABC
+from typing import List, Optional, Set, Union
 
 from git import Commit, Diff, DiffIndex, Repo
 
-from persper.analytics.git_tools import (diff_with_commit, get_contents)
-from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.commit_classifier import CommitClassifier
+from persper.analytics.git_tools import diff_with_commit, get_contents
+from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.score import commit_overall_scores
 
 
