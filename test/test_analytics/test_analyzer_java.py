@@ -33,16 +33,38 @@ async def test_analyzer_master_only(az):
     history_truth = {
         'A': {
             'main': {'adds': 3, 'dels': 0},
-            'doStuff': {'adds': 3, 'dels': 0}
+            'doStuff': {'adds': 3, 'dels': 0},
+            'addFunction': {'adds': 4, 'dels': 0}
         },
         'B': {
-            'doStuff': {'adds': 4, 'dels': 0},
-            'addFunction': {'adds': 3, 'dels': 0}
+            'addFunction': {'adds': 4, 'dels': 0},
+            'tempFunction': {'adds': 3, 'dels': 0}
         },
         'C':{
-            'addFunction': {'adds': 0, 'dels': 3}
+            'tempFunction': {'adds': 0, 'dels': 3}
+        },
+        'D':{
+            'addFunction': {'adds': 1, 'dels': 1},
+            'AddChangeFunction': {'adds': 1, 'dels': 0}
+        },
+        'E': {
+            'AddChangeFunction': {'adds': 2, 'dels': 2}
+        },
+        'F': {
+            'AddChangeFunction': {'adds': 4, 'dels': 0}
+        },
+        'G': {
+            'AddChangeFunction': {'adds': 0, 'dels': 2}
+        },
+        'I': {
+            'AddChangeFunction': {'adds': 3, 'dels': 3}
         }
     }
+
+    edges_truth = [
+        ('doStuff', 'newA().foo()')
+    ]
+
     commits = ccgraph.commits()
 
     for func, data in ccgraph.nodes(data=True):
@@ -50,4 +72,8 @@ async def test_analyzer_master_only(az):
 
         for cid, chist in history.items():
             message = commits[cid]['message']
+            print(message.strip(), chist, func.strip())
             assert(chist == history_truth[message.strip()][func])
+
+    print(az._graph_server.get_graph().edges())
+    #assert(set(az._graph_server.get_graph().edges()) == set(edges_truth))

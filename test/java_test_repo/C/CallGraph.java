@@ -10,4 +10,9 @@ public class CallGraphs
 	    new A().foo();
     }
 
+    public static void addFunction(int a, int b){
+        int sum = a + b;
+        doStuff();
+    }
+
 }

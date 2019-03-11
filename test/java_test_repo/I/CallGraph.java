@@ -10,12 +10,11 @@ public class CallGraphs
 	    new A().foo();
     }
 
-    public static void addFunction(int a, int b){
-        int sum = a + b;
+    public static void AddChangeFunction(int a, int b, int c){
+        int summation = a + b + c;
+        int addition = a + b;
+        int subtraction = a - b;
         doStuff();
     }
 
-    public static void tempFunction(){
-        int temp = 0;
-    }
 }
