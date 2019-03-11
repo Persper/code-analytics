@@ -97,7 +97,7 @@ async def test_analyzer_master_only(az):
 
         for cid, chist in history.items():
             message = commits[cid]['message']
-            assert(chist == history_truth[message.strip()][func])
+            assert chist == history_truth[message.strip()][func]
 
     edges_truth = [
         # Edges existing in final snapshot
@@ -120,4 +120,4 @@ async def test_analyzer_master_only(az):
         ('str_append_chr', 'snprintf'),
         ('str_append', 'malloc')
     ]
-    assert(set(az._graph_server.get_graph().edges()) == set(edges_truth))
+    assert set(az._graph_server.get_graph().edges()) == set(edges_truth)
