@@ -15,4 +15,4 @@ def test_inverse_diff():
     )
 
     inv_result = inverse_diff(*adds_dels)
-    assert(inv_truth == inv_result)
+    assert inv_truth == inv_result

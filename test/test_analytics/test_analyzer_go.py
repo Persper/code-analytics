@@ -64,7 +64,7 @@ def test_analzyer_go(az):
         history = data['history']
         for cindex, csize in history.items():
             commit_message = commits[int(cindex)]['message']
-            assert(csize == history_truth[commit_message.strip()][func])
+            assert csize == history_truth[commit_message.strip()][func]
 
     edges_added_by_A = set([
         ('Abs', 'Sqrt'),
@@ -93,4 +93,4 @@ def test_analzyer_go(az):
 
     print(set(az._graph_server.get_graph().edges()))
     all_edges = edges_added_by_A.union(edges_added_by_B).union(edges_added_by_C).union(edges_added_by_D)
-    assert(set(az._graph_server.get_graph().edges()) == all_edges)
+    assert set(az._graph_server.get_graph().edges()) == all_edges
