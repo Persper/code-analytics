@@ -37,15 +37,15 @@ def test_detect_change():
     with open(os.path.join(dir_path, 'example.patch'), 'r') as f:
         example_patch = f.read()
         parsing_result = parser.parse(example_patch)
-        assert(parsing_result == parsing_truth)
+        assert parsing_result == parsing_truth
 
     with open(os.path.join(dir_path, 'example.cc'), 'r') as f:
         root = src_to_tree('example.cc', f.read())
         func_ranges_result = get_func_ranges_cpp(root)
-        assert(func_ranges_result == func_ranges_truth)
+        assert func_ranges_result == func_ranges_truth
 
-    assert(changed_result == get_changed_functions(
-        *func_ranges_result, *parsing_result))
+    assert changed_result == get_changed_functions(
+        *func_ranges_result, *parsing_result)
 
 
 def test_patch_parser():
@@ -58,7 +58,7 @@ def test_patch_parser():
     with open(os.path.join(dir_path, 'example2.patch'), 'r') as f:
         example2_patch = f.read()
         parsing_result = parser.parse(example2_patch)
-        assert(parsing_result == patch2_truth)
+        assert parsing_result == patch2_truth
 
     # view patch3_truth here
     # https://github.com/UltimateBeaver/test_feature_branch/commit/caaac10f604ea7ac759c2147df8fb2b588ee2a27
@@ -69,7 +69,7 @@ def test_patch_parser():
     with open(os.path.join(dir_path, 'example3.patch'), 'r') as f:
         example3_patch = f.read()
         parsing_result = parser.parse(example3_patch)
-        assert(parsing_result == patch3_truth)
+        assert parsing_result == patch3_truth
 
     # view patch4_truth here
     # https://github.com/UltimateBeaver/test_feature_branch/commit/364d5cc49aeb2e354da458924ce84c0ab731ac77
@@ -80,7 +80,7 @@ def test_patch_parser():
     with open(os.path.join(dir_path, 'example4.patch'), 'r') as f:
         example4_patch = f.read()
         parsing_result = parser.parse(example4_patch)
-        assert(parsing_result == patch4_truth)
+        assert parsing_result == patch4_truth
 
 
 def test_no_newline_at_the_end_of_file():
@@ -91,7 +91,7 @@ def test_no_newline_at_the_end_of_file():
     with open(os.path.join(dir_path, 'example5.patch'), 'r') as f:
         example5_patch = f.read()
         parsing_result = parser.parse(example5_patch)
-        assert(parsing_result == patch5_truth)
+        assert parsing_result == patch5_truth
 
     patch6_truth = (
         [[17, 1], [20, 3], [30, 5]],
@@ -100,4 +100,4 @@ def test_no_newline_at_the_end_of_file():
     with open(os.path.join(dir_path, 'example6.patch'), 'r') as f:
         example6_patch = f.read()
         parsing_result = parser.parse(example6_patch)
-        assert(parsing_result == patch6_truth)
+        assert parsing_result == patch6_truth

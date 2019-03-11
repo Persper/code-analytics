@@ -9,4 +9,4 @@ def test_src_to_tree():
     with open(full_path, 'r') as f:
         src = f.read()
     root = src_to_tree(filename, src)
-    assert(root.attrib['filename'] == filename)
+    assert root.attrib['filename'] == filename
