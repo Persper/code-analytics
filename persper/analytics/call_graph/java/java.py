@@ -5,6 +5,11 @@ from persper.analytics.call_graph.java.Java8Parser import Java8Parser
 
 
 class FunctionStatsListener(Java8Listener):
+    """
+    This class is responsible to get name of the function and
+    range of the function which is the start and end line of the function.
+    """
+
     def __init__(self):
         self.function_names = list()
         self.function_ranges = list()
@@ -41,7 +46,10 @@ class FunctionCalleeListener(Java8Listener):
         self.current_function_name = name
 
     def enterMethodInvocation(self, ctx=Java8Parser.MethodInvocationContext):
-        name = ctx.getText()
+        if ctx.methodName():
+            name = ctx.methodName().getText()
+        else:
+            name = ctx.getText()
         if self.current_function_name:
             self.function_caller_callee_map[self.current_function_name].append(
                 name)
@@ -60,6 +68,7 @@ def get_all_function_caller(tree):
     walker.walk(collector, tree)
     return collector.function_names
 
+
 def get_caller_callee_map(tree):
     walker = ParseTreeWalker()
     collector = FunctionCalleeListener()
@@ -68,7 +77,6 @@ def get_caller_callee_map(tree):
 
 
 def update_graph(ccgraph, ast_list, change_stats):
-
     for ast in ast_list:
         filename = ast.filename
         tree = ast.tree

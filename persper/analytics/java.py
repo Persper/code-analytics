@@ -14,7 +14,6 @@ class JavaGraphServer(GraphServer):
         self._ccgraph = CallCommitGraph()
         self._filename_regexes = [re.compile(
             regex_str) for regex_str in filename_regex_strs]
-        # TODO: The right implementation of patch parser for java
         self._pparser = PatchParser()
 
     def register_commit(self, hexsha, author_name, author_email,
@@ -23,13 +22,11 @@ class JavaGraphServer(GraphServer):
                                  commit_message)
 
     def update_graph(self, old_filename, old_src, new_filename, new_src, patch):
-        ast_list = []
         ast_obj_list = list()
         old_ast = None
         new_ast = None
 
         # Parse source codes into ASTs
-        # TODO: Should we use filepath or file source
         if old_src:
             ast_obj = ASTCreater(Java8Parser, Java8Lexer,
                                  old_filename, old_src)
@@ -45,17 +42,14 @@ class JavaGraphServer(GraphServer):
             new_ast = ast_obj.tree
             if new_ast is None:
                 return -1
-            ast_list = [new_ast]
             ast_obj_list = [ast_obj]
 
-        # TODO: Why is this and what is this?
         # Compute function change stats
         change_stats = function_change_stats(old_ast, new_ast, patch,
                                              self._parse_patch,
                                              get_function_range_java)
 
         # Update call-commit graph
-        # TODO: How is filename passed?
         update_graph(self._ccgraph, ast_obj_list, change_stats)
         return 0
 
