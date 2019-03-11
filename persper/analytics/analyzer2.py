@@ -112,7 +112,7 @@ class Analyzer:
                                      label_weights,
                                      top_one=top_one)
 
-    async def analyze(self, maxAnalyzedCommits=1000):
+    async def analyze(self, maxAnalyzedCommits=None):
         graphServerLastCommit: str = None
         commitSpec = self._terminalCommit
         if self._originCommit:
