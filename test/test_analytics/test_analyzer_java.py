@@ -67,12 +67,19 @@ async def test_analyzer_master_only(az):
             'AddChangeFunction': {'adds': 0, 'dels': 2},
             'FunctionCaller': {'adds': 5, 'dels': 0},
             'doStuff': {'adds': 3, 'dels': 1}
+        },
+        'L': {
+            'FunctionCaller': {'adds': 2, 'dels': 2},
         }
     }
 
     edges_truth = [
         ('doStuff', 'newA().foo()'),
-        ('FunctionCaller', 'summation')
+        # caller callee relationship
+        ('FunctionCaller', 'summation'),
+        # modifying function call
+        ('FunctionCaller', 'summation_new')
+
     ]
 
     commits = ccgraph.commits()
@@ -82,7 +89,7 @@ async def test_analyzer_master_only(az):
 
         for cid, chist in history.items():
             message = commits[cid]['message']
-            # print(message.strip(), chist, func.strip())
+            #print(message.strip(), chist, func.strip())
             assert (chist == history_truth[message.strip()][func])
 
     filenames = list()
@@ -91,5 +98,5 @@ async def test_analyzer_master_only(az):
         filenames.extend(data["files"])
     assert (set(filenames) == set(filenames_truth))
 
-    # print(az._graph_server.get_graph().edges())
+    #print(az._graph_server.get_graph().edges())
     assert (set(az._graph_server.get_graph().edges()) == set(edges_truth))
