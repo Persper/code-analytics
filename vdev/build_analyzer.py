@@ -170,6 +170,7 @@ def developer_profile(pickle_path, alpha=0.85, show_merge=True):
             'values': values
         }
         item['dev_value'] = sum(values)
+        item['top_commits'] = get_top_commits(item['commits'], commit_share)
 
     dev_share = module_contrib(az.get_graph(), dev_share)
 
@@ -204,7 +205,7 @@ def modules_on_dev(ccgraph, email, alpha=0.85, black_set=[]):
         for cid, chist in history.items():
             csize = chist['adds'] + chist['dels']
             sha = ccgraph.commits()[cid]['hexsha']
-            if (sha not in black_set) and (sha in commits) :
+            if (sha not in black_set) and (sha in commits):
                 dr = (csize / size) * func_devranks[func]
                 for file in files:
                     if file in modules_share:
@@ -213,3 +214,27 @@ def modules_on_dev(ccgraph, email, alpha=0.85, black_set=[]):
                         modules_share[file] = dr/len(files)*1.0
 
     return modules_share
+
+
+def get_top_commits(commits, commit_share):
+    top_commits = []
+    for commit in commits:
+        if commit.hexsha in commit_share:
+            share_value = commit_share[commit.hexsha]
+            top_commits.append({
+                'author_email': commit.author.email,
+                'author_name': commit.author.name,
+                'author_timestamp': commit.authored_date,
+                'committer_email': commit.committer.email,
+                'committer_name': commit.committer.name,
+                'commit_timestamp': commit.committed_date,
+                'hash': commit.hexsha,
+                'parent_hashes': [p.hexsha for p in commit.parents],
+                'dev_value': share_value,
+                'title': commit.message.splitlines()[0],
+                'message': commit.message
+                })
+            
+    top_commits = sorted(top_commits, key=lambda k: k['dev_value'],  reverse=True)[:10]
+
+    return top_commits
