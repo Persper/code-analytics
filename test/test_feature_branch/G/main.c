@@ -8,6 +8,8 @@ int str_len(char *string)
 
 /* str_append is deleted in B */
 
+int str_equals(char *equal1, char *eqaul2); // Forward decl
+
 /* added in B*/
 char* str_append_chr(char* string, char append) {
     char* newstring = NULL;

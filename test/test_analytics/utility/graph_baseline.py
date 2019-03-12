@@ -11,7 +11,7 @@ from git import Commit
 from networkx import Graph
 
 from persper.analytics.analyzer2 import Analyzer, AnalyzerObserver
-from persper.analytics.call_commit_graph import CallCommitGraph
+from persper.analytics.call_commit_graph import CallCommitGraph, CommitIdGenerators
 from persper.analytics.graph_server import CommitSeekingMode
 
 _logger = logging.getLogger()
@@ -66,12 +66,6 @@ def assertGraphMatches(baseline: dict, ccg: CallCommitGraph):
     assert not baselineEdgeIds, str.format(
         "Branch(es) missing: {0}.", baselineEdgeIds)
 
-
-class GraphDumpNamingRule(Enum):
-    CommitMessage = 0,
-    CommitHexSha = 1
-
-
 class GraphDumpAnalyzerObserver(AnalyzerObserver):
     """
     An implementation of AnalyzerObserver that generates graph dump after each commit,
@@ -79,7 +73,7 @@ class GraphDumpAnalyzerObserver(AnalyzerObserver):
     """
 
     def __init__(self, graphBaselineDumpPath: str = None, graphTestDumpPath: str = None,
-                 dumpOnlyOnError: bool = None, dumpNaming: GraphDumpNamingRule = GraphDumpNamingRule.CommitHexSha):
+                 dumpOnlyOnError: bool = None, dumpNaming = CommitIdGenerators.fromHexsha):
         """
         Params:
             graphBaselineDumpPath: root folder of the baseline graph dump files. Set to values other than `None`
@@ -105,11 +99,13 @@ class GraphDumpAnalyzerObserver(AnalyzerObserver):
         else:
             self._dumpPath = None
         self._dumpOnlyOnError = graphBaselineDumpPath != None if dumpOnlyOnError == None else dumpOnlyOnError
+        self._dumpNaming = dumpNaming
 
     def onAfterCommit(self, analyzer: Analyzer, commit: Commit, seeking_mode: CommitSeekingMode):
         if seeking_mode == CommitSeekingMode.Rewind:
             return
         graph: CallCommitGraph = analyzer.graph
+        graphDumpLocalName = self._dumpNaming(-1, commit.hexsha, commit.message) + ".g.json"
 
         def dumpGraph(warnIfNotAvailable: bool):
             if not self._dumpPath:
@@ -118,16 +114,14 @@ class GraphDumpAnalyzerObserver(AnalyzerObserver):
                         "Cannot dump call commit graph because no dump path has been specified. Commit %s: %s.", commit.hexsha, commit.message)
                 return False
             data = graphToDict(graph)
-            graphPath = self._dumpPath.joinpath(
-                commit.message.strip() + ".g.json")
+            graphPath = self._dumpPath.joinpath(graphDumpLocalName)
             with open(graphPath, "wt") as f:
                 json.dump(data, f, sort_keys=True, indent=4)
             return True
         # check baseline for regression
         if self._baselinePath:
             try:
-                graphPath = self._baselinePath.joinpath(
-                    commit.message.strip() + ".g.json")
+                graphPath = self._baselinePath.joinpath(graphDumpLocalName)
                 baselineData: dict = None
                 with open(graphPath, "rt") as f:
                     baselineData = fixGraphDict(json.load(f))

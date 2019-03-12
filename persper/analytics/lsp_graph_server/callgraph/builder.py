@@ -58,7 +58,7 @@ class TokenizedDocument:
                 if filterResult == None:
                     continue
                 if filterResult == False:
-                    if isinstance(s, SymbolInformation):
+                    if isinstance(s, DocumentSymbol):
                         PopulateSymbols(s.children)
                     continue
                 if isinstance(s, DocumentSymbol):
@@ -66,12 +66,12 @@ class TokenizedDocument:
                     symbolKinds[s.selectionRange.start.toTuple()] = s.kind
                     self._scopes.append(CallGraphScope(s.detail or s.name, s.kind,
                                                        fileName, s.range.start, s.range.end))
+                    if s.children:
+                        PopulateSymbols(s.children)
                 elif isinstance(s, SymbolInformation):
                     symbolKinds[(s.location.range.start.line, s.name)] = (s.location.range.start.character, s.kind)
                     self._scopes.append(CallGraphScope(s.containerName, s.kind, fileName,
                                                        s.location.range.start, s.location.range.end))
-                    if s.children:
-                        PopulateSymbols(s.children)
                 else:
                     _logger.error("Invalid DocumentSymbol in %s: %s", fileName, s)
 
@@ -293,6 +293,11 @@ class CallGraphBuilder(ABC):
             False   symbol should be excluded, while its children will pass filterSymbol
             None    symbol and its children will be excluded
         """
+        if symbol.kind in {
+            SymbolKind.Parameter,
+            SymbolKind.TypeParameter
+        }:
+            return None
         return symbol.kind in {
             SymbolKind.Constructor,
             SymbolKind.Enum,

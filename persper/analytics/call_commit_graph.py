@@ -7,6 +7,7 @@ import networkx as nx
 from networkx.readwrite import json_graph
 from persper.analytics.devrank import devrank
 from persper.analytics.score import normalize
+from typing import Union, Set, List, Dict, Optional
 
 
 class CommitIdGenerators:
@@ -29,13 +30,22 @@ class CallCommitGraph:
     and edit histories across commits.
     """
 
-    def __init__(self, node_link_data=None, commit_id_generator=CommitIdGenerators.fromHexsha):
-        if node_link_data:
-            self._digraph = json_graph.node_link_graph(node_link_data)
+    def __init__(self, graph_data: Optional[Dict] = None, commit_id_generator=CommitIdGenerators.fromHexsha):
+        if graph_data:
+            self._digraph = json_graph.node_link_graph(
+                CallCommitGraph._to_networkx_format(graph_data))
         else:
             self._digraph = self._new_graph()
         self._commit_id_generator = commit_id_generator
         self._current_commit_id = None
+
+    @staticmethod
+    def _to_networkx_format(graph_data: Dict) -> Dict:
+        graph_data['multigraph'] = False
+        graph_data['directed'] = True
+        for node in graph_data['nodes']:
+            node['files'] = set(node['files'])
+        return graph_data
 
     def reset(self):
         """Reset all internal states"""
@@ -58,6 +68,10 @@ class CallCommitGraph:
         """Provide read-only access for commits"""
         # https://networkx.github.io/documentation/stable/tutorial.html#graph-attributes
         return self._digraph.graph['commits']
+
+    def files(self, node: str) -> Set[str]:
+        """Provide read-only access to `files` attribute of a node"""
+        return self.nodes()[node]['files']
 
     def __contains__(self, node):
         """Implement membership check"""
@@ -82,8 +96,8 @@ class CallCommitGraph:
         return self._cur_cindex() + 1
 
     # TODO: remove the default value of files
-    def add_node(self, node, files=[]):
-        self._digraph.add_node(node, size=None, history={}, files=files)
+    def add_node(self, node: str, files: Union[Set[str], List[str]] = []):
+        self._digraph.add_node(node, size=None, history={}, files=set(files))
 
     # add_node must be called on source and target first
     def add_edge(self, source, target):
@@ -106,11 +120,11 @@ class CallCommitGraph:
             node_history[self._current_commit_id] = {'adds': num_adds, 'dels': num_dels}
 
     # read/write access to node history are thourgh this function
-    def _get_node_history(self, node):
+    def _get_node_history(self, node: str) -> Dict[str, Dict[str, int]]:
         return self._digraph.nodes[node]['history']
 
-    def update_node_files(self, node, new_files):
-        self._digraph.nodes[node]['files'] = new_files
+    def update_node_files(self, node: str, new_files: Union[Set[str], List[str]]):
+        self._digraph.nodes[node]['files'] = set(new_files)
 
     # TODO: provide other options for computing a node's size
     def _set_all_nodes_size(self, black_set=None):

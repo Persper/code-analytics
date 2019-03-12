@@ -1,18 +1,18 @@
 {
     "edges": {
-        "char *str_append_chr(char *string, char append)|->|int str_equals()": {
-            "addedBy": "C",
+        "char *str_append_chr(char *string, char append)|->|int str_equals(char *equal1, char *eqaul2)": {
+            "addedBy": "D",
             "weight": null
         },
         "char *str_append_chr(char *string, char append)|->|int str_len(char *string)": {
-            "addedBy": "C",
+            "addedBy": "D",
             "weight": null
         },
         "char *str_replace(char *search, char *replace, char *subject)|->|char *str_append_chr(char *string, char append)": {
             "addedBy": "D",
             "weight": null
         },
-        "char *str_replace(char *search, char *replace, char *subject)|->|int str_equals()": {
+        "char *str_replace(char *search, char *replace, char *subject)|->|int str_equals(char *equal1, char *eqaul2)": {
             "addedBy": "D",
             "weight": null
         },
@@ -76,13 +76,6 @@
                     "dels": 0
                 }
             },
-            "size": null
-        },
-        "int str_equals()": {
-            "files": [
-                "main.c"
-            ],
-            "history": {},
             "size": null
         },
         "int str_equals(char *equal1, char *eqaul2)": {
