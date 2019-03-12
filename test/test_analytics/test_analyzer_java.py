@@ -40,10 +40,10 @@ async def test_analyzer_master_only(az):
             'addFunction': {'adds': 4, 'dels': 0},
             'tempFunction': {'adds': 3, 'dels': 0}
         },
-        'C':{
+        'C': {
             'tempFunction': {'adds': 0, 'dels': 3}
         },
-        'D':{
+        'D': {
             'addFunction': {'adds': 1, 'dels': 1},
             'AddChangeFunction': {'adds': 1, 'dels': 0}
         },
@@ -63,7 +63,7 @@ async def test_analyzer_master_only(az):
             'AddChangeFunction': {'adds': 1, 'dels': 1},
             'doStuff': {'adds': 0, 'dels': 1}
         },
-        'K':{
+        'K': {
             'AddChangeFunction': {'adds': 0, 'dels': 2},
             'FunctionCaller': {'adds': 5, 'dels': 0},
             'doStuff': {'adds': 3, 'dels': 1}
@@ -82,8 +82,14 @@ async def test_analyzer_master_only(az):
 
         for cid, chist in history.items():
             message = commits[cid]['message']
-            #print(message.strip(), chist, func.strip())
-            assert(chist == history_truth[message.strip()][func])
+            # print(message.strip(), chist, func.strip())
+            assert (chist == history_truth[message.strip()][func])
 
-    #print(az._graph_server.get_graph().edges())
-    assert(set(az._graph_server.get_graph().edges()) == set(edges_truth))
+    filenames = list()
+    filenames_truth = ['CallGraph.java']
+    for func, data in ccgraph.nodes(data=True):
+        filenames.extend(data["files"])
+    assert (set(filenames) == set(filenames_truth))
+
+    # print(az._graph_server.get_graph().edges())
+    assert (set(az._graph_server.get_graph().edges()) == set(edges_truth))
