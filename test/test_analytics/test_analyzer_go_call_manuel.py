@@ -2,7 +2,6 @@ import os
 import pytest
 import subprocess
 import shutil
-from persper.analytics.c import CGraphServer
 from persper.analytics.analyzer import Analyzer
 from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from persper.analytics.go import GoGraphServer
