@@ -1,0 +1,38 @@
+diff --git a/main.go b/main.go
+index 5398e6d..2a81399 100644
+--- a/main.go
++++ b/main.go
+@@ -9,22 +9,20 @@ type animal interface {
+
+ type cat int
+ type dog int
+-
+ func (c cat) printInfo(){
+     fmt.Println("a cat")
+ }
+
+-func (d dog) printInfo(){
++func (c dog) printInfo(){
+     fmt.Println("a dog")
+ }
+-
++func invoke(a animal){
++    a.printInfo()
++}
+ func main() {
+-    var a animal
+     var c cat
+-    a=c
+-    a.printInfo()
+-    //other type
+-    var d dog
+-    a=d
+-    a.printInfo()
+-}
+\ No newline at end of file
++       var d dog
++       //as value convert
++       invoke(c)
++       invoke(d)
++}
+

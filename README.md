@@ -36,23 +36,12 @@ sudo apt-get install git -y
 git --version
 ```
 
-4. Apply a patch to gitpython
-
-(Try to) apply a patch to gitpython 2.1.x:
-
-```bash
-pipenv shell
-cd misc/
-./apply_patch.py
-exit
-```
-
-5. Add project directory to path
+4. Add project directory to path
 
 Add the following line to your `~/.bashrc` file.
 
 ```
-export PATH=$PATH:/path/to/dir
+export PYTHONPATH=$PYTHONPATH:/path/to/dir
 ```
 
 To update your path for the remainder of the session.
@@ -60,7 +49,7 @@ To update your path for the remainder of the session.
 source ~/.bashrc
 ```
 
-6. Install srcML for parsing C/C++ and Java
+5. Install srcML for parsing C/C++ and Java
 
 Please download from [here](https://www.srcml.org/#download) and follow the [instructions](http://131.123.42.38/lmcrs/beta/README).
 
@@ -71,13 +60,29 @@ sudo apt install libarchive-dev
 sudo apt install libcurl4-openssl-dev
 ```
 
-7. Check setup correctness
+6. Check setup correctness
 
 ```bash
 pipenv run pytest test/test_analytics
 ```
 
 You should see all tests passed.
+
+## Report Test Coverage
+
+We use [coverage.py](https://coverage.readthedocs.io/) and [pytest-cov](https://pytest-cov.readthedocs.io/en/latest/) to compute test coverage:
+
+```
+# Execution
+pytest --cov=persper/ test/test_analytics
+
+# Reporting
+coverage html
+
+# then visit htmlcov/index.html in your browser
+```
+
+
 
 ## Interactive mode with jupyter notebook
 

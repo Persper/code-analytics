@@ -75,6 +75,7 @@ def run_graph_server(graph_server_bin):
 
 
 def test_analzyer_go(az):
+<<<<<<< HEAD
     graph_server_bin = build_graph_server()
     graph_server_proc = run_graph_server(graph_server_bin)
 
@@ -210,3 +211,41 @@ def test_analzyer_go(az):
     finally:
         graph_server_proc.terminate()
 
+=======
+    az._graph_server.reset_graph()
+    az.analyze()
+    ccgraph = az.get_graph()
+
+    history_truth = {
+        'A': {'printInfo': 0,
+              'main': 10},
+        'B': {'printInfo': 1,
+              'main': 8, 
+              "invoke":3}
+    }
+
+    commits = ccgraph.commits()
+    for func, data in ccgraph.nodes(data=True):
+        history = data['history']
+        for cindex, csize in history.items():
+            commit_message = commits[int(cindex)]['message']
+            assert csize == history_truth[commit_message.strip()][func]
+
+    edges_added_by_A = set([
+        ('main', 'printInfo'),
+        ('printInfo', 'Println'),
+    ])
+
+    edges_added_by_B = set([
+        ('invoke', 'printInfo'),
+        ('main', 'invoke'),
+    ])
+
+    edges_added_by_C = set([
+        ('Abs', 'a'),
+        ('funcB', 'funcA')
+    ])
+
+    all_edges = edges_added_by_A.union(edges_added_by_B)
+    assert set(az._graph_server.get_graph().edges()) == all_edges
+>>>>>>> c57baf152dc3a0b31a56a0487f789f54b9b43081

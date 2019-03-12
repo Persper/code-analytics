@@ -1,0 +1,9 @@
+--- patch_error.c	2019-02-27 16:20:31.000000000 -0800
++++ new_patch_error.c	2019-02-27 16:15:41.000000000 -0800
+@@ -9,4 +9,4 @@
+    }
+    if(*eqaul1 == '\0' && *eqaul2 == '\0' ){return 0;}
+    else {return -1};
+-} 
++}
+\ No newline at end of file

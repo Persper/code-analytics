@@ -1,11 +1,40 @@
 import re
 from persper.analytics.inverse_diff import inverse_diff
-from persper.analytics.srcml import transform_src_to_tree
+from persper.analytics.srcml import src_to_tree
 from persper.analytics.call_graph.c import update_graph, get_func_ranges_c
 from persper.analytics.detect_change import get_changed_functions
 from persper.analytics.patch_parser import PatchParser
 from persper.analytics.graph_server import GraphServer
 from persper.analytics.call_commit_graph import CallCommitGraph
+
+
+def function_change_stats(old_ast, new_ast, patch, patch_parser, ranges_func):
+    """
+    Parse old/new source files and extract the change info for all functions
+    """
+    adds, dels = patch_parser(patch)
+
+    forward_stats = {}
+    bckward_stats = {}
+
+    if old_ast is not None:
+        forward_stats = get_changed_functions(
+            *ranges_func(old_ast), adds, dels, separate=True)
+
+    if new_ast is not None:
+        inv_adds, inv_dels = inverse_diff(adds, dels)
+        bckward_stats = get_changed_functions(
+            *ranges_func(new_ast), inv_adds, inv_dels, separate=True)
+
+    # merge forward and backward stats
+    for func, fstat in bckward_stats.items():
+        if func not in forward_stats:
+            forward_stats[func] = {
+                'adds': fstat['dels'],
+                'dels': fstat['adds']
+            }
+
+    return forward_stats
 
 
 class CGraphServer(GraphServer):
@@ -21,30 +50,28 @@ class CGraphServer(GraphServer):
 
     def update_graph(self, old_filename, old_src, new_filename, new_src, patch):
         ast_list = []
-        forward_stats = {}
-        bckward_stats = {}
-        adds, dels = self._parse_patch(patch)
+        old_ast = None
+        new_ast = None
 
+        # Parse source codes into ASTs
         if old_src:
-            old_ast = transform_src_to_tree(old_src)
+            old_ast = src_to_tree(old_filename, old_src)
             if old_ast is None:
                 return -1
 
-            forward_stats = get_changed_functions(
-                *get_func_ranges_c(old_ast), adds, dels)
-
         if new_src:
-            new_ast = transform_src_to_tree(new_src)
+            new_ast = src_to_tree(new_filename, new_src)
             if new_ast is None:
                 return -1
-
             ast_list = [new_ast]
-            inv_adds, inv_dels = inverse_diff(adds, dels)
-            bckward_stats = get_changed_functions(
-                *get_func_ranges_c(new_ast), inv_adds, inv_dels)
 
-        bckward_stats.update(forward_stats)
-        update_graph(self._ccgraph, ast_list, bckward_stats)
+        # Compute function change stats
+        change_stats = function_change_stats(old_ast, new_ast, patch,
+                                             self._parse_patch,
+                                             get_func_ranges_c)
+
+        # Update call-commit graph
+        update_graph(self._ccgraph, ast_list, change_stats)
         return 0
 
     def get_graph(self):

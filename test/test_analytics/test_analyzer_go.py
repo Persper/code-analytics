@@ -73,6 +73,7 @@ def run_graph_server(graph_server_bin):
 
 
 def test_analzyer_go(az):
+<<<<<<< HEAD
     graph_server_bin = build_graph_server()
     graph_server_proc = run_graph_server(graph_server_bin)
 
@@ -130,3 +131,62 @@ def test_analzyer_go(az):
 
     finally:
         graph_server_proc.terminate()
+=======
+    az._graph_server.reset_graph()
+    az.analyze()
+    ccgraph = az.get_graph()
+
+    history_truth = {
+        'D': {'Abs': 6,
+              'funcA': 0,
+              'main': 8,
+              "Absp": 3},
+        'C': {'Abs': 5,
+              'funcA': 0,
+              'funcB': 1,
+              'main': 0},
+        'B': {'Abs': 3,
+              'funcA': 0,
+              'funcB': 3,
+              'main': 5},
+        'A': {'Abs': 3,
+              'funcA': 3,
+              'main': 6}
+    }
+
+    commits = ccgraph.commits()
+    for func, data in ccgraph.nodes(data=True):
+        history = data['history']
+        for cindex, csize in history.items():
+            commit_message = commits[int(cindex)]['message']
+            assert csize == history_truth[commit_message.strip()][func]
+
+    edges_added_by_A = set([
+        ('Abs', 'Sqrt'),
+        ('funcA', 'Println'),
+        ('main', 'a'),
+        ('main', 'Println'),
+        ('main', 'Abs'),
+    ])
+
+    edges_added_by_B = set([
+        ('Abs', 'funcA'),
+        ('funcB', 'Println'),
+        ('main', 'b'),
+        ('main', 'c'),
+    ])
+
+    edges_added_by_C = set([
+        ('Abs', 'a'),
+        ('funcB', 'funcA')
+    ])
+
+    edges_added_by_D = set([
+        ("Absp", "Sqrt"),
+        ("main", "Absp")
+    ])
+
+    print(set(az._graph_server.get_graph().edges()))
+    all_edges = edges_added_by_A.union(edges_added_by_B).union(edges_added_by_C).union(edges_added_by_D)
+    assert set(az._graph_server.get_graph().edges()) == all_edges
+>>>>>>> c57baf152dc3a0b31a56a0487f789f54b9b43081

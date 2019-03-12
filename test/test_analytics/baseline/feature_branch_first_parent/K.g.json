@@ -1,0 +1,146 @@
+{
+    "edges": {
+        "char *str_append_chr(char *string, char append)|->|int str_equals(char *equal1, char *eqaul2)": {
+            "addedBy": "D",
+            "weight": null
+        },
+        "char *str_append_chr(char *string, char append)|->|int str_len(char *string)": {
+            "addedBy": "D",
+            "weight": null
+        },
+        "char *str_replace(char *search, char *replace, char *subject)|->|char *str_append_chr(char *string, char append)": {
+            "addedBy": "D",
+            "weight": null
+        },
+        "char *str_replace(char *search, char *replace, char *subject)|->|int str_equals(char *equal1, char *eqaul2)": {
+            "addedBy": "D",
+            "weight": null
+        },
+        "char *str_replace(char *search, char *replace, char *subject)|->|int str_len(char *string)": {
+            "addedBy": "D",
+            "weight": null
+        }
+    },
+    "nodes": {
+        "char *str_append(char *string, char *append)": {
+            "files": [
+                "main.c"
+            ],
+            "history": {
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                },
+                "B": {
+                    "adds": 0,
+                    "dels": 3
+                }
+            },
+            "size": null
+        },
+        "char *str_append_chr(char *string, char append)": {
+            "files": [
+                "main.c"
+            ],
+            "history": {
+                "B": {
+                    "adds": 3,
+                    "dels": 0
+                },
+                "C": {
+                    "adds": 30,
+                    "dels": 4
+                }
+            },
+            "size": null
+        },
+        "char *str_replace(char *search, char *replace, char *subject)": {
+            "files": [
+                "feature-G.c"
+            ],
+            "history": {
+                "D": {
+                    "adds": 26,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "int count()": {
+            "files": [
+                "feature-K.c"
+            ],
+            "history": {
+                "F": {
+                    "adds": 12,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "int str_equals(char *equal1, char *eqaul2)": {
+            "files": [
+                "main.c"
+            ],
+            "history": {
+                "B": {
+                    "adds": 11,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "int str_len(char *string)": {
+            "files": [
+                "main.c"
+            ],
+            "history": {
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "void add(int num)": {
+            "files": [
+                "feature-H.c"
+            ],
+            "history": {
+                "E": {
+                    "adds": 11,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "void append(int num)": {
+            "files": [
+                "feature-H.c"
+            ],
+            "history": {
+                "E": {
+                    "adds": 29,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "void display(struct node *r)": {
+            "files": [
+                "feature-K.c"
+            ],
+            "history": {
+                "F": {
+                    "adds": 14,
+                    "dels": 0
+                },
+                "K": {
+                    "adds": 0,
+                    "dels": 5
+                }
+            },
+            "size": null
+        }
+    }
+}

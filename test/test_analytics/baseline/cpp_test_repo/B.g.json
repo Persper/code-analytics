@@ -1,0 +1,870 @@
+{
+    "edges": {
+        "ArgumentException::ArgumentException(const std::string &message, const std::string &argumentName)|->|static std::string ArgumentException::BuildMessage(const std::string &message, const std::string &argumentName)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)|->|TStream OpenAndValidate(const TPath arg1)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)|->|void ConfigurationParser::Load(std::istream &inputStream)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "ConfigurationParser::ConfigurationParser(std::istream &inputStream)|->|void ConfigurationParser::Load(std::istream &inputStream)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, bool &rhs)|->|bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "RowReader &operator>>(RowReader &reader, bool &rhs)|->|enum class StringComparison : int {}": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const|->|bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const|->|enum class StringComparison : int {}": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)|->|enum class StringComparison : int {}": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "int main(int argc, char *argv[])|->|TStream OpenAndValidate(const TPath arg1)": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "int main(int argc, char *argv[])|->|bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "int main(int argc, char *argv[])|->|double ConfigurationParser::GetDouble(const std::string &key, double defaultValue) const": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "int main(int argc, char *argv[])|->|std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "int main(int argc, char *argv[])|->|void ReportException(const std::exception &ex, int level)": {
+            "addedBy": "B",
+            "weight": null
+        }
+    },
+    "nodes": {
+        "ANSI_COLOR_BLUE": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "ANSI_COLOR_BRIGHT": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "ANSI_COLOR_CYAN": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "ANSI_COLOR_GREEN": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "ANSI_COLOR_MAGENTA": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "ANSI_COLOR_RED": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "ANSI_COLOR_RESET": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "ANSI_COLOR_YELLOW": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "ArgumentException::ArgumentException(const std::string &message)": {
+            "files": [
+                "Exceptions.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 2,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "ArgumentException::ArgumentException(const std::string &message, const std::string &argumentName)": {
+            "files": [
+                "Exceptions.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 2,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "BlockExitHandler &BlockExitHandler::operator=(const BlockExitHandler &) = delete": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "BlockExitHandler::BlockExitHandler(const BlockExitHandler &) = delete": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "BlockExitHandler::~BlockExitHandler() noexcept": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 11,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 5,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "ConfigurationParser::ConfigurationParser(std::istream &inputStream)": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 4,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "Exception::Exception()": {
+            "files": [
+                "Exceptions.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "Exception::~Exception() noexcept": {
+            "files": [
+                "Exceptions.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "InvalidCastException::InvalidCastException(const std::string &message)": {
+            "files": [
+                "Exceptions.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, bool &rhs)": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 24,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, double &rhs)": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, float &rhs)": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, int &rhs)": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, long &rhs)": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "RowReader &operator>>(RowReader &reader, std::string &rhs)": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 16,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "RowReader::operator bool() const": {
+            "files": [
+                "TextFileParsers.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 4,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "TDest safe_cast(TSrc obj)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "TEnum operator&(TEnum lhs, TEnum rhs)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "TEnum operator|(TEnum lhs, TEnum rhs)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "TIterator _RangeToEnumerable::begin()": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "TIterator _RangeToEnumerable::end()": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "TStream &operator>>(TStream &s, RowReader &reader)": {
+            "files": [
+                "TextFileParsers.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "TStream OpenAndValidate(const TPath arg1)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "_DECLARE_ENUM": {
+            "files": [
+                "Utility-1.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "_DECLARE_ENUM_DEFAULT": {
+            "files": [
+                "Utility-1.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "_RE_TRACE": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "_RangeToEnumerable::_RangeToEnumerable<TIterator>(const std::pair<TIterator, TIterator> range)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "_RangeToEnumerable<TIterator> RangeToEnumerable(const std::pair<TIterator, TIterator> range)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "_SILENCE_STDEXT_ALLOCATORS_DEPRECATION_WARNING": {
+            "files": [
+                "stdafx.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 16,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "bool Confirm(const std::string &prompt)": {
+            "files": [
+                "Utility-1.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 17,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
+            "files": [
+                "Utility-1.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 29,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "bool RowReader::operator!() const": {
+            "files": [
+                "TextFileParsers.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 4,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "bool _RangeToEnumerable::empty()": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "bool dynamic_kind_of(const TSrc *obj)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "bool pointer_kind_of(const std::shared_ptr<TSrc> obj)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "const char *Exception::what() const noexcept": {
+            "files": [
+                "Exceptions.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "const char *FriendlyNameOf()": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "const std::string &ArgumentException::ArgumentName() const": {
+            "files": [
+                "Exceptions.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "const std::stringstream &RowReader::LineStream() const": {
+            "files": [
+                "TextFileParsers.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "double ConfigurationParser::GetDouble(const std::string &key, double defaultValue) const": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 12,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "enum class StringComparison : int {}": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "explicit BlockExitHandler::BlockExitHandler(const std::function<void ()> &handler)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 4,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "explicit Exception::Exception(const std::string &message)": {
+            "files": [
+                "Exceptions.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "explicit OperationFailureException::OperationFailureException(int errorCode)": {
+            "files": [
+                "Exceptions.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 4,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "explicit RowReader::RowReader(bool keepWhitespace, char delim)": {
+            "files": [
+                "TextFileParsers.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 3,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "inline std::string to_string(const std::pair<std::string, std::string> &value)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 4,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "int ConfigurationParser::GetInt(const std::string &key, int defaultValue) const": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 12,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "int main(int argc, char *argv[])": {
+            "files": [
+                "main.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                },
+                "B": {
+                    "adds": 4,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "size_t RowReader::LineNumber() const": {
+            "files": [
+                "TextFileParsers.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "static std::string ArgumentException::BuildMessage(const std::string &message, const std::string &argumentName)": {
+            "files": [
+                "Exceptions.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 5,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "std::shared_ptr<TDest> safe_pointer_cast(const std::shared_ptr<TSrc> &obj)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "std::string StreamStatusToString(const TStream &stream)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "void ConfigurationParser::Load(std::istream &inputStream)": {
+            "files": [
+                "TextFileParsers.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 23,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "void ReportException(const std::exception &ex, int level)": {
+            "files": [
+                "Utility-1.cpp"
+            ],
+            "history": {
+                "A": {
+                    "adds": 20,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "void RowReader::ResetLineNumber()": {
+            "files": [
+                "TextFileParsers.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "void ValidateStream(const TStream &stream)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        }
+    }
+}
