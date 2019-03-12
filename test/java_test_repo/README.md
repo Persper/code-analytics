@@ -34,3 +34,11 @@ Remove line from function block
 ### Commit I
 
 Modify function block lines
+
+### Commit J
+
+Remove line separation between functions
+
+### Commit K
+
+Remove a function call, add function call.
