@@ -1,4 +1,5 @@
 from persper.analytics.call_graph.utils import ns, line_attr
+from typing import Set
 
 
 class NotFunctionCallError(Exception):
@@ -83,9 +84,10 @@ def update_graph(ccgraph, ast_list, change_stats):
             if caller_name not in ccgraph:
                 ccgraph.add_node(caller_name, [filename])
             else:
-                files = ccgraph.nodes()[caller_name]['files']
+                files: Set[str] = ccgraph.files(caller_name)
                 if filename not in files:
-                    ccgraph.update_node_files(caller_name, files + [filename])
+                    files.add(filename)
+                    ccgraph.update_node_files(caller_name, files)
 
             for call in function.xpath('.//srcml:call', namespaces=ns):
                 try:
