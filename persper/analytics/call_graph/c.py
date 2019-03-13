@@ -44,9 +44,17 @@ def _handle_function_name(name_node):
             name = name_node.text
             line = int(name_node.attrib[line_attr])
         else:
-            line = int(name_node[0].attrib[line_attr])
+            # In this case, name_node should have three children
+            # assert len(name_node) == 3
+            # the first children should be another name node
+            # the second children is the operator "::"
+            # the third children is yet another name node
+            # Example: ratio_string<Ratio>::symbol
+            # name_node[0] -> ratio_string<Ratio>
+            # name_node[1] -> ::
+            # name_node[2] -> symbol
+            line = int(name_node[2].attrib[line_attr])
             name = name_node[2].text
-
     return name, line
 
 
