@@ -48,6 +48,41 @@ def test_detect_change():
         *func_ranges_result, *parsing_result)
 
 
+def test_get_changed_functions():
+    """This test is added to reproduce the bug described in
+    https://gitlab.com/persper/code-analytics/issues/12
+    """
+    func_ranges_truth = (
+        ['append',
+         'add',
+         'insert'],
+        [[9, 20], [23, 38], [41, 65]]
+    )
+
+    parser = PatchParser()
+    with open(os.path.join(dir_path, 'example7.patch'), 'r') as f:
+        example_patch = f.read()
+        parsing_result = parser.parse(example_patch)
+
+    changed_truth = {
+        'append': {
+            'adds': 26,
+            'dels': 9
+        },
+        'add': {
+            'adds': 0,
+            'dels': 5
+        },
+        'insert': {
+            'adds': 0,
+            'dels': 25
+        }
+
+    }
+    assert changed_truth == get_changed_functions(
+        *func_ranges_truth, *parsing_result, separate=True)
+
+
 def test_patch_parser():
     parser = PatchParser()
 
