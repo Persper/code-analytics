@@ -19,7 +19,7 @@ from vdev.analyzer_observer_vdev import AnalyzerObserverVdev
 root_path = os.path.dirname(os.path.abspath(__file__))
 config = get_config_from_yaml(os.path.join(root_path, 'config.yaml'))
 ALPHA = 0.85
-LANGUAGE_LIST = ['C', 'C++']
+LANGUAGE_LIST = ['C', 'C++', 'Go']
 
 
 def observer(redis_address, redis_port, git_url):
@@ -45,7 +45,7 @@ async def build_analyzer2(git_url, repo_path, original_pickle_path, new_pickle_p
         'Go':  Analyzer(repo_path, GoGraphServer(config['go_server_addr'], GO_FILENAME_REGEXES))
     }
 
-    az = analyzer_dict['major_language']
+    az = analyzer_dict[major_language]
     az.observer = observer(config['redis']['host'], config['redis']['port'], git_url)
     await az.analyze(git_url, new_pickle_path, from_beginning=True, into_branches=True)
 
