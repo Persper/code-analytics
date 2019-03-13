@@ -8,10 +8,12 @@ from Naked.toolshed.shell import muterun_rb
 from persper.analytics.cpp import CPPGraphServer
 from persper.analytics.analyzer import Analyzer
 from persper.analytics.go import GoGraphServer
+from persper.analytics.score import normalize
 from persper.analytics.graph_server import CPP_FILENAME_REGEXES
 from persper.analytics.graph_server import C_FILENAME_REGEXES
 from persper.analytics.graph_server import JS_FILENAME_REGEXES
 from persper.analytics.graph_server import GO_FILENAME_REGEXES
+
 from utils import get_config_from_yaml
 from vdev.analyzer_observer_vdev import AnalyzerObserverVdev
 
@@ -84,7 +86,8 @@ def check_linguist(repo_path):
 def basic_stats(pickle_path, alpha=0.85, show_merge=True):
     az = pickle.load(open(pickle_path, 'rb'))
 
-    commit_share = az.get_graph().commit_devranks(alpha, black_set=[])
+    commit_share = normalize(az.get_graph().commit_devranks(alpha, black_set=[]))
+
     points = []
     
 
@@ -145,7 +148,7 @@ def developer_profile(pickle_path, alpha=0.85, show_merge=True):
     dev_share = {}
     az = pickle.load(open(pickle_path, 'rb'))
 
-    commit_share = az.get_graph().commit_devranks(alpha, black_set=[])
+    commit_share = normalize(az.get_graph().commit_devranks(alpha, black_set=[]))
 
     for commit in az._ri.repo.iter_commits():
 
