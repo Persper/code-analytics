@@ -53,7 +53,7 @@ def get_changed_functions(func_names, func_ranges, additions, deletions,
     num_adds, num_dels = len(additions), len(deletions)
     for fn, fr in zip(func_names, func_ranges):
         for i in range(add_ptr, num_adds):
-            if fr[0] <= additions[i][0] <= fr[1]:
+            if fr[0] <= additions[i][0] < fr[1]:
                 update_info(fn, additions[i][1], 'adds')
                 add_ptr = i + 1
 
