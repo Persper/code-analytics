@@ -28,10 +28,12 @@ class GoGraphServer(GraphServer):
 
     def register_commit(self, hexsha, author_name, author_email, commit_message):
         # TODO: use 'message' or 'commit_message', but not both
-        payload = {'hexsha': hexsha,
-                   'author_name': author_name,
-                   'author_email': author_email,
-                   'message': commit_message}
+        payload = {
+            'hexsha': hexsha,
+            'authorEmail': author_email,
+            'authorName': author_name,
+            'message': commit_message,
+        }
         register_url = urllib.parse.urljoin(self.server_addr, '/register_commit')
         r = requests.post(register_url, json=payload).json()
         if r != '0':
