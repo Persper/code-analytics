@@ -14,12 +14,9 @@ public class CallGraphs
         int summation = a + b + c;
         int addition = a + b;
         int subtraction = a - b;
-        doStuff();
     }
 
     public static int FunctionCaller(int a, int b, int c){
-        doStuff();
-        AddChangeFunction(a, b, c);
-        summation(a, b, c);
+        int a = 30 + addMore(30);
     }
 }
