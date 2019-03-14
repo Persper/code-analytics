@@ -20,5 +20,6 @@ public class CallGraphs
         doStuff();
         AddChangeFunction(a, b);
         summation_new(a, b, c);
+        int a = 30 + addMore(30);
     }
 }

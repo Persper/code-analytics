@@ -54,6 +54,27 @@ class FunctionCalleeListener(Java8Listener):
             self.function_caller_callee_map[self.current_function_name].append(
                 name)
 
+    def enterPrimary(self, ctx: Java8Parser.PrimaryContext):
+        """
+        This function is responsible to handle all the expressions,
+        For example:
+            int a = 1 + add(3);
+            add(someStuff(), moreStuff());
+            if(someStuff()){
+                int a = 30;
+            }
+
+        :param ctx: context for parser
+        :return:
+        """
+        is_method = ctx.primaryNoNewArray_lfno_primary().methodInvocation_lfno_primary()
+        if is_method:
+            name = is_method.methodName().getText()
+
+            if self.current_function_name:
+                self.function_caller_callee_map[self.current_function_name].append(
+                    name)
+
 
 def get_function_range_java(tree):
     walker = ParseTreeWalker()

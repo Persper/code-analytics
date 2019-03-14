@@ -69,7 +69,7 @@ async def test_analyzer_master_only(az):
             'doStuff': {'adds': 3, 'dels': 1}
         },
         'L': {
-            'FunctionCaller': {'adds': 2, 'dels': 2},
+            'FunctionCaller': {'adds': 3, 'dels': 2},
         }
     }
 
@@ -78,7 +78,9 @@ async def test_analyzer_master_only(az):
         # caller callee relationship
         ('FunctionCaller', 'summation'),
         # modifying function call
-        ('FunctionCaller', 'summation_new')
+        ('FunctionCaller', 'summation_new'),
+        # Statement expressions
+        ('FunctionCaller', 'addMore')
 
     ]
 
@@ -89,7 +91,7 @@ async def test_analyzer_master_only(az):
 
         for cid, chist in history.items():
             message = commits[cid]['message']
-            #print(message.strip(), chist, func.strip())
+            print(message.strip(), chist, func.strip())
             assert (chist == history_truth[message.strip()][func])
 
     filenames = list()
@@ -98,5 +100,5 @@ async def test_analyzer_master_only(az):
         filenames.extend(data["files"])
     assert (set(filenames) == set(filenames_truth))
 
-    #print(az._graph_server.get_graph().edges())
+    print(az._graph_server.get_graph().edges())
     assert (set(az._graph_server.get_graph().edges()) == set(edges_truth))
