@@ -4,7 +4,7 @@ from persper.analytics.srcml import src_to_tree
 from persper.analytics.call_graph.c import update_graph, get_func_ranges_c
 from persper.analytics.detect_change import get_changed_functions
 from persper.analytics.patch_parser import PatchParser
-from persper.analytics.graph_server import GraphServer
+from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.call_commit_graph import CallCommitGraph
 
 
@@ -42,6 +42,13 @@ class CGraphServer(GraphServer):
         self._ccgraph = CallCommitGraph()
         self._filename_regexes = [re.compile(regex_str) for regex_str in filename_regex_strs]
         self._pparser = PatchParser()
+        self._seeking_mode = None
+
+    def start_commit(self, hexsha: str, seeking_mode: CommitSeekingMode,
+                     author_name: str, author_email: str, commit_message: str):
+        self._seeking_mode = seeking_mode
+        self._ccgraph.add_commit(hexsha, author_name, author_email,
+                                 commit_message)
 
     def register_commit(self, hexsha, author_name, author_email,
                         commit_message):
@@ -52,6 +59,10 @@ class CGraphServer(GraphServer):
         ast_list = []
         old_ast = None
         new_ast = None
+
+        # Do nothing if in rewind mode
+        if self._seeking_mode == CommitSeekingMode.Rewind:
+            return 0
 
         # Parse source codes into ASTs
         if old_src:
@@ -66,9 +77,12 @@ class CGraphServer(GraphServer):
             ast_list = [new_ast]
 
         # Compute function change stats
-        change_stats = function_change_stats(old_ast, new_ast, patch,
-                                             self._parse_patch,
-                                             get_func_ranges_c)
+        # Compatible with both the old and the new Analyzer
+        change_stats = {}
+        if self._seeking_mode != CommitSeekingMode.MergeCommit:
+            change_stats = function_change_stats(old_ast, new_ast, patch,
+                                                 self._parse_patch,
+                                                 get_func_ranges_c)
 
         # Update call-commit graph
         update_graph(self._ccgraph, ast_list, change_stats)
