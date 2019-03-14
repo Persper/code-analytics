@@ -3,7 +3,7 @@ import pytest
 import subprocess
 import shutil
 from persper.analytics.java import JavaGraphServer
-from persper.analytics.analyzer import Analyzer
+from persper.analytics.analyzer2 import Analyzer
 from persper.analytics.graph_server import JAVA_FILENAME_REGEXES
 from persper.util.path import root_path
 
@@ -27,8 +27,8 @@ def az():
 
 @pytest.mark.asyncio
 async def test_analyzer_master_only(az):
-    await az.analyze(from_beginning=True)
-    ccgraph = az.get_graph()
+    await az.analyze()
+    ccgraph = az.graph
 
     history_truth = {
         'A': {
@@ -37,7 +37,6 @@ async def test_analyzer_master_only(az):
             'addFunction': {'adds': 4, 'dels': 0}
         },
         'B': {
-            'addFunction': {'adds': 4, 'dels': 0},
             'tempFunction': {'adds': 3, 'dels': 0}
         },
         'C': {
@@ -64,9 +63,9 @@ async def test_analyzer_master_only(az):
             'doStuff': {'adds': 0, 'dels': 1}
         },
         'K': {
-            'AddChangeFunction': {'adds': 0, 'dels': 2},
+            'AddChangeFunction': {'adds': 3, 'dels': 2},
             'FunctionCaller': {'adds': 5, 'dels': 0},
-            'doStuff': {'adds': 3, 'dels': 1}
+            'doStuff': {'adds': 0, 'dels': 1}
         },
         'L': {
             'FunctionCaller': {'adds': 3, 'dels': 2},
@@ -91,7 +90,7 @@ async def test_analyzer_master_only(az):
 
         for cid, chist in history.items():
             message = commits[cid]['message']
-            print(message.strip(), chist, func.strip())
+            #print(message.strip(), chist, func.strip())
             assert (chist == history_truth[message.strip()][func])
 
     filenames = list()
@@ -100,5 +99,5 @@ async def test_analyzer_master_only(az):
         filenames.extend(data["files"])
     assert (set(filenames) == set(filenames_truth))
 
-    print(az._graph_server.get_graph().edges())
-    assert (set(az._graph_server.get_graph().edges()) == set(edges_truth))
+    #print(az.graph.edges())
+    assert (set(az.graph.edges()) == set(edges_truth))

@@ -1,6 +1,6 @@
 import re
 from persper.analytics.call_commit_graph import CallCommitGraph
-from persper.analytics.graph_server import GraphServer
+from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.patch_parser import PatchParser
 from persper.analytics.c import function_change_stats
 from persper.analytics.call_graph.java.ast_creater import ASTCreater
@@ -15,6 +15,13 @@ class JavaGraphServer(GraphServer):
         self._filename_regexes = [re.compile(
             regex_str) for regex_str in filename_regex_strs]
         self._pparser = PatchParser()
+        self._seeking_mode = None
+
+    def start_commit(self, hexsha: str, seeking_mode: CommitSeekingMode,
+                     author_name: str, author_email: str, commit_message: str):
+        self._seeking_mode = seeking_mode
+        self._ccgraph.add_commit(hexsha, author_name, author_email,
+                                 commit_message)
 
     def register_commit(self, hexsha, author_name, author_email,
                         commit_message):
@@ -25,6 +32,10 @@ class JavaGraphServer(GraphServer):
         ast_obj_list = list()
         old_ast = None
         new_ast = None
+
+        # Do nothing if in rewind mode
+        if self._seeking_mode == CommitSeekingMode.Rewind:
+            return 0
 
         # Parse source codes into ASTs
         if old_src:
@@ -44,10 +55,12 @@ class JavaGraphServer(GraphServer):
                 return -1
             ast_obj_list = [ast_obj]
 
-        # Compute function change stats
-        change_stats = function_change_stats(old_ast, new_ast, patch,
-                                             self._parse_patch,
-                                             get_function_range_java)
+        # Compute function change stats only when it's not a merge commit
+        change_stats = {}
+        if self._seeking_mode != CommitSeekingMode.MergeCommit:
+            change_stats = function_change_stats(old_ast, new_ast, patch,
+                                                 self._parse_patch,
+                                                 get_function_range_java)
 
         # Update call-commit graph
         update_graph(self._ccgraph, ast_obj_list, change_stats)
