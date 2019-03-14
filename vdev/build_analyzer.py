@@ -101,7 +101,7 @@ def basic_stats(pickle_path, alpha=0.85, show_merge=True):
         else:
             points.append(0.0)
 
-    return points
+    return list(reversed(points))
 
 
 def is_merged_commit(commit):
