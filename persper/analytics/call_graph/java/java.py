@@ -108,7 +108,7 @@ def update_graph(ccgraph, ast_list, change_stats):
             else:
                 files = ccgraph.nodes()[function]['files']
                 if filename not in files:
-                    ccgraph.update_node_files(function, files + [filename])
+                    ccgraph.update_node_files(function, files.union(set([filename])))
 
         for call, callee in get_caller_callee_map(tree).items():
             for callee_name in callee:
@@ -120,6 +120,6 @@ def update_graph(ccgraph, ast_list, change_stats):
 
     for func, fstat in change_stats.items():
         if func not in ccgraph:
-            print("%s in change_stats but not in ccgraph" % func_name)
+            print("%s in change_stats but not in ccgraph" % func)
             continue
         ccgraph.update_node_history(func, fstat['adds'], fstat['dels'])

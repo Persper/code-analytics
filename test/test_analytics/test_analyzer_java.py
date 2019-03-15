@@ -83,6 +83,11 @@ async def test_analyzer_master_only(az):
         },
         'P': {
             'FunctionCallerLoops': {'adds': 10, 'dels': 0}
+        },
+        # New file added having same function name
+        'Q': {
+            'main': {'adds': 3, 'dels': 0},
+            'doStuff': {'adds': 3, 'dels': 0}
         }
 
     }
@@ -113,7 +118,9 @@ async def test_analyzer_master_only(az):
         ('FunctionCallerLoops', 'length'),
         ('FunctionCallerLoops', 'doSomething'),
         ('FunctionCallerLoops', 'doSomthingMore'),
-        ('FunctionCallerLoops', 'parseIt')
+        ('FunctionCallerLoops', 'parseIt'),
+        # New file with same function name
+        ('doStuff', 'callSum')
     ]
 
     commits = ccgraph.commits()
@@ -127,7 +134,7 @@ async def test_analyzer_master_only(az):
             assert (chist == history_truth[message.strip()][func])
 
     filenames = list()
-    filenames_truth = ['CallGraph.java']
+    filenames_truth = ['CallGraph.java', 'SecondFile.java']
     for func, data in ccgraph.nodes(data=True):
         filenames.extend(data["files"])
     assert (set(filenames) == set(filenames_truth))
