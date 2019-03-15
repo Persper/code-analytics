@@ -23,7 +23,7 @@ def _handle_function(func_node):
             block_node = func_node.xpath('./following-sibling::srcml:block',
                                          namespaces=ns)[0]
         except:
-            print("ERROR: %s has no block_node." % func_namae)
+            print("ERROR: %s has no block_node." % func_name)
             return func_name, start_line, None
     try:
         pos_node = block_node.find('pos:position', ns)
@@ -114,7 +114,7 @@ def update_graph(ccgraph, ast_list, change_stats):
 
     for func, fstat in change_stats.items():
         if func not in ccgraph:
-            print("%s in change_stats but not in ccgraph" % func_name)
+            print("%s in change_stats but not in ccgraph" % func)
             continue
         ccgraph.update_node_history(func, fstat['adds'], fstat['dels'])
 
