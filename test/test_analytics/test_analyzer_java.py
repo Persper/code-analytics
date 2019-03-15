@@ -78,7 +78,8 @@ async def test_analyzer_master_only(az):
             'FunctionCaller': {'adds': 3, 'dels': 0}
         },
         'O': {
-            'FunctionCallerConditionals': {'adds': 10, 'dels': 0}
+            'FunctionCallerConditionals': {'adds': 10, 'dels': 0},
+            'FunctionCallerConditionalsSwitch': {'adds': 33, 'dels': 0}
         }
 
     }
@@ -100,7 +101,10 @@ async def test_analyzer_master_only(az):
         # If conditionals
         ('FunctionCallerConditionals', 'addMoreAgain'),
         ('FunctionCallerConditionals', 'greater30'),
-        ('FunctionCallerConditionals', 'anotherValueAgain')
+        ('FunctionCallerConditionals', 'anotherValueAgain'),
+        # Switch Test
+        ('FunctionCallerConditionalsSwitch', 'getDay'),
+        ('FunctionCallerConditionalsSwitch', 'getNumDay')
     ]
 
     commits = ccgraph.commits()

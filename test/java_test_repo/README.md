@@ -100,3 +100,12 @@ Spec 1.2.2.1.2
 
 If conditionals, adding call in
 if statement and later in if block itself.
+
+
+Spec 1.2.2.1.2
+
+Spec 1.2.2.1.2.1
+
+Spec 1.2.2.1.2.2
+
+Switch statement tests

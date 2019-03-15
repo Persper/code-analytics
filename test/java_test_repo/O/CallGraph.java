@@ -33,4 +33,38 @@ public class CallGraphs
             int a = greater30(30) + anotherValueAgain(90);
         }
     }
+
+    public static int FunctionCallerConditionalsSwitch(int a, int b, int c){
+        int day = 5;
+        String dayString;
+
+        // switch statement with int data type
+        switch (day) {
+        case 1:
+            dayString = "Monday";
+            getDay(dayString);
+            break;
+        case 2:
+            dayString = "Tuesday";
+            break;
+        case 3:
+            dayString = "Wednesday";
+            break;
+        case 4:
+            dayString = "Thursday";
+            break;
+        case getNumDay("Friday"):
+            dayString = "Friday";
+            break;
+        case 6:
+            dayString = "Saturday";
+            break;
+        case 7:
+            dayString = "Sunday";
+            break;
+        default:
+            dayString = "Invalid day";
+            break;
+        }
+    }
  }
