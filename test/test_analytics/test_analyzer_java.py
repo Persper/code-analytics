@@ -134,7 +134,7 @@ async def test_analyzer_master_only(az):
             assert (chist == history_truth[message.strip()][func])
 
     filenames = list()
-    filenames_truth = ['CallGraph.java', 'SecondFile.java']
+    filenames_truth = ['CallGraph.java', 'SecondFile.java', 'SecondFileRename.java']
     for func, data in ccgraph.nodes(data=True):
         filenames.extend(data["files"])
     assert (set(filenames) == set(filenames_truth))

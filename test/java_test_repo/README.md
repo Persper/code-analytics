@@ -116,3 +116,13 @@ Spec 1.2.2.2
 
 This commit has everything related to loop
 and calls.
+
+### Commit Q
+
+Add a new file having same function name as `CallGraph.java`
+This results in different nodes and edges.
+
+### Commit R
+
+Renaming the file, this should keep the previous filename
+also in the list to check attribute.
