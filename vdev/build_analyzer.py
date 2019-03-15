@@ -13,8 +13,9 @@ from persper.analytics.graph_server import CPP_FILENAME_REGEXES
 from persper.analytics.graph_server import C_FILENAME_REGEXES
 from persper.analytics.graph_server import JS_FILENAME_REGEXES
 from persper.analytics.graph_server import GO_FILENAME_REGEXES
-
+from pathlib import Path
 from utils import get_config_from_yaml
+from vdev.component_aggregation import get_aggregated_modules
 from vdev.analyzer_observer_vdev import AnalyzerObserverVdev
 
 
@@ -181,19 +182,24 @@ def developer_profile(pickle_path, alpha=0.85, show_merge=True):
 
 
 def module_contrib(ccgraph, dev_share):
+    all_modules = modules_on_devs(ccgraph)
+    aggregated_modules = get_aggregated_modules(all_modules)
+
     for email in dev_share.keys():
-        dev_share[email]['modules'] = modules_on_dev(ccgraph, email)
+        dev_modules = modules_on_devs(ccgraph, email)
+        dev_share[email]['modules'] = get_aggregated_modules_on_dev(aggregated_modules, dev_modules)
 
     return dev_share
 
 
-def modules_on_dev(ccgraph, email, alpha=0.85, black_set=[]):
-    commits = []
-    for commit in ccgraph.commits().values():
-        if commit['authorEmail'] == email:
-            commits.append(commit['hexsha'])
+def modules_on_devs(ccgraph, email=None, alpha=0.85, black_set=[]):
+    if email==None:
+        graph_commits = list(ccgraph.commits().values())
+        commits = [commit['hexsha'] for commit in graph_commits]
+    else:
+        graph_commits  = list(ccgraph.commits().values())
+        commits =  [commit['hexsha'] for commit in graph_commits if commit['authorEmail'] == email]
 
-    print(len(commits))
     modules_share = {}
     func_devranks = ccgraph.function_devranks(alpha, black_set=black_set)
 
@@ -218,6 +224,31 @@ def modules_on_dev(ccgraph, email, alpha=0.85, black_set=[]):
 
     return modules_share
 
+
+def get_aggregated_modules_on_dev(aggregated_modules, dev_modules):
+    new_modules = {}
+
+    for path, value in dev_modules.items():
+        new_path = get_aggregated_path(path, aggregated_modules)
+
+        if new_path in new_modules:
+            new_modules[new_path] += value
+        else:
+            new_modules[new_path] = value
+
+    return new_modules
+
+
+def get_aggregated_path(path, aggregated_modules):
+    if path == '.':
+        return '...'
+
+    if path in aggregated_modules:
+        return path
+    elif (path + "/...") in aggregated_modules:
+        return (path + "/...")
+    else:
+        return get_aggregated_path(str(Path(path).parent), aggregated_modules)
 
 def get_top_commits(commits, commit_share):
     top_commits = []
