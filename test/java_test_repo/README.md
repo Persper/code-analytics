@@ -89,3 +89,14 @@ Function embeddig
 Function in parameter, assigned return
 Function value to a variable
 Function value used with operator
+
+### Commit N
+
+Spec 1.2.2.1
+
+Spec 1.2.2.1.1
+
+Spec 1.2.2.1.2
+
+If conditionals, adding call in
+if statement and later in if block itself.
