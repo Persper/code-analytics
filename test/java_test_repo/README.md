@@ -90,7 +90,7 @@ Function in parameter, assigned return
 Function value to a variable
 Function value used with operator
 
-### Commit N
+### Commit O
 
 Spec 1.2.2.1
 
@@ -109,3 +109,10 @@ Spec 1.2.2.1.2.1
 Spec 1.2.2.1.2.2
 
 Switch statement tests
+
+### Commit P
+
+Spec 1.2.2.2
+
+This commit has everything related to loop
+and calls.
