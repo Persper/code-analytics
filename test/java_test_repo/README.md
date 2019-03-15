@@ -73,3 +73,19 @@ change function name summation --> summation_new
 Spec 1.2.1.1.2
 
 Remove the function call
+
+### Commit N
+
+Spec 1.2.1.2
+
+Spec 1.2.1.2.1
+
+Spec 1.2.1.2.2
+
+Spec 1.2.1.2.3
+
+Function embeddig
+
+Function in parameter, assigned return
+Function value to a variable
+Function value used with operator

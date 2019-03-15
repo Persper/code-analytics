@@ -73,7 +73,11 @@ async def test_analyzer_master_only(az):
         },
         'M': {
             'FunctionCaller': {'adds': 0, 'dels': 3}
-        }
+        },
+        'N': {
+            'FunctionCaller': {'adds': 3, 'dels': 0}
+        },
+
     }
 
     edges_truth = [
@@ -83,8 +87,13 @@ async def test_analyzer_master_only(az):
         # modifying function call
         ('FunctionCaller', 'summation_new'),
         # Statement expressions
-        ('FunctionCaller', 'addMore')
-
+        ('FunctionCaller', 'addMore'),
+        ('FunctionCaller', 'addNewNumber'),
+        # Embedded functions
+        ('FunctionCaller', 'add40'),
+        ('FunctionCaller', 'returnBigValues'),
+        ('FunctionCaller', 'sumValue'),
+        ('FunctionCaller', 'anotherValue')
     ]
 
     commits = ccgraph.commits()

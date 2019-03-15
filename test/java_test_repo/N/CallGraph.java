@@ -18,5 +18,8 @@ public class CallGraphs
 
     public static int FunctionCaller(int a, int b, int c){
         int a = 30 + addMore(30);
+        addNewNumber(add40(40), 20, 30);
+        int a = returnBigValues();
+        int b = sumValue(90) + anotherValue(80);
     }
 }

@@ -1,3 +1,3 @@
 digraph go_test_repo {
-	A -> B -> C -> D -> E -> F -> G -> I -> J -> K -> L -> M;
+	A -> B -> C -> D -> E -> F -> G -> I -> J -> K -> L -> M -> N;
 }
