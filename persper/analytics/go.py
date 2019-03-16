@@ -1,5 +1,5 @@
 from networkx.readwrite import json_graph
-from persper.analytics.graph_server import GraphServer
+from persper.analytics.graph_server import GraphServer, CommitSeekingMode
 from persper.analytics.call_commit_graph import CallCommitGraph
 import re
 import requests
@@ -12,12 +12,28 @@ class GoGraphServer(GraphServer):
         self.filename_regexes = [re.compile(regex_str) for regex_str in filename_regex_strs]
         self.config_param = dict()
 
+    def start_commit(self, hexsha: str, seeking_mode: CommitSeekingMode, author_name: str,
+                     author_email: str, commit_message: str):
+        payload = {
+            'hexsha': hexsha,
+            'authorEmail': author_email,
+            'authorName': author_name,
+            'message': commit_message,
+            'seekingMode': seeking_mode.value,
+        }
+        register_url = urllib.parse.urljoin(self.server_addr, '/start_commit')
+        r = requests.post(register_url, json=payload).json()
+        if r != '0':
+            raise ValueError()
+
     def register_commit(self, hexsha, author_name, author_email, commit_message):
         # TODO: use 'message' or 'commit_message', but not both
-        payload = {'hexsha': hexsha,
-                   'author_name': author_name,
-                   'author_email': author_email,
-                   'message': commit_message}
+        payload = {
+            'hexsha': hexsha,
+            'authorEmail': author_email,
+            'authorName': author_name,
+            'message': commit_message,
+        }
         register_url = urllib.parse.urljoin(self.server_addr, '/register_commit')
         r = requests.post(register_url, json=payload).json()
         if r != '0':

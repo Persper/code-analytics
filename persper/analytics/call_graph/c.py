@@ -23,7 +23,7 @@ def _handle_function(func_node):
             block_node = func_node.xpath('./following-sibling::srcml:block',
                                          namespaces=ns)[0]
         except:
-            print("ERROR: %s has no block_node." % func_namae)
+            print("ERROR: %s has no block_node." % func_name)
             return func_name, start_line, None
     try:
         pos_node = block_node.find('pos:position', ns)
@@ -44,9 +44,17 @@ def _handle_function_name(name_node):
             name = name_node.text
             line = int(name_node.attrib[line_attr])
         else:
-            line = int(name_node[0].attrib[line_attr])
+            # In this case, name_node should have three children
+            # assert len(name_node) == 3
+            # the first children should be another name node
+            # the second children is the operator "::"
+            # the third children is yet another name node
+            # Example: ratio_string<Ratio>::symbol
+            # name_node[0] -> ratio_string<Ratio>
+            # name_node[1] -> ::
+            # name_node[2] -> symbol
+            line = int(name_node[2].attrib[line_attr])
             name = name_node[2].text
-
     return name, line
 
 
@@ -106,7 +114,7 @@ def update_graph(ccgraph, ast_list, change_stats):
 
     for func, fstat in change_stats.items():
         if func not in ccgraph:
-            print("%s in change_stats but not in ccgraph" % func_name)
+            print("%s in change_stats but not in ccgraph" % func)
             continue
         ccgraph.update_node_history(func, fstat['adds'], fstat['dels'])
 

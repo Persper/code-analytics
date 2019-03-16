@@ -1,46 +1,19 @@
 import re
-from persper.analytics.inverse_diff import inverse_diff
-from persper.analytics.srcml import src_to_tree
-from persper.analytics.call_graph.c import update_graph, get_func_ranges_c
-from persper.analytics.detect_change import get_changed_functions
-from persper.analytics.patch_parser import PatchParser
-from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.call_commit_graph import CallCommitGraph
+from persper.analytics.graph_server import CommitSeekingMode, GraphServer
+from persper.analytics.patch_parser import PatchParser
+from persper.analytics.c import function_change_stats
+from persper.analytics.call_graph.java.ast_creater import ASTCreater
+from persper.analytics.call_graph.java.Java8Lexer import Java8Lexer
+from persper.analytics.call_graph.java.Java8Parser import Java8Parser
+from persper.analytics.call_graph.java.java import get_function_range_java, update_graph
 
 
-def function_change_stats(old_ast, new_ast, patch, patch_parser, ranges_func):
-    """
-    Parse old/new source files and extract the change info for all functions
-    """
-    adds, dels = patch_parser(patch)
-
-    forward_stats = {}
-    bckward_stats = {}
-
-    if old_ast is not None:
-        forward_stats = get_changed_functions(
-            *ranges_func(old_ast), adds, dels, separate=True)
-
-    if new_ast is not None:
-        inv_adds, inv_dels = inverse_diff(adds, dels)
-        bckward_stats = get_changed_functions(
-            *ranges_func(new_ast), inv_adds, inv_dels, separate=True)
-
-    # merge forward and backward stats
-    for func, fstat in bckward_stats.items():
-        if func not in forward_stats:
-            forward_stats[func] = {
-                'adds': fstat['dels'],
-                'dels': fstat['adds']
-            }
-
-    return forward_stats
-
-
-class CGraphServer(GraphServer):
+class JavaGraphServer(GraphServer):
     def __init__(self, filename_regex_strs):
         self._ccgraph = CallCommitGraph()
-        self._filename_regexes = [re.compile(regex_str) for regex_str in filename_regex_strs]
+        self._filename_regexes = [re.compile(
+            regex_str) for regex_str in filename_regex_strs]
         self._pparser = PatchParser()
         self._seeking_mode = None
 
@@ -56,7 +29,7 @@ class CGraphServer(GraphServer):
                                  commit_message)
 
     def update_graph(self, old_filename, old_src, new_filename, new_src, patch):
-        ast_list = []
+        ast_obj_list = list()
         old_ast = None
         new_ast = None
 
@@ -66,26 +39,31 @@ class CGraphServer(GraphServer):
 
         # Parse source codes into ASTs
         if old_src:
-            old_ast = src_to_tree(old_filename, old_src)
+            ast_obj = ASTCreater(Java8Parser, Java8Lexer,
+                                 old_filename, old_src)
+            ast_obj()
+            old_ast = ast_obj.tree
             if old_ast is None:
                 return -1
 
         if new_src:
-            new_ast = src_to_tree(new_filename, new_src)
+            ast_obj = ASTCreater(Java8Parser, Java8Lexer,
+                                 new_filename, new_src)
+            ast_obj()
+            new_ast = ast_obj.tree
             if new_ast is None:
                 return -1
-            ast_list = [new_ast]
+            ast_obj_list = [ast_obj]
 
-        # Compute function change stats
-        # Compatible with both the old and the new Analyzer
+        # Compute function change stats only when it's not a merge commit
         change_stats = {}
         if self._seeking_mode != CommitSeekingMode.MergeCommit:
             change_stats = function_change_stats(old_ast, new_ast, patch,
                                                  self._parse_patch,
-                                                 get_func_ranges_c)
+                                                 get_function_range_java)
 
         # Update call-commit graph
-        update_graph(self._ccgraph, ast_list, change_stats)
+        update_graph(self._ccgraph, ast_obj_list, change_stats)
         return 0
 
     def get_graph(self):

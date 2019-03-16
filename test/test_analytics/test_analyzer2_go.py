@@ -1,11 +1,10 @@
 import os
 import pytest
-import signal
+import shutil
 import subprocess
-import tempfile
 from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from persper.analytics.go import GoGraphServer
-from persper.analytics.analyzer import Analyzer
+from persper.analytics.analyzer2 import Analyzer
 from persper.util.path import root_path
 from .utility.go_graph_server import GoGraphBackend
 
@@ -26,9 +25,12 @@ def az():
     test_src_path = os.path.join(root_path, 'test/go_test_repo')
     server_address = 'http://127.0.0.1:%d' % GO_GRAPH_SERVER_PORT
 
-    if not os.path.isdir(repo_path):
-        cmd = '{} {}'.format(script_path, test_src_path)
-        subprocess.call(cmd, shell=True)
+    # Always use latest source to create test repo
+    if os.path.exists(repo_path):
+        shutil.rmtree(repo_path)
+
+    cmd = '{} {}'.format(script_path, test_src_path)
+    subprocess.call(cmd, shell=True)
 
     return Analyzer(repo_path, GoGraphServer(server_address, GO_FILENAME_REGEXES))
 
@@ -46,9 +48,9 @@ async def test_analzyer_go(az):
 
 @pytest.mark.skip
 async def _test_analzyer_go(az):
-    az._graph_server.reset_graph()
+    az._graphServer.reset_graph()
     await az.analyze()
-    ccgraph = az.get_graph()
+    ccgraph = az.graph
 
     history_truth = {
         'D': {
