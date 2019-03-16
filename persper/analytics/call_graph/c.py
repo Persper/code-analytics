@@ -81,7 +81,7 @@ def _handle_call(call_node):
     return callee_name
 
 
-def update_graph(ccgraph, ast_list, change_stats):
+def update_graph(ccgraph, ast_list, change_stats, new_fname_to_old_fname):
     for ast in ast_list:
         filename = ast.attrib['filename']
         for function in ast.findall('./srcml:function', namespaces=ns):
@@ -93,7 +93,13 @@ def update_graph(ccgraph, ast_list, change_stats):
                 ccgraph.add_node(caller_name, [filename])
             else:
                 files: Set[str] = ccgraph.files(caller_name)
-                if filename not in files:
+                # Case: rename
+                if filename in new_fname_to_old_fname:
+                    files.add(filename)
+                    files.remove(new_fname_to_old_fname[filename])
+                    ccgraph.update_node_files(caller_name, files)
+                # Case: new file
+                elif filename not in files:
                     files.add(filename)
                     ccgraph.update_node_files(caller_name, files)
 
