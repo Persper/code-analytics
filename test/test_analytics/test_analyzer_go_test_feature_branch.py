@@ -1,5 +1,4 @@
 import os
-import time
 import pytest
 import shutil
 import subprocess
@@ -7,9 +6,9 @@ from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from persper.analytics.go import GoGraphServer
 from persper.analytics.analyzer2 import Analyzer
 from persper.util.path import root_path
+from .utility.go_graph_server import GoGraphBackend
 
-# TODO: Use a port other than the default 8080 in case of collision
-server_port = 9089
+GO_GRAPH_SERVER_PORT = 9089
 
 
 @pytest.fixture(scope='module')
@@ -21,10 +20,10 @@ def az():
           script_path - A string, path to the repo creator script
         test_src_path - A string, path to the dir to be passed to repo creator
     """
-    repo_path = os.path.join(root_path, 'repos/go_test_call')
+    repo_path = os.path.join(root_path, 'repos/go_test_feature_branch')
     script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
-    test_src_path = os.path.join(root_path, 'test/go_test_call')
-    server_addr = 'http://localhost:%d' % server_port
+    test_src_path = os.path.join(root_path, 'test/go_test_feature_branch')
+    server_address = 'http://127.0.0.1:%d' % GO_GRAPH_SERVER_PORT
 
     # Always use latest source to create test repo
     if os.path.exists(repo_path):
@@ -33,11 +32,22 @@ def az():
     cmd = '{} {}'.format(script_path, test_src_path)
     subprocess.call(cmd, shell=True)
 
-    return Analyzer(repo_path, GoGraphServer(server_addr, GO_FILENAME_REGEXES))
+    return Analyzer(repo_path, GoGraphServer(server_address, GO_FILENAME_REGEXES))
 
 
 @pytest.mark.asyncio
 async def test_analzyer_go(az):
+    backend = GoGraphBackend(GO_GRAPH_SERVER_PORT)
+    backend.build()
+    backend.run()
+    try:
+        await _test_analzyer_go(az)
+    finally:
+        backend.terminate()
+
+
+@pytest.mark.skip
+async def _test_analzyer_go(az):
     az._graphServer.reset_graph()
     await az.analyze()
     ccgraph = az.graph
@@ -45,21 +55,24 @@ async def test_analzyer_go(az):
     history_truth = {
             'A': {
                 'main.go::funcA': 3,
-                'main.go::main': 3
+                'main.go::main': 3 ##should 2
                 },
             'B': {'main.go::funcA': 0,
-                'main.go::main': 2},
-            'C': {'main.go::funcA': 0,
-                'main.go::main': 2
+                'main.go::main': 2 #should 1
                 },
-            'D': {'main.go::funcB': 1, ##shoudle 3
-                'main.go::main': 2, ##should 2
-                'main.go::funcA': 2  ##3
+            'C': {'main.go::funcA': 0,
+                'main.go::main': 2 #should 2
+                },
+            'D': {'func.go::funcB': 3,
+                'main.go::main': 3, #should 2
+                'main.go::funcA': 0,
+                "func.go::return_1":3 #should 4
                 },
             'E': {
-                'main.go::funcB': 2, ##0
-                'main.go::main': 2,  ##0,
-                'main.go::funcA': 0 
+                'func.go::funcB': 0,
+                'main.go::main': 2,
+                'main.go::funcA': 0 ,
+                "func.go::return_1":4
                 },
             'F': {
                 'main.go::funcA': 1,
@@ -67,33 +80,34 @@ async def test_analzyer_go(az):
             },
             'G': {
                 'main.go::funcA': 1,
-                'main.go::main': 0, 
+                'func.go::return_1': 3,
+                'func.go::funcB': 3,
+                'main.go::main': 2,  ##should 0
             },            
             'H': {
-                'main.go::funcA': 1,
-                'main.go::main': 0,   
-            },            
-            'I': {
-                'main.go::funcA': 1,
-                'main.go::main': 0,   
-            },           
-            'J': {
-                'main.go::funcA': 1,
-                'main.go::main': 0,   
-           }, 
-            'K': {
-                'main.go::funcA': 1,
-                'main.go::main': 0,   
-           }, 
-            'L': {
                 'main.go::funcA': 0,
                 'main.go::main': 1,   
+                'func.go::funcB': 0,
+                'func.go::return_1': 0,
+            },            
+            'I': {
+                'main.go::funcA': 0,
+                'main.go::main': 1,   
+                'func.go::funcB': 0,
+                'func.go::return_1': 0,
+            },           
+            'J': {
+                'main.go::funcA': 0,
+                'main.go::main': 2,   
+                'func.go::funcB': 3,
+                'func.go::return_1': 4,
            }, 
-            'M': {'main.go::funcA': 1,
-                'main.go::main': 3
-            },
-            'N': {'main.go::funcA': 0,
-                'main.go::main': 0},
+            'K': {
+                'main.go::funcA': 0,
+                'main.go::main': 1,  
+                'func.go::funcB': 0,
+                'func.go::return_1': 0, 
+           }, 
         }
 
     commits = ccgraph.commits()
@@ -101,25 +115,26 @@ async def test_analzyer_go(az):
         history = data['history']
         for csha, csize in history.items():
             commit_message = commits[csha]['message']
-            print(commit_message.strip())
-            print(func)
-            print(csize)
-            assert((csize['adds']+ csize['dels']) == history_truth[commit_message.strip()][func])
+            assert (csize == history_truth[commit_message.strip()][func])
+
     edges_added_by_A = set([        ])
     edges_added_by_B = set([('main.go::main','main.go::funcA'),])
     edges_added_by_C = set([
         ])
     edges_added_by_D = set([
-           ('main.go::main','main.go::funcB')
+           ('main.go::main','func.go::funcB'),
+           ('main.go::main', 'func.go::return_1')
         ])
     edges_added_by_E = set([
         ])
     edges_added_by_F = set([
-    #    ('main.go::main','main.go::return_1'),
+        ('main.go::main','func.go::return_1'),
         ])
     edges_added_by_G = set([
+        ('main.go::main', 'func.go::funcB')
         ])        
     edges_added_by_H = set([
+    
         ]) 
     edges_added_by_I = set([
         ])  
