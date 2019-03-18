@@ -41,7 +41,7 @@ async def build_analyzer2(git_url, repo_path, original_pickle_path, new_pickle_p
     if original_pickle_path and os.path.exists(original_pickle_path):
         az = pickle.load(open(original_pickle_path, 'rb'))
         az.observer = observer(config['redis']['host'], config['redis']['port'], git_url)
-        await az.analyze(git_url, new_pickle_path, continue_iter=True, end_commit_sha='master', into_branches=True)
+        await az.analyze(git_url, new_pickle_path, continue_iter=True, end_commit_sha='HEAD', into_branches=True)
         return
 
     analyzer_dict = {
@@ -65,7 +65,7 @@ async def build_analyzer(git_url, repo_path, original_pickle_path, new_pickle_pa
         if original_pickle_path and os.path.exists(original_pickle_path):
             az = pickle.load(open(original_pickle_path, 'rb'))
             az.observer = observer(config['redis']['host'], config['redis']['port'], git_url)
-            await az.analyze(git_url, new_pickle_path, continue_iter=True, end_commit_sha='master', into_branches=True)
+            await az.analyze(git_url, new_pickle_path, continue_iter=True, end_commit_sha='HEAD', into_branches=True)
         else:
             az = Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES))
             az.observer = observer(config['redis']['host'], config['redis']['port'], git_url)
