@@ -53,50 +53,55 @@ async def _test_analzyer_go(az):
     ccgraph = az.graph
     history_truth = {
             'A': {
-                'main.go::funcA': 3,
-                'main.go::main': 3
+                'main.go::funcA': {'adds': 3, 'dels': 0},
+                'main.go::main': {'adds': 3, 'dels': 0}
+ 
                 },
-            'B': {'main.go::funcA': 0,
-                'main.go::main': 2}, ##should 1
-            'C': {'main.go::funcA': 0,
-                'main.go::main': 2 ###should be 1
+            'B': {
+                'main.go::funcA': {'adds': 0, 'dels': 0},
+                'main.go::main': {'adds': 1, 'dels': 1}
+            },
+             'C': {
+                'main.go::funcA': {'adds': 0, 'dels': 0},
+                'main.go::main': {'adds': 1, 'dels': 1}                
                 },
-            'D': {'main.go::funcB': 3,
-                'main.go::main': 1,
-                'main.go::funcA': 3
+            'D': {
+                'main.go::funcA': {'adds': 0, 'dels': 1},
+                'main.go::funcB': {'adds': 1, 'dels': 0},                
+                'main.go::main': {'adds': 1, 'dels': 1}
                 },
             'E': {
-                'main.go::funcB': 0,
-                'main.go::main': 0,
-                'main.go::funcA': 0 
+                'main.go::funcA': {'adds': 0, 'dels': 0},
+                'main.go::funcB': {'adds': 1, 'dels': 1},                
+                'main.go::main': {'adds': 3, 'dels': 2}
                 },
             'F': {
-                'main.go::funcA': 1,
-                'main.go::main': 0,
+                'main.go::funcA': {'adds': 1, 'dels': 0},
+                'main.go::main': {'adds': 0, 'dels': 0}  
             },
             'G': {
-                'main.go::funcA': 1,
-                'main.go::main': 0, 
+                'main.go::funcA': {'adds': 1, 'dels': 0},
+                'main.go::main': {'adds': 0, 'dels': 0}  
             },            
             'H': {
-                'main.go::funcA': 1,
-                'main.go::main': 0,   
+                'main.go::funcA': {'adds': 1, 'dels': 0},
+                'main.go::main': {'adds': 0, 'dels': 0}  
             },            
             'I': {
-                'main.go::funcA': 1,
-                'main.go::main': 0,   
+                'main.go::funcA': {'adds': 1, 'dels': 1},
+                'main.go::main': {'adds': 0, 'dels': 0}  
             },           
             'J': {
-                'main.go::funcA': 1,
-                'main.go::main': 0,   
+                'main.go::funcA': {'adds': 1, 'dels': 1},
+                'main.go::main': {'adds': 0, 'dels': 0}  
            }, 
             'K': {
-                'main.go::funcA': 1,
-                'main.go::main': 0,   
+                'main.go::funcA': {'adds': 0, 'dels': 1},
+                'main.go::main': {'adds': 0, 'dels': 0}  
            }, 
             'L': {
-                'main.go::funcA': 2,
-                'main.go::main': 0,   
+                'main.go::funcA': {'adds': 0, 'dels': 0},
+                'main.go::main': {'adds': 1, 'dels': 1}  
            }, 
             'M': {'main.go::funcA': 2,
                 'main.go::main': 0,
