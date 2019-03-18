@@ -6,6 +6,7 @@ import pickle
 from datetime import datetime, timedelta
 from Naked.toolshed.shell import muterun_rb
 from persper.analytics.cpp import CPPGraphServer
+from persper.analytics.c import CGraphServer
 from persper.analytics.analyzer import Analyzer
 from persper.analytics.go import GoGraphServer
 from persper.analytics.score import normalize
@@ -43,7 +44,7 @@ async def build_analyzer2(git_url, repo_path, original_pickle_path, new_pickle_p
         return
 
     analyzer_dict = {
-        'C':   Analyzer(repo_path, CPPGraphServer(C_FILENAME_REGEXES)),
+        'C':   Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES)),
         'C++': Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES)),
         'Go':  Analyzer(repo_path, GoGraphServer(config['go_server_addr'], GO_FILENAME_REGEXES))
     }
