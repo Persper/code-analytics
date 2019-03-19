@@ -188,9 +188,11 @@ def module_contrib(ccgraph, dev_share):
     all_modules = modules_on_devs(ccgraph)
     aggregated_modules = get_aggregated_modules(all_modules)
 
+    normalize_coef = sum(aggregated_modules.values())
+
     for email in dev_share.keys():
         dev_modules = modules_on_devs(ccgraph, email)
-        dev_share[email]['modules'] = get_aggregated_modules_on_dev(aggregated_modules, dev_modules)
+        dev_share[email]['modules'] = get_aggregated_modules_on_dev(aggregated_modules, dev_modules, normalize_coef)
 
     return dev_share
 
@@ -228,16 +230,18 @@ def modules_on_devs(ccgraph, email=None, alpha=0.85, black_set=[]):
     return modules_share
 
 
-def get_aggregated_modules_on_dev(aggregated_modules, dev_modules):
+def get_aggregated_modules_on_dev(aggregated_modules, dev_modules, normalize_coef):
     new_modules = {}
 
     for path, value in dev_modules.items():
         new_path = get_aggregated_path(path, aggregated_modules)
 
+        normalized_value = value / normalize_coef
+
         if new_path in new_modules:
-            new_modules[new_path] += value
+            new_modules[new_path] += normalized_value
         else:
-            new_modules[new_path] = value
+            new_modules[new_path] = normalized_value
 
     return new_modules
 
