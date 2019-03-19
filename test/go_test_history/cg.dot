@@ -1,0 +1,11 @@
+digraph go_test_repo {
+	A -> B -> C;  //1.1.1 add  1.1.2remove function
+	A -> D -> E ; //1.1.3.1 change function name 1.1.3.2 change function argument
+	A -> F -> G -> H -> I -> J -> K; //1.1.3.3.1 add lines in function body first line
+									//1.1.3.3.2. remove lines in function body
+	H -> L -> M -> N ;  //1.1.3.3.3. update lines in function body
+							//1.1.4.1.  No new line at end of file
+							//1.1.4.2. No new line between functions
+	A -> O;  //1.1.4.1.  No new line at end of file
+	A -> P -> Q; // 1.1.4.2. No new line between functions
+}
