@@ -63,7 +63,11 @@ class JavaGraphServer(GraphServer):
                                                  get_function_range_java)
 
         # Update call-commit graph
-        update_graph(self._ccgraph, ast_obj_list, change_stats)
+        new_fname_to_old_fname = {}
+        if old_filename is not None and new_filename is not None and \
+                old_filename != new_filename:
+            new_fname_to_old_fname = {new_filename: old_filename}
+        update_graph(self._ccgraph, ast_obj_list, change_stats, new_fname_to_old_fname)
         return 0
 
     def get_graph(self):

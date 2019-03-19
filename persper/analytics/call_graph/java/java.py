@@ -97,7 +97,7 @@ def get_caller_callee_map(tree):
     return collector.function_caller_callee_map
 
 
-def update_graph(ccgraph, ast_list, change_stats):
+def update_graph(ccgraph, ast_list, change_stats, new_fname_to_old_fname):
     for ast in ast_list:
         filename = ast.filename
         tree = ast.tree
@@ -106,9 +106,17 @@ def update_graph(ccgraph, ast_list, change_stats):
             if function not in ccgraph:
                 ccgraph.add_node(function, [filename])
             else:
-                files = ccgraph.nodes()[function]['files']
-                if filename not in files:
-                    ccgraph.update_node_files(function, files.union(set([filename])))
+                files = ccgraph.files(function)
+                old_filename = new_fname_to_old_fname.get(filename, None)
+                # Case: Rename
+                if old_filename:
+                    files.add(filename)
+                    files.remove(old_filename)
+                    ccgraph.update_node_files(function, files)
+                # Case: New
+                elif filename not in files:
+                    files.add(filename)
+                    ccgraph.update_node_files(function, files)
 
         for call, callee in get_caller_callee_map(tree).items():
             for callee_name in callee:
