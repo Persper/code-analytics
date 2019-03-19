@@ -190,6 +190,12 @@ def module_contrib(ccgraph, dev_share):
 
     normalize_coef = sum(aggregated_modules.values())
 
+    if normalize_coef == 0:
+        normalize_coef = 1.0
+
+    print('normalize_coef')
+    print(normalize_coef)
+
     for email in dev_share.keys():
         dev_modules = modules_on_devs(ccgraph, email)
         dev_share[email]['modules'] = get_aggregated_modules_on_dev(aggregated_modules, dev_modules, normalize_coef)
