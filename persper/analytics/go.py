@@ -11,6 +11,7 @@ class GoGraphServer(GraphServer):
         self.server_addr = server_addr
         self.filename_regexes = [re.compile(regex_str) for regex_str in filename_regex_strs]
         self.config_param = dict()
+        self._session = requests.Session()
 
     def start_commit(self, hexsha: str, seeking_mode: CommitSeekingMode, author_name: str,
                      author_email: str, commit_message: str):
@@ -22,7 +23,7 @@ class GoGraphServer(GraphServer):
             'seekingMode': seeking_mode.value,
         }
         register_url = urllib.parse.urljoin(self.server_addr, '/start_commit')
-        r = requests.post(register_url, json=payload).json()
+        r = self._session.post(register_url, json=payload).json()
         if r != '0':
             raise ValueError()
 
@@ -35,7 +36,7 @@ class GoGraphServer(GraphServer):
             'message': commit_message,
         }
         register_url = urllib.parse.urljoin(self.server_addr, '/register_commit')
-        r = requests.post(register_url, json=payload).json()
+        r = self._session.post(register_url, json=payload).json()
         if r != '0':
             raise ValueError()
 
@@ -49,18 +50,18 @@ class GoGraphServer(GraphServer):
                    'config': self.config_param}
 
         update_url = urllib.parse.urljoin(self.server_addr, '/update')
-        r = requests.post(update_url, json=payload).json()
+        r = self._session.post(update_url, json=payload).json()
         if r != '0':
             raise ValueError()
 
     def get_graph(self):
         graph_url = self.server_addr + '/callgraph'
-        r = requests.get(graph_url)
+        r = self._session.get(graph_url)
         return CallCommitGraph(graph_data=r.json())
 
     def reset_graph(self):
         reset_url = urllib.parse.urljoin(self.server_addr, '/reset')
-        requests.post(reset_url)
+        self._session.post(reset_url)
 
     def filter_file(self, filename):
         for regex in self.filename_regexes:
