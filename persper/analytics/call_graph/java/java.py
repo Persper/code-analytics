@@ -111,7 +111,8 @@ def update_graph(ccgraph, ast_list, change_stats, new_fname_to_old_fname):
                 # Case: Rename
                 if old_filename:
                     files.add(filename)
-                    files.remove(old_filename)
+                    if old_filename in files:
+                        files.remove(old_filename)
                     ccgraph.update_node_files(function, files)
                 # Case: New
                 elif filename not in files:
