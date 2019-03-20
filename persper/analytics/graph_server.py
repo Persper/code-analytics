@@ -27,6 +27,10 @@ GO_FILENAME_REGEXES = [
     r'.+\.go$'
 ]
 
+JAVA_FILENAME_REGEXES = [
+    r'.+\.java$'
+]
+
 
 class CommitSeekingMode(Enum):
     """

@@ -26,7 +26,7 @@ def az():
 
 
 @pytest.mark.asyncio
-async def test_analyzer_master_only(az):
+async def test_analyzer_all_branches(az):
     await az.analyze()
     ccgraph = az.graph
 
@@ -126,4 +126,4 @@ async def test_analyzer_master_only(az):
         ('insert', 'count'),
         ('insert', 'append')
     ]
-    assert set(az.graph.edges()) == set(edges_truth)
+    assert set(ccgraph.edges()) == set(edges_truth)

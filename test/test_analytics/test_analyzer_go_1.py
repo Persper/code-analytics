@@ -3,13 +3,15 @@ import time
 import pytest
 import shutil
 import subprocess
+import tempfile
 from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from persper.analytics.go import GoGraphServer
 from persper.analytics.analyzer import Analyzer
 from persper.util.path import root_path
 
 # TODO: Use a port other than the default 8080 in case of collision
-server_port = 8080
+server_port = 9089
+server_addr = ':%d' % server_port
 
 
 @pytest.fixture(scope='module')
@@ -35,7 +37,7 @@ def az():
 
     return Analyzer(repo_path, GoGraphServer(server_addr, GO_FILENAME_REGEXES))
 
-# DO NOT RUN THIS TEST
+
 def test_analzyer_go(az):
     az._graph_server.reset_graph()
     az.analyze()
@@ -72,7 +74,6 @@ def test_analzyer_go(az):
         ('main', 'b'),
         ('main', 'c'),
     ])
-
 
     all_edges = edges_added_by_A.union(edges_added_by_B)
     assert set(az._graph_server.get_graph().edges()) == all_edges

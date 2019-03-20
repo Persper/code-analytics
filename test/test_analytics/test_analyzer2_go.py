@@ -1,5 +1,4 @@
 import os
-import time
 import pytest
 import shutil
 import subprocess
@@ -7,9 +6,9 @@ from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from persper.analytics.go import GoGraphServer
 from persper.analytics.analyzer2 import Analyzer
 from persper.util.path import root_path
+from .utility.go_graph_server import GoGraphBackend
 
-# TODO: Use a port other than the default 8080 in case of collision
-server_port = 9089
+GO_GRAPH_SERVER_PORT = 9089
 
 
 @pytest.fixture(scope='module')
@@ -24,7 +23,7 @@ def az():
     repo_path = os.path.join(root_path, 'repos/go_test_repo')
     script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
     test_src_path = os.path.join(root_path, 'test/go_test_repo')
-    server_addr = 'http://localhost:%d' % server_port
+    server_address = 'http://127.0.0.1:%d' % GO_GRAPH_SERVER_PORT
 
     # Always use latest source to create test repo
     if os.path.exists(repo_path):
@@ -33,11 +32,22 @@ def az():
     cmd = '{} {}'.format(script_path, test_src_path)
     subprocess.call(cmd, shell=True)
 
-    return Analyzer(repo_path, GoGraphServer(server_addr, GO_FILENAME_REGEXES))
+    return Analyzer(repo_path, GoGraphServer(server_address, GO_FILENAME_REGEXES))
 
 
 @pytest.mark.asyncio
 async def test_analzyer_go(az):
+    backend = GoGraphBackend(GO_GRAPH_SERVER_PORT)
+    backend.build()
+    backend.run()
+    try:
+        await _test_analzyer_go(az)
+    finally:
+        backend.terminate()
+
+
+@pytest.mark.skip
+async def _test_analzyer_go(az):
     az._graphServer.reset_graph()
     await az.analyze()
     ccgraph = az.graph
@@ -76,7 +86,7 @@ async def test_analzyer_go(az):
         history = data['history']
         for csha, csize in history.items():
             commit_message = commits[csha]['message']
-            assert(csize == history_truth[commit_message.strip()][func])
+            assert (csize == history_truth[commit_message.strip()][func])
 
     edges_added_by_a = {
         ('main.go::main', 'main.go:Vertex:Abs')
@@ -96,4 +106,4 @@ async def test_analzyer_go(az):
 
     print(set(ccgraph.edges()))
     all_edges = edges_added_by_a.union(edges_added_by_b).union(edges_added_by_c).union(edges_added_by_d)
-    assert(set(ccgraph.edges()) == all_edges)
+    assert (set(ccgraph.edges()) == all_edges)
