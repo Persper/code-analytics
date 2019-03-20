@@ -25,6 +25,42 @@ def az():
     return Analyzer(repo_path, JavaGraphServer(JAVA_FILENAME_REGEXES))
 
 
+@pytest.fixture(scope='module')
+def az_file():
+    # build the repo first if not exists yet
+    repo_path = os.path.join(root_path, 'repos/java_test_repo')
+    script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
+    test_src_path = os.path.join(root_path, 'test/java_test_repo')
+
+    # Always use latest source to create test repo
+    if os.path.exists(repo_path):
+        shutil.rmtree(repo_path)
+
+    cmd = '{} {}'.format(script_path, test_src_path)
+    subprocess.call(cmd, shell=True)
+
+    return Analyzer(repo_path, JavaGraphServer(JAVA_FILENAME_REGEXES))
+
+
+@pytest.mark.asyncio
+async def test_analyzer_files(az_file):
+    az_file.terminalCommit = 'A'
+    await az_file.analyze()
+    assert az_file.graph.nodes(data=True)['main']['files'] == {'CallGraph.java'}
+
+    # Different file having the same function name
+    az_file.terminalCommit = 'Q'
+    await az_file.analyze()
+    assert az_file.graph.nodes(data=True)['main']['files'] == {'CallGraph.java', 'SecondFile.java'}
+    assert az_file.graph.nodes(data=True)['doStuff']['files'] == {'CallGraph.java', 'SecondFile.java'}
+
+    # Renaming the file will store the latest information
+    az_file.terminalCommit = 'R'
+    await az_file.analyze()
+    assert az_file.graph.nodes(data=True)['main']['files'] == {'CallGraph.java', 'SecondFileRename.java'}
+    assert az_file.graph.nodes(data=True)['doStuff']['files'] == {'CallGraph.java', 'SecondFileRename.java'}
+
+
 @pytest.mark.asyncio
 async def test_analyzer_master_only(az):
     await az.analyze()
@@ -130,14 +166,6 @@ async def test_analyzer_master_only(az):
 
         for cid, chist in history.items():
             message = commits[cid]['message']
-            print(message.strip(), chist, func.strip())
             assert (chist == history_truth[message.strip()][func])
 
-    filenames = list()
-    filenames_truth = ['CallGraph.java', 'SecondFile.java', 'SecondFileRename.java']
-    for func, data in ccgraph.nodes(data=True):
-        filenames.extend(data["files"])
-    assert (set(filenames) == set(filenames_truth))
-
-    print(az.graph.edges())
     assert (set(az.graph.edges()) == set(edges_truth))

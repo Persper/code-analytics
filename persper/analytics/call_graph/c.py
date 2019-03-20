@@ -150,12 +150,12 @@ def update_graph(ccgraph, ast_list, change_stats, new_fname_to_old_fname):
                 ccgraph.add_node(caller_name, [filename])
             else:
                 files: Set[str] = ccgraph.files(caller_name)
+                old_filename = new_fname_to_old_fname.get(filename, None)
                 # Case: rename
-                if filename in new_fname_to_old_fname:
+                if old_filename:
                     files.add(filename)
-                    old_fname = new_fname_to_old_fname[filename]
-                    if old_fname in files:
-                        files.remove(old_fname)
+                    if old_filename in files:
+                        files.remove(old_filename)
                     ccgraph.update_node_files(caller_name, files)
                 # Case: new file
                 elif filename not in files:
