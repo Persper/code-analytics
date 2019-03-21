@@ -7,6 +7,7 @@ from persper.analytics.go import GoGraphServer
 from persper.analytics.analyzer2 import Analyzer
 from persper.util.path import root_path
 from .utility.go_graph_server import GoGraphBackend
+from .utility.graph_helper import reduce_graph_history_truth, reduce_graph_edge_truth
 
 GO_GRAPH_SERVER_PORT = 9089
 
@@ -38,8 +39,8 @@ def az():
 @pytest.mark.asyncio
 async def test_analzyer_go(az):
     backend = GoGraphBackend(GO_GRAPH_SERVER_PORT)
-    backend.build()
-    backend.run()
+    # backend.build()
+    # backend.run()
     try:
         await _test_analzyer_go(az)
     finally:
@@ -80,13 +81,14 @@ async def _test_analzyer_go(az):
             'main.go::main': {'adds': 6, 'dels': 0},
         }
     }
+    reduced_history_truth = reduce_graph_history_truth(history_truth)
 
     commits = ccgraph.commits()
     for func, data in ccgraph.nodes(data=True):
         history = data['history']
         for csha, csize in history.items():
             commit_message = commits[csha]['message']
-            assert (csize == history_truth[commit_message.strip()][func])
+            assert (csize == reduced_history_truth[commit_message.strip()][func])
 
     edges_added_by_a = {
         ('main.go::main', 'main.go:Vertex:Abs')
@@ -104,6 +106,6 @@ async def _test_analzyer_go(az):
         ("main.go::main", "main.go:Vertex:Absp")
     }
 
-    print(set(ccgraph.edges()))
     all_edges = edges_added_by_a.union(edges_added_by_b).union(edges_added_by_c).union(edges_added_by_d)
-    assert (set(ccgraph.edges()) == all_edges)
+    reduced_edges = reduce_graph_edge_truth(all_edges)
+    assert (set(ccgraph.edges()) == reduced_edges)
