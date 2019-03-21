@@ -39,8 +39,8 @@ def az():
 @pytest.mark.asyncio
 async def test_analzyer_go(az):
     backend = GoGraphBackend(GO_GRAPH_SERVER_PORT)
-    # backend.build()
-    # backend.run()
+    backend.build()
+    backend.run()
     try:
         await _test_analzyer_go(az)
     finally:
