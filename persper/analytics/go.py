@@ -20,7 +20,6 @@ class GoGraphServer(GraphServer):
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        del state['_session']
         state['server_state'] = self._get_server_state()
         return state
 
@@ -32,9 +31,7 @@ class GoGraphServer(GraphServer):
         return self.get_graph()
 
     def __setstate__(self, state):
-        self.server_addr = state['server_addr']
-        self.filename_regexes = state['filename_regexes']
-        self.config_param = state['config_param']
+        self.__dict__.update(state)
         self._set_server_state(state['server_state'])
 
     def _set_server_state(self, server_state):
