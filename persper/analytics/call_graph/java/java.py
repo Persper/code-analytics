@@ -54,7 +54,7 @@ class FunctionCalleeListener(Java8Listener):
             self.function_caller_callee_map[self.current_function_name].append(
                 name)
 
-    def enterPrimary(self, ctx: Java8Parser.PrimaryContext):
+    def enterMethodInvocation_lfno_primary(self, ctx: Java8Parser.MethodInvocation_lfno_primaryContext):
         """
         This function is responsible to handle all the expressions,
         For example:
@@ -67,13 +67,13 @@ class FunctionCalleeListener(Java8Listener):
         :param ctx: context for parser
         :return:
         """
-        is_method = ctx.primaryNoNewArray_lfno_primary().methodInvocation_lfno_primary()
-        if is_method:
-            name = is_method.methodName().getText()
-
-            if self.current_function_name:
-                self.function_caller_callee_map[self.current_function_name].append(
-                    name)
+        if ctx.methodName():
+            name = ctx.methodName().getText()
+        else:
+            name = ctx.getText()
+        if self.current_function_name:
+            self.function_caller_callee_map[self.current_function_name].append(
+                name)
 
 
 def get_function_range_java(tree):
