@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-gitpython = "*"
 networkx = "*"
 numpy = "*"
 scipy = "*"
@@ -17,11 +16,14 @@ pytest = "*"
 pydot = "*"
 ipykernel = "*"
 matplotlib = "*"
+redis = "*"
+naked = "*"
 antlr4-python3-runtime = "*"
 python-jsonrpc-server = "==0.0.2"
 pytest-asyncio = "*"
 aenum = "*"
 pytest-cov = "*"
+gitpython = "*"
 sphinx = "*"
 
 [dev-packages]

@@ -79,7 +79,9 @@ class Analyzer:
     def observer(self, value):
         self._observer = value or emptyAnalyzerObserver
 
-    async def analyze(self, rev=None,
+    async def analyze(self,
+                pickle_path=None,
+                rev=None,
                 from_beginning=False,
                 num_commits=None,
                 continue_iter=False,
@@ -88,7 +90,8 @@ class Analyzer:
                 max_branch_length=100,
                 min_branch_date=None,
                 checkpoint_interval=1000,
-                verbose=False):
+                verbose=False,
+                autosave=False):
 
         if not continue_iter:
             self.reset_state()
@@ -107,23 +110,32 @@ class Analyzer:
         print_overview(commits, branch_commits)
         start_time = time.time()
 
+        total_commits_num = len(commits) + len(branch_commits)
+
         for idx, commit in enumerate(reversed(commits), 1):
             phase = 'main'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self._observer.onBeforeCommit(self, idx, commit, True)
+            self._observer.onBeforeCommit(self, idx, commit, total_commits_num, True)
             await self.analyze_master_commit(commit)
-            self._observer.onAfterCommit(self, idx, commit, True)
-            self.autosave(phase, idx, checkpoint_interval)
+            self._observer.onAfterCommit(self, idx, commit, total_commits_num, True)
+
+            if autosave:
+                self.autosave(phase, idx, checkpoint_interval)
 
         for idx, commit in enumerate(branch_commits, 1):
             phase = 'branch'
             print_commit_info(phase, idx, commit, start_time, verbose)
-            self._observer.onBeforeCommit(self, idx, commit, False)
+            self._observer.onBeforeCommit(self, idx, commit, total_commits_num, False)
             await self.analyze_branch_commit(commit)
-            self._observer.onAfterCommit(self, idx, commit, False)
-            self.autosave(phase, idx, checkpoint_interval)
+            self._observer.onAfterCommit(self, idx, commit, total_commits_num, False)
 
-        self.autosave('finished', 0, 1)
+            if autosave:
+                self.autosave(phase, idx, checkpoint_interval)
+
+        if pickle_path:
+            self.save(pickle_path)
+        else:
+            self.autosave('finished', 0, 1)
 
     async def _analyze_commit(self, commit, server_func):
         self._graph_server.register_commit(commit.hexsha,
@@ -163,7 +175,7 @@ class Analyzer:
 
         result = self._graph_server.end_commit(commit.hexsha)
         if asyncio.iscoroutine(result):
-            result = await result
+            await result
 
     async def analyze_master_commit(self, commit):
         await self._analyze_commit(commit, self._graph_server.update_graph)
@@ -207,7 +219,7 @@ class AnalyzerObserver(ABC):
     def __init__(self):
         pass
 
-    def onBeforeCommit(self, analyzer:Analyzer, index:int, commit:Commit, isMaster:bool):
+    def onBeforeCommit(self, analyzer:Analyzer, index:int, commit:Commit, total_commits_num:int, isMaster:bool):
         """
         Called before the observed Analyzer is about to analyze a commit.
         Params:
@@ -220,7 +232,7 @@ class AnalyzerObserver(ABC):
         """
         pass
 
-    def onAfterCommit(self, analyzer:Analyzer, index:int, commit:Commit, isMaster:bool):
+    def onAfterCommit(self, analyzer:Analyzer, index:int, commit:Commit, total_commits_num:int, isMaster:bool):
         """
         Called after the observed Analyzer has finished analyzing a commit.
         Params:
