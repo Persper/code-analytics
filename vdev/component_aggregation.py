@@ -1,5 +1,3 @@
-import json
-
 def set_dict(adict, *para):
     cur_dict = adict
     alen = len(para)

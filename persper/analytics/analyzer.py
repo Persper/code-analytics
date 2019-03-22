@@ -1,7 +1,6 @@
 import os
 import time
 import pickle
-from redis import Redis
 import asyncio
 from persper.analytics.git_tools import get_contents, diff_with_first_parent, initialize_repo
 from persper.analytics.iterator import RepoIterator
@@ -80,7 +79,7 @@ class Analyzer:
     def observer(self, value):
         self._observer = value or emptyAnalyzerObserver
 
-    async def analyze(self, repo_url='Unknown',
+    async def analyze(self,
                 pickle_path=None,
                 rev=None,
                 from_beginning=False,
@@ -111,7 +110,6 @@ class Analyzer:
         print_overview(commits, branch_commits)
         start_time = time.time()
 
-        analyzed_commits = 0
         total_commits_num = len(commits) + len(branch_commits)
 
         for idx, commit in enumerate(reversed(commits), 1):
@@ -177,7 +175,7 @@ class Analyzer:
 
         result = self._graph_server.end_commit(commit.hexsha)
         if asyncio.iscoroutine(result):
-            result = await result
+            await result
 
     async def analyze_master_commit(self, commit):
         await self._analyze_commit(commit, self._graph_server.update_graph)

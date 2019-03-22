@@ -1,7 +1,5 @@
-import sys
 import os
 import json
-import redis
 import pickle
 from datetime import datetime, timedelta
 from Naked.toolshed.shell import muterun_rb
@@ -12,7 +10,6 @@ from persper.analytics.go import GoGraphServer
 from persper.analytics.score import normalize
 from persper.analytics.graph_server import CPP_FILENAME_REGEXES
 from persper.analytics.graph_server import C_FILENAME_REGEXES
-from persper.analytics.graph_server import JS_FILENAME_REGEXES
 from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from pathlib import Path
 from utils import get_config_from_yaml
