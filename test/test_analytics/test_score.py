@@ -45,3 +45,23 @@ def test_commit_overall_scores_multiplicative_with_top_one(commit_devranks, clf_
     }
 
     assert expected == commit_overall_scores(commit_devranks, clf_results, label_weights, top_one=True)
+
+def test_commit_overall_scores_additive(commit_devranks, clf_results, label_weights):
+    expected = {
+        'abcdefg': 0.17687074829931967,
+        'bcdefgh': 0.3877551020408163,
+        'cdefghi': 0.326530612244898,
+        'defghij': 0.108843537414966,
+    }
+
+    assert expected == commit_overall_scores(commit_devranks, clf_results, label_weights)
+
+def test_commit_overall_scores_additive_with_top_one(commit_devranks, clf_results, label_weights, additive=True):
+    expected = {
+        'abcdefg': 0.18,
+        'bcdefgh': 0.32,
+        'cdefghi': 0.26,
+        'defghij': 0.24,
+    }
+
+    assert expected == commit_overall_scores(commit_devranks, clf_results, label_weights, top_one=True, additive=True)
