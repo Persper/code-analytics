@@ -106,7 +106,7 @@ class Analyzer:
         return self._s_visitedCommits
 
     def compute_commit_scores(self, alpha: float, label_weights: List[float],
-                              top_one=False):
+                              top_one=False, additive=False):
         """
         Compute the overall scores for all commits by combining DevRank and
         commit classification.
@@ -114,7 +114,8 @@ class Analyzer:
         return commit_overall_scores(self.graph.commit_devranks(alpha),
                                      self._clf_results,
                                      label_weights,
-                                     top_one=top_one)
+                                     top_one=top_one,
+                                     additive=additive)
 
     async def analyze(self, maxAnalyzedCommits=None):
         graphServerLastCommit: str = None
