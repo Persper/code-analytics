@@ -11,7 +11,7 @@ from .utility.go_graph_server import GoGraphBackend
 GO_GRAPH_SERVER_PORT = 9089
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope = 'module')
 def az():
     """ Build the test repo if not already exists
 
@@ -30,7 +30,7 @@ def az():
         shutil.rmtree(repo_path)
 
     cmd = '{} {}'.format(script_path, test_src_path)
-    subprocess.call(cmd, shell=True)
+    subprocess.call(cmd, shell = True)
 
     return Analyzer(repo_path, GoGraphServer(server_address, GO_FILENAME_REGEXES))
 
@@ -54,91 +54,91 @@ async def _test_analzyer_go(az):
 
     history_truth = {
             'A': {
-                'main.go::funcA': {'adds': 3, 'dels': 0},
+                'main.go::funcA': {'adds': 3, 'dels': 0}, 
                 'main.go::main': {'adds': 3, 'dels': 0}
-                },
+                }, 
             'B': {
-                'main.go::funcA': {'adds': 0, 'dels': 0},
+                'main.go::funcA': {'adds': 0, 'dels': 0}, 
                 'main.go::main': {'adds': 1, 'dels': 1}
-                },
+                }, 
             'C': {
-                'main.go::funcA': {'adds': 0, 'dels': 0},
+                'main.go::funcA': {'adds': 0, 'dels': 0}, 
                 'main.go::main': {'adds': 1, 'dels': 1}
-                },
+                }, 
             'D': {
-                'func.go::funcB': {'adds': 3, 'dels': 0},
-                'main.go::funcA': {'adds': 0, 'dels': 0},
-                'main.go::main': {'adds': 2, 'dels': 1},
-                "func.go::return_1":{'adds': 3, 'dels': 0},
-                },
+                'func.go::funcB': {'adds': 3, 'dels': 0}, 
+                'main.go::funcA': {'adds': 0, 'dels': 0}, 
+                'main.go::main': {'adds': 2, 'dels': 1}, 
+                "func.go::return_1":{'adds': 3, 'dels': 0}, 
+                }, 
             'E': {
-                'func.go::funcB': {'adds': 0, 'dels': 0},
-                'main.go::funcA': {'adds': 0, 'dels': 0},
-                'main.go::main': {'adds': 2, 'dels': 1},
-                "func.go::return_1":{'adds': 0, 'dels': 0},
+                'func.go::funcB': {'adds': 0, 'dels': 0}, 
+                'main.go::funcA': {'adds': 0, 'dels': 0}, 
+                'main.go::main': {'adds': 2, 'dels': 1}, 
+                "func.go::return_1":{'adds': 0, 'dels': 0}, 
 
-                },
+                }, 
             'F': {
-                'func.go::funcB': {'adds': 0, 'dels': 0},
-                'main.go::funcA': {'adds': 0, 'dels': 0},
-                'main.go::main': {'adds': 0, 'dels': 0},
-                "func.go::return_1":{'adds': 1, 'dels': 0},
+                'func.go::funcB': {'adds': 0, 'dels': 0}, 
+                'main.go::funcA': {'adds': 0, 'dels': 0}, 
+                'main.go::main': {'adds': 0, 'dels': 0}, 
+                "func.go::return_1":{'adds': 1, 'dels': 0}, 
 
-            },
+            }, 
             'G': {
-                'func.go::funcB': {'adds': 3, 'dels': 0},
-                'main.go::funcA': {'adds': 0, 'dels': 0},
-                'main.go::main': {'adds': 1, 'dels': 1},
-                "func.go::return_1":{'adds': 3, 'dels': 0},
+                'func.go::funcB': {'adds': 3, 'dels': 0}, 
+                'main.go::funcA': {'adds': 0, 'dels': 0}, 
+                'main.go::main': {'adds': 1, 'dels': 1}, 
+                "func.go::return_1":{'adds': 3, 'dels': 0}, 
             },            
             'H': {
-                'func.go::funcB': {'adds': 0, 'dels': 0},
-                'main.go::funcA': {'adds': 0, 'dels': 0},
-                'main.go::main': {'adds': 0, 'dels': 1},
-                "func.go::return_1":{'adds': 0, 'dels': 0},
+                'func.go::funcB': {'adds': 0, 'dels': 0}, 
+                'main.go::funcA': {'adds': 0, 'dels': 0}, 
+                'main.go::main': {'adds': 0, 'dels': 1}, 
+                "func.go::return_1":{'adds': 0, 'dels': 0}, 
 
             },            
             'I': {
-                'func.go::funcB': {'adds': 0, 'dels': 0},
-                'main.go::funcA': {'adds': 0, 'dels': 0},
-                'main.go::main': {'adds': 1, 'dels': 0},
-                "func.go::return_1":{'adds': 0, 'dels': 0},
+                'func.go::funcB': {'adds': 0, 'dels': 0}, 
+                'main.go::funcA': {'adds': 0, 'dels': 0}, 
+                'main.go::main': {'adds': 1, 'dels': 0}, 
+                "func.go::return_1":{'adds': 0, 'dels': 0}, 
 
             },           
             'J': {
-                'func.go::funcB': {'adds': 3, 'dels': 0},
-                'main.go::funcA': {'adds': 0, 'dels': 0},
-                'main.go::main': {'adds': 1, 'dels': 1},
-                "func.go::return_1":{'adds': 4, 'dels': 0},
+                'func.go::funcB': {'adds': 3, 'dels': 0}, 
+                'main.go::funcA': {'adds': 0, 'dels': 0}, 
+                'main.go::main': {'adds': 1, 'dels': 1}, 
+                "func.go::return_1":{'adds': 4, 'dels': 0}, 
 
            }, 
             'K': {
-                'func.go::funcB': {'adds': 0, 'dels': 0},
-                'main.go::funcA': {'adds': 0, 'dels': 0},
-                'main.go::main': {'adds': 0, 'dels': 1},
-                "func.go::return_1":{'adds': 0, 'dels': 0},
+                'func.go::funcB': {'adds': 0, 'dels': 0}, 
+                'main.go::funcA': {'adds': 0, 'dels': 0}, 
+                'main.go::main': {'adds': 0, 'dels': 1}, 
+                "func.go::return_1":{'adds': 0, 'dels': 0}, 
            }, 
         }
 
     commits = ccgraph.commits()
-    for func, data in ccgraph.nodes(data=True):
+    for func, data in ccgraph.nodes(data = True):
         history = data['history']
         for csha, csize in history.items():
             commit_message = commits[csha]['message']
             assert (csize == history_truth[commit_message.strip()][func])
 
     edges_added_by_A = set([        ])
-    edges_added_by_B = set([('main.go::main','main.go::funcA'),])
+    edges_added_by_B = set([('main.go::main', 'main.go::funcA'), ])
     edges_added_by_C = set([
         ])
     edges_added_by_D = set([
-           ('main.go::main','func.go::funcB'),
+           ('main.go::main', 'func.go::funcB'), 
            ('main.go::main', 'func.go::return_1')
         ])
     edges_added_by_E = set([
         ])
     edges_added_by_F = set([
-        ('main.go::main','func.go::return_1'),
+        ('main.go::main', 'func.go::return_1'), 
         ])
     edges_added_by_G = set([
         ('main.go::main', 'func.go::funcB')

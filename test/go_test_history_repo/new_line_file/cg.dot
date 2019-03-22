@@ -1,0 +1,3 @@
+digraph go_test_repo {
+	A -> O;  //1.1.4.1.  No new line at end of file
+}
