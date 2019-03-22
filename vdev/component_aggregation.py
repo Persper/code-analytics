@@ -21,15 +21,16 @@ def set_dict(adict, *para):
             return None
 
 
-#note: "\t<v>\t" => value field, add "\t" to be different from words in path.
+# note: "\t<v>\t" => value field, add "\t" to be different from words in path.
 VALUE_TAG = "\t<v>\t"
+
 
 def build_tree_from_path_map(input_json):
     tree_map = {}
     for path in input_json:
         value = input_json[path]
         part_list = path.split("/")
-        
+
         part_list.append(VALUE_TAG)
         part_list.append(value)
         set_dict(tree_map, *tuple(part_list))
@@ -39,6 +40,8 @@ def build_tree_from_path_map(input_json):
 """
 fill the inner nodes with key(VALUE_TAG) and value(sum of each node's leaves' value)
 """
+
+
 def fill_value_of_node(tree_map):
     if VALUE_TAG in tree_map:
         return tree_map[VALUE_TAG]
@@ -48,7 +51,7 @@ def fill_value_of_node(tree_map):
     tree_map[VALUE_TAG] = node_value
     return node_value
 
-    
+
 def collect_deep_and_big_target_nodes(tree_map, node_path, value_threshold):
     node_info_list = []
     b_found_value_above_threshold = False
@@ -57,25 +60,28 @@ def collect_deep_and_big_target_nodes(tree_map, node_path, value_threshold):
         if key == VALUE_TAG:
             continue
         else:
-            node_info_list_tmp, b_found_value_above_threshold_tmp = collect_deep_and_big_target_nodes(tree_map[key], node_path + "/" + key, value_threshold)
-            
+            node_info_list_tmp, b_found_value_above_threshold_tmp = collect_deep_and_big_target_nodes(tree_map[key],
+                                                                                                      node_path + "/" + key,
+                                                                                                      value_threshold)
+
             if b_found_value_above_threshold_tmp:
                 b_found_value_above_threshold = True
                 node_info_list += node_info_list_tmp
             else:
-                # if value above threshold not found,node_info_list_tmp is a list with a single aggregated result, so node_info_list_tmp.length = 1, node_info_list_tmp[0][0] is the aggregated value
-                other_value += node_info_list_tmp[0][0] 
-            
+                # If value above threshold not found, node_info_list_tmp is a list with a single aggregated result.
+                # So node_info_list_tmp.length = 1, node_info_list_tmp[0][0] is the aggregated value
+                other_value += node_info_list_tmp[0][0]
+
     if b_found_value_above_threshold:
         if other_value > 0:
-            node_info_list.append( (other_value, node_path + "/...",) )
+            node_info_list.append((other_value, node_path + "/...",))
         return node_info_list, b_found_value_above_threshold
-        
+
     value = tree_map[VALUE_TAG]
-    if node_path != ".": #not root
-        return [ (value, node_path,) ], value >= value_threshold
-    else:#root return the first level paths
-        return [ (other_value, "...",) ], value >= value_threshold
+    if node_path != ".":  # not root
+        return [(value, node_path,)], value >= value_threshold
+    else:  # root return the first level paths
+        return [(other_value, "...",)], value >= value_threshold
 
 
 """
@@ -98,21 +104,27 @@ example for return value:
 
 }
 """
+
+
 def get_aggregated_modules(original_modules, value_threshold=0.001):
+    """
+    This method is used to find the right modules with bigger values than given threshold.
+    :param original_modules: a dict with file path as the key and dev_share as the value.
+    :param value_threshold: the threshold we set to filter small modules. We want to display
+            modules with values bigger than this threshold.
+    :return: A truncated module list, but with the same share sum of the original modules.
+            '...' is the root folder. 'a/b/...' is the collection of small file under folder 'a/b/'
+    """
     assert value_threshold > 0
-    
+
     tree_map = build_tree_from_path_map(original_modules)
     fill_value_of_node(tree_map)
     target_node_list, flag = collect_deep_and_big_target_nodes(tree_map, ".", value_threshold)
-    
+
     target_node_dict = {}
     for value, path in target_node_list:
         if path.startswith("./"):
-            path = path[2:] #del the prefix "./" 
+            path = path[2:]  # del the prefix "./"
         target_node_dict[path] = value
 
     return target_node_dict
-
-
-# if __name__ == '__main__':
-#     output_dict = get_target_nodes_from_json(input_json, 0.001)
