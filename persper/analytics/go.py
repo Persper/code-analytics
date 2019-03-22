@@ -4,6 +4,11 @@ from persper.analytics.call_commit_graph import CallCommitGraph
 import re
 import requests
 import urllib.parse
+from persper.analytics.error import GraphServerError
+
+
+class GraphServerStateRecoveryError(GraphServerError):
+    pass
 
 
 class GoGraphServer(GraphServer):
@@ -12,6 +17,29 @@ class GoGraphServer(GraphServer):
         self.filename_regexes = [re.compile(regex_str) for regex_str in filename_regex_strs]
         self.config_param = dict()
         self._session = requests.Session()
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state['server_state'] = self._get_server_state()
+        return state
+
+    def _get_server_state(self):
+        """Request the server to dump all internal state
+
+        Right now, the call-commit graph contains all info we need for resetting state.
+        """
+        return self.get_graph()
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self._set_server_state(state['server_state'])
+
+    def _set_server_state(self, server_state):
+        payload = {'serverState': server_state}
+        url = urllib.parse.urljoin(self.server_addr, '/set_server_state')
+        r = self._session.post(url, json=payload).json()
+        if r != '0':
+            raise GraphServerStateRecoveryError('Failed to set golang server state.')
 
     def start_commit(self, hexsha: str, seeking_mode: CommitSeekingMode, author_name: str,
                      author_email: str, commit_message: str):

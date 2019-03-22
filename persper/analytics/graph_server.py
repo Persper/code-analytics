@@ -69,7 +69,7 @@ class GraphServer(ABC):
 
     ```
     lastCommit = EMPTY_TREE_SHA
-    for commit in commits: 
+    for commit in commits:
         start_commit(commit)
         for oldFileName, fileName, fileDiff in compareCommit(lastCommit, commit):
             filter_file(oldFileName)
@@ -117,6 +117,22 @@ class GraphServer(ABC):
     synchronous or asynchronous (with `asyncio`, or `async def`). You will find the
     note on the methods respectively.
     """
+
+    def start_project(self, project_info):
+        """Signals the start of a new analysis"""
+        pass
+
+    def end_project(self, save_state=False):
+        """Signals the end of an analysis"""
+        pass
+
+    def __getstate__(self):
+        """Properly save `GraphServer` internal state"""
+        pass
+
+    def __setstate__(self):
+        """Properly set `GraphServer`'s internal state using pickle file"""
+        pass
 
     def register_commit(self, hexsha, author_name, author_email,
                         commit_message):
