@@ -1,11 +1,12 @@
 import os
+import ast
 from collections import defaultdict
 from antlr4 import *
 from persper.analytics.call_graph.java.Java8Listener import Java8Listener
 from persper.analytics.call_graph.java.Java8Parser import Java8Parser
 import logging
 
-DEBUG = os.environ.get('DEBUG_JAVA', True)
+DEBUG = ast.literal_eval(os.environ.get('DEBUG_JAVA', True))
 logging.basicConfig(filename='java.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
 
