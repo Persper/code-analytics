@@ -22,8 +22,10 @@ def commit_overall_scores(commit_devranks: Dict[str, float],
         assert sha in clf_results, "Commit %s does not have label."
         if top_one:
             top_idx = np.argmax(clf_results[sha])
-            overall_scores[sha] = label_weights[top_idx] * dr
+            category_vec = np.zeros(len(label_weights))
+            category_vec[top_idx] = 1
         else:
-            overall_scores[sha] = np.dot(clf_results[sha], label_weights) * dr
+            category_vec = clf_results[sha]
+        overall_scores[sha] = np.dot(category_vec, label_weights) * dr
 
     return normalize(overall_scores)
