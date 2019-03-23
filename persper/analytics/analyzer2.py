@@ -1,6 +1,7 @@
 import asyncio
 import collections.abc
 import logging
+import re
 import time
 from abc import ABC
 from typing import List, Optional, Set, Union
@@ -133,7 +134,8 @@ class Analyzer:
             for commit in self._repo.iter_commits(commitSpec,
                                                   topo_order=True, reverse=True, first_parent=self._firstParentOnly):
                 def printCommitStatus(level, status: str):
-                    message = commit.message.strip()[:32]
+                    message = commit.message.lstrip()[:32].rstrip()
+                    message = re.sub(r"\w+", " ", message)
                     # note the commit # here only indicates the ordinal of current commit in current analysis session
                     if not suppressStdOutLogs:
                         print("Commit #{0} {1} ({2}): {3}".format(
