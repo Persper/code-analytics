@@ -49,6 +49,7 @@ class LspClientGraphServer(GraphServer):
         self._ccgraph = graph or CallCommitGraph()
         self._callGraph = CallCommitGraphSynchronizer(self._ccgraph)
         self._workspaceRoot: Path = Path(workspaceRoot).resolve()
+        self._workspaceHexsha: str = None
         self._invalidatedFiles = set()
         if not self._workspaceRoot.exists():
             self._workspaceRoot.touch()
@@ -83,9 +84,12 @@ class LspClientGraphServer(GraphServer):
         if not self._workspaceRoot.exists():
             self._workspaceRoot.touch()
 
+    def get_workspace_commit_hexsha(self):
+        return self._workspaceHexsha
+
     def start_commit(self, hexsha: str, seeking_mode: CommitSeekingMode, author_name: str,
                      author_email: str, commit_message: str):
-        _logger.info("Start commit: %s %s (%s)", hexsha, commit_message[:32].strip(), seeking_mode)
+        _logger.debug("Start commit: %s %s (%s)", hexsha, commit_message[:32].strip(), seeking_mode)
         self._commitSeekingMode = seeking_mode
         if seeking_mode != CommitSeekingMode.Rewind:
             self._ccgraph.add_commit(hexsha, author_name, author_email, commit_message)
@@ -171,6 +175,9 @@ class LspClientGraphServer(GraphServer):
                 self._safeUpdateNodeHistory(s, c, 0)
 
     async def end_commit(self, hexsha):
+        # workspace files are at the new commit now.
+        self._workspaceHexsha = hexsha
+
         # update vetices & edges
         if self._commitSeekingMode != CommitSeekingMode.Rewind:
             await self.updateGraph()
@@ -282,7 +289,7 @@ class LspClientGraphServer(GraphServer):
         if not self._invalidatedFiles:
             return
         affectedFiles = self._callGraphManager.removeByFiles(self._invalidatedFiles)
-        _logger.info("Invalidated %d files, affected %d files.", len(self._invalidatedFiles), len(affectedFiles))
+        _logger.debug("Invalidated %d files, affected %d files.", len(self._invalidatedFiles), len(affectedFiles))
         await self._callGraphBuilder.waitForFileSystem()
         # update vertices
         # Use scope full name as identifier.

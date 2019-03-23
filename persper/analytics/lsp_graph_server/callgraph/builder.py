@@ -365,7 +365,7 @@ class CallGraphBuilder(ABC):
         Build call graph branches asynchronously in the specified file.
         """
         srcPath = self.pathFromUri(fileName)
-        _logger.info("Build call graph in: %s", srcPath)
+        _logger.debug("Build call graph in: %s", srcPath)
         counter = 0
         thisDoc = await self.getTokenizedDocument(srcPath)
         textDoc = TextDocument.loadFile(srcPath, self.inferLanguageId(srcPath))
@@ -411,7 +411,7 @@ class CallGraphBuilder(ABC):
                         yield CallGraphBranch(nodeScope, ds, node, dn)
         finally:
             await self.closeDocument(textDoc.uri)
-        _logger.info("Yielded %d branches.", counter)
+        _logger.debug("Yielded %d branches.", counter)
 
     async def enumScopesInFile(self, fileName: str) -> Iterable[CallGraphScope]:
         """
@@ -448,7 +448,7 @@ class CallGraphBuilder(ABC):
                 if p.exists():
                     await asyncio.sleep(0.1)
                 else:
-                    _logger.info("Confirm deleted: %s", p)
+                    _logger.debug("Confirm deleted: %s", p)
             self._lspClient.server.workspaceDidChangeWatchedFiles(
                 [FileEvent(TextDocument.fileNameToUri(p), FileChangeType.Deleted) for p in self._deletePendingPaths])
             self._deletePendingPaths.clear()
@@ -474,6 +474,5 @@ class CallGraphBuilder(ABC):
             f.write(newContent)
         uri = TextDocument.fileNameToUri(filePath)
         self._lspClient.server.workspaceDidChangeWatchedFiles(
-            [FileEvent(uri,
-                       FileChangeType.Changed if prevFileExists else FileChangeType.Created)])
-        _logger.info("Modified %s.", filePath)
+            [FileEvent(uri, FileChangeType.Changed if prevFileExists else FileChangeType.Created)])
+        _logger.debug("Modified %s.", filePath)

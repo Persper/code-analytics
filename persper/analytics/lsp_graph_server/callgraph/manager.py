@@ -49,9 +49,9 @@ class CallGraphManager():
                 self._graph.add(branch)
                 branchCounter += 1
                 if branchCounter % 2000 == 0:
-                    _logger.info("Already added %d branches.", branchCounter)
+                    _logger.debug("Already added %d branches.", branchCounter)
             except ValueError as ex:
-                _logger.debug("%s Branch: %s", ex, branch)
+                _logger.warn("%s Branch: %s", ex, branch)
 
         if fileNames:
             if isinstance(fileNames, (str, PurePath)):
@@ -67,9 +67,9 @@ class CallGraphManager():
             async for b in self._builder.buildCallGraphInFiles(globPattern):
                 pushBranch(b)
         if fileNames and not globPattern:
-            _logger.info("Added %d branches from %d files.", branchCounter, fileCounter)
+            _logger.debug("Added %d branches from %d files.", branchCounter, fileCounter)
         else:
-            _logger.info("Added %d branches.", branchCounter)
+            _logger.debug("Added %d branches.", branchCounter)
 
     def removeByFiles(self, fileNames: Iterable[str]) -> Iterable[Path]:
         """

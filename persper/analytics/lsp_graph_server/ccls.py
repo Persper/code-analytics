@@ -45,6 +45,15 @@ class CclsLspServerStub(LspServerStub):
     def __init__(self, endpoint: Endpoint):
         super().__init__(endpoint)
 
+    def textDocumentGetSymbols(self, *args, **kwargs):
+        if kwargs == None:
+            kwargs = {}
+        if "requestParamsOverride" not in kwargs:
+            kwargs["requestParamsOverride"] = {}
+        # Role((int)Role::All - (int)Role::Definition)
+        kwargs["requestParamsOverride"]["excludeRole"] = 511 - 2
+        return super().textDocumentGetSymbols(*args, **kwargs)
+
     async def cclsInfo(self):
         """
         Gets the ccls language server status.
@@ -163,7 +172,9 @@ class CclsGraphServer(LspClientGraphServer):
                  graph: CallCommitGraph = None):
         super().__init__(workspaceRoot, languageServerCommand=languageServerCommand,
                          dumpLogs=dumpLogs, graph=graph)
-        self._cacheRoot = Path(cacheRoot).resolve() if cacheRoot else self._workspaceRoot.joinpath(".ccls-cache")
+        if cacheRoot == True:
+            cacheRoot = self._workspaceRoot.joinpath(".ccls-cache")
+        self._cacheRoot = Path(cacheRoot).resolve() if cacheRoot else None
         self._c_requireScopeDefinitionMatch = True
 
     async def startLspClient(self):
@@ -176,8 +187,8 @@ class CclsGraphServer(LspClientGraphServer):
             initializationOptions={"cacheDirectory": str(self._cacheRoot),
                                    "diagnostics": {"onParse": False, "onType": False},
                                    "discoverSystemIncludes": True,
-                                   "enableCacheRead": True,
-                                   "enableCacheWrite": True,
+                                   "enableCacheRead": self._cacheRoot != None,
+                                   "enableCacheWrite": self._cacheRoot != None,
                                    "clang": {
                                        "excludeArgs": [],
                                        "extraArgs": ["-nocudalib"],
