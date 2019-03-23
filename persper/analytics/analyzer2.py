@@ -1,6 +1,7 @@
 import asyncio
 import collections.abc
 import logging
+import time
 from abc import ABC
 from typing import List, Optional, Set, Union
 
@@ -187,11 +188,16 @@ class Analyzer:
         if type(commit) != Commit:
             commit = self._repo.commit(commit)
 
+        t0 = time.monotonic()
         self._observer.onBeforeCommit(self, commit, seekingMode)
+
+        t1 = time.monotonic()
         result = self._graphServer.start_commit(commit.hexsha, seekingMode,
                                                 commit.author.name, commit.author.email, commit.message)
         if asyncio.iscoroutine(result):
             await result
+
+        t1 = time.monotonic() - t1
         diff_index = diff_with_commit(self._repo, commit, parentCommit)
 
         # commit classification
@@ -199,6 +205,7 @@ class Analyzer:
             prob = self._commit_classifier.predict(commit, diff_index)
             self._clf_results[commit.hexsha] = prob
 
+        t2 = time.monotonic()
         for diff in diff_index:
             old_fname, new_fname = _get_fnames(diff)
             # apply filter
@@ -226,11 +233,17 @@ class Analyzer:
                     old_fname, old_src, new_fname, new_src, diff.diff)
                 if asyncio.iscoroutine(result):
                     await result
+        t2 = time.monotonic() - t2
 
+        t3 = time.monotonic()
         result = self._graphServer.end_commit(commit.hexsha)
         if asyncio.iscoroutine(result):
             await result
+        t3 = time.monotonic() - t3
         self._observer.onAfterCommit(self, commit, seekingMode)
+        t0 = time.monotonic() - t0
+        _logger.info("t0 = %.2f, t1 = %.2f, t2 = %.2f, t3 = %.2f",
+                     t0, t1, t2, t3)
         assert self._graphServer.get_workspace_commit_hexsha() == commit.hexsha, \
             "GraphServer.get_workspace_commit_hexsha should be return the hexsha seen in last start_commit."
 
