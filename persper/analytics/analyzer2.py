@@ -1,5 +1,6 @@
 import asyncio
 import collections.abc
+import logging
 from abc import ABC
 from typing import List, Optional, Set, Union
 
@@ -9,6 +10,8 @@ from persper.analytics.commit_classifier import CommitClassifier
 from persper.analytics.git_tools import diff_with_commit, get_contents
 from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.score import commit_overall_scores
+
+_logger = logging.getLogger(__name__)
 
 
 class Analyzer:
@@ -118,52 +121,63 @@ class Analyzer:
                                      top_one=top_one,
                                      additive=additive)
 
-    async def analyze(self, maxAnalyzedCommits=None):
-        graphServerLastCommit: str = None
+    async def analyze(self, maxAnalyzedCommits=None, suppressStdOutLogs=False):
         commitSpec = self._terminalCommit
         if self._originCommit:
             commitSpec = self._originCommit.hexsha + ".." + self._terminalCommit.hexsha
 
         analyzedCommits = 0
-        for commit in self._repo.iter_commits(commitSpec,
-                                              topo_order=True, reverse=True, first_parent=self._firstParentOnly):
-            def printCommitStatus(status: str):
-                message = commit.message.strip()[:32]
-                # note the commit # here only indicates the ordinal of current commit in current analysis session
-                print("Commit #{0} {1} ({2}): {3}".format(analyzedCommits, commit.hexsha, message, status))
-
-            if maxAnalyzedCommits and analyzedCommits >= maxAnalyzedCommits:
-                print("Max analyzed commits reached.")
-                break
-            if commit.hexsha in self._visitedCommits:
-                printCommitStatus("Already visited.")
-                continue
-            if len(commit.parents) > 1:
-                # merge commit
-                # process connection, do not process diff
-                printCommitStatus("Going forward (merge).")
-                if self._firstParentOnly:
-                    assert graphServerLastCommit == commit.parents[0].hexsha, \
-                        "git should traverse along first parent, but actually not."
-                    await self._analyzeCommit(commit, graphServerLastCommit, CommitSeekingMode.NormalForward)
-                else:
-                    await self._analyzeCommit(commit, graphServerLastCommit, CommitSeekingMode.MergeCommit)
-            elif not commit.parents:
-                printCommitStatus("Going forward (initial commit).")
-                await self._analyzeCommit(commit, None, CommitSeekingMode.NormalForward)
-            else:
-                parent: Commit = commit.parents[0]
-                if graphServerLastCommit != parent.hexsha:
+        self._graphServer.before_analyze()
+        try:
+            for commit in self._repo.iter_commits(commitSpec,
+                                                  topo_order=True, reverse=True, first_parent=self._firstParentOnly):
+                def printCommitStatus(level, status: str):
+                    message = commit.message.strip()[:32]
+                    # note the commit # here only indicates the ordinal of current commit in current analysis session
+                    if not suppressStdOutLogs:
+                        print("Commit #{0} {1} ({2}): {3}".format(
+                            analyzedCommits, commit.hexsha, message, status))
+                    _logger.log(level, "Commit #%d %s (%s): %s",
+                                analyzedCommits, commit.hexsha, message, status)
+                lastCommit = self._graphServer.get_workspace_commit_hexsha()
+                if maxAnalyzedCommits and analyzedCommits >= maxAnalyzedCommits:
+                    _logger.warning("Max analyzed commits reached.")
+                    break
+                if commit.hexsha in self._visitedCommits:
+                    printCommitStatus(logging.DEBUG, "Already visited.")
+                    continue
+                if len(commit.parents) > 1:
+                    # merge commit
+                    # process connection, do not process diff
+                    printCommitStatus(logging.INFO, "Going forward (merge).")
+                    if self._firstParentOnly:
+                        assert lastCommit == commit.parents[0].hexsha, \
+                            "git should traverse along first parent, but actually not."
+                        await self._analyzeCommit(commit, lastCommit, CommitSeekingMode.NormalForward)
+                    else:
+                        await self._analyzeCommit(commit, lastCommit, CommitSeekingMode.MergeCommit)
+                elif not commit.parents:
                     printCommitStatus(
-                        "Rewind to parent: {0}.".format(parent.hexsha))
-                    # jumping to the parent commit first
-                    await self._analyzeCommit(parent, graphServerLastCommit, CommitSeekingMode.Rewind)
-                # then go on with current commit
-                printCommitStatus("Going forward.")
-                await self._analyzeCommit(commit, parent, CommitSeekingMode.NormalForward)
-            self._visitedCommits.add(commit.hexsha)
-            graphServerLastCommit = commit.hexsha
-            analyzedCommits += 1
+                        logging.INFO, "Going forward (initial commit).")
+                    await self._analyzeCommit(commit, None, CommitSeekingMode.NormalForward)
+                else:
+                    parent: Commit = commit.parents[0]
+                    if lastCommit != parent.hexsha:
+                        printCommitStatus(
+                            logging.INFO, "Rewind to parent: {0}.".format(parent.hexsha))
+                        # jumping to the parent commit first
+                        await self._analyzeCommit(parent, lastCommit, CommitSeekingMode.Rewind)
+                    # then go on with current commit
+                    printCommitStatus(logging.INFO, "Going forward.")
+                    await self._analyzeCommit(commit, parent, CommitSeekingMode.NormalForward)
+                self._visitedCommits.add(commit.hexsha)
+                analyzedCommits += 1
+        except Exception as ex:
+            self._graphServer.after_analyze(ex)
+            raise
+        else:
+            self._graphServer.after_analyze(None)
+        return analyzedCommits
 
     async def _analyzeCommit(self, commit: Union[Commit, str], parentCommit: Union[Commit, str],
                              seekingMode: CommitSeekingMode):
@@ -217,6 +231,8 @@ class Analyzer:
         if asyncio.iscoroutine(result):
             await result
         self._observer.onAfterCommit(self, commit, seekingMode)
+        assert self._graphServer.get_workspace_commit_hexsha() == commit.hexsha, \
+            "GraphServer.get_workspace_commit_hexsha should be return the hexsha seen in last start_commit."
 
 
 def _get_fnames(diff: Diff):
