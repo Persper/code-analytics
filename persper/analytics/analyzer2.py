@@ -135,7 +135,7 @@ class Analyzer:
                                                   topo_order=True, reverse=True, first_parent=self._firstParentOnly):
                 def printCommitStatus(level, status: str):
                     message = commit.message.lstrip()[:32].rstrip()
-                    message = re.sub(r"\w+", " ", message)
+                    message = re.sub(r"\s+", " ", message)
                     # note the commit # here only indicates the ordinal of current commit in current analysis session
                     if not suppressStdOutLogs:
                         print("Commit #{0} {1} ({2}): {3}".format(
