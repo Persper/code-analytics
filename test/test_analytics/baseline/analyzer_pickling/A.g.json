@@ -1,0 +1,29 @@
+{
+    "edges": {},
+    "nodes": {
+        "char *str_append(char *string, char *append)": {
+            "files": [
+                "main.c"
+            ],
+            "history": {
+                "A": {
+                    "adds": 7,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "int str_len(char *string)": {
+            "files": [
+                "main.c"
+            ],
+            "history": {
+                "A": {
+                    "adds": 6,
+                    "dels": 0
+                }
+            },
+            "size": null
+        }
+    }
+}
