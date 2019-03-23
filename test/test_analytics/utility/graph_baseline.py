@@ -54,7 +54,7 @@ def assertGraphMatches(baseline: dict, ccg: CallCommitGraph):
             "Node attribute mismatch: {0}. Baseline: {1}; Actual: {2}.", id, baselineAttr, attr)
         baselineNodeIds.remove(id)
     assert not baselineNodeIds, str.format(
-        "Node(s) missing: %s.", baselineNodeIds)
+        "Node(s) missing: {0}.", baselineNodeIds)
     baselineEdgeIds = set(baseline["edges"].keys())
     for u, v, attr in ccg.edges(data=True):
         id = formatEdgeId(u, v)
@@ -66,6 +66,7 @@ def assertGraphMatches(baseline: dict, ccg: CallCommitGraph):
     assert not baselineEdgeIds, str.format(
         "Branch(es) missing: {0}.", baselineEdgeIds)
 
+
 class GraphDumpAnalyzerObserver(AnalyzerObserver):
     """
     An implementation of AnalyzerObserver that generates graph dump after each commit,
@@ -73,7 +74,7 @@ class GraphDumpAnalyzerObserver(AnalyzerObserver):
     """
 
     def __init__(self, graphBaselineDumpPath: str = None, graphTestDumpPath: str = None,
-                 dumpOnlyOnError: bool = None, dumpNaming = CommitIdGenerators.fromHexsha):
+                 dumpOnlyOnError: bool = None, dumpNaming=CommitIdGenerators.fromHexsha):
         """
         Params:
             graphBaselineDumpPath: root folder of the baseline graph dump files. Set to values other than `None`
@@ -105,7 +106,8 @@ class GraphDumpAnalyzerObserver(AnalyzerObserver):
         if seeking_mode == CommitSeekingMode.Rewind:
             return
         graph: CallCommitGraph = analyzer.graph
-        graphDumpLocalName = self._dumpNaming(-1, commit.hexsha, commit.message) + ".g.json"
+        graphDumpLocalName = self._dumpNaming(-1,
+                                              commit.hexsha, commit.message) + ".g.json"
 
         def dumpGraph(warnIfNotAvailable: bool):
             if not self._dumpPath:
