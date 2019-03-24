@@ -2,14 +2,18 @@ from typing import Dict, List
 import numpy as np
 
 
-def normalize(scores: Dict[str, float]) -> Dict[str, float]:
+def normalize(scores: Dict[str, float], coef=1.0) -> Dict[str, float]:
+    """
+
+    :rtype:
+    """
     normalized_scores = {}
     score_sum = 0
     for _, score in scores.items():
         score_sum += score
 
     for idx in scores:
-        normalized_scores[idx] = scores[idx] / score_sum
+        normalized_scores[idx] = scores[idx] / score_sum * coef
     return normalized_scores
 
 
