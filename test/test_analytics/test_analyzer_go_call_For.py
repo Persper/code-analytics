@@ -62,7 +62,6 @@ async def _test_analzyer_go(az):
                 'main.go::main':  {'adds': 3, 'dels': 1},   
              }, 
             'N': {
-                'main.go::funcA':  {'adds': 0, 'dels': 0}, 
                 'main.go::main':  {'adds': 1, 'dels': 1},   
          }
     }
@@ -76,10 +75,10 @@ async def _test_analzyer_go(az):
             print(func)
             assert (csize == history_truth[commit_message.strip()][func])
 
-    edges_added_by_A = set([ 
-         ('main.go::main', 'main.go::funcA')
+    edges_added_by_A = set([
         ])
     edges_added_by_M = set([
+        ('main.go::main', 'main.go::funcA')
         ])     
     edges_added_by_N = set([
         ])     

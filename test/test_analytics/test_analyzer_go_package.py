@@ -51,20 +51,16 @@ async def _test_analzyer_go(az):
     await az.analyze()
     ccgraph = az.graph
     history_truth = {
-        'B': {
-              'calcproj/src/simplemath/sqrt.go::Sqrt': {'adds': 4, 'dels': 0}, 
-              'calcproj/src/simplemath/sqrt_test.go::TestSqrt1': {'adds':7, 'dels': 0},
-              'calcproj/src/simplemath/add_test.go::TestAdd1': {'adds': 7, 'dels': 0}, 
-              'calcproj/src/simplemath/add.go::Add': {'adds': 3, 'dels': 0},
-              'calcproj/src/cals/cals.go::main': {'adds': 42, 'dels': 0},  
-            }, 
         'A': {
-              'calcproj/src/simplemath/sqrt.go::Sqrt': {'adds': 4, 'dels': 0}, 
-              'calcproj/src/simplemath/sqrt.go::TestSqrt1': {'adds':7, 'dels': 0},
-              'calcproj/src/simplemath/sqrt.go::TestAdd1': {'adds': 7, 'dels': 0}, 
-              'calcproj/src/simplemath/sqrt.go::Add': {'adds': 3, 'dels': 0}, 
+            'calcproj/src/simplemath/add.go::Add': {'adds': 3, 'dels': 0},
+            'calcproj/src/simplemath/add_test.go::TestAdd1': {'adds': 7, 'dels': 0},
+            'calcproj/src/simplemath/sqrt.go::Sqrt': {'adds': 4, 'dels': 0},
+            'calcproj/src/simplemath/sqrt_test.go::TestSqrt1': {'adds': 7, 'dels': 0},
 
-            }
+        },
+        'B': {
+            'calcproj/src/calc/calc.go::main': {'adds': 41, 'dels': 0},
+        },
     }
 
     commits = ccgraph.commits()
@@ -77,12 +73,14 @@ async def _test_analzyer_go(az):
             assert (csize == history_truth[commit_message.strip()][func])
 
     edges_added_by_A = set([
-        ('calcproj/src/simplemath/sqrt_test.go::TestSqrt1', 'calcproj/src/simplemath/sqrt.go::Sqrt'), 
+        ('calcproj/src/simplemath/sqrt.go::Sqrt', 'calcproj/src/simplemath/sqrt.go::Sqrt'),
         ('calcproj/src/simplemath/add_test.go::TestAdd1', 'calcproj/src/simplemath/add.go::Add'),
+        ('calcproj/src/simplemath/sqrt_test.go::TestSqrt1', 'calcproj/src/simplemath/sqrt.go::Sqrt'),
     ])
 
     edges_added_by_B = set([
-
+        ('calcproj/src/calc/calc.go::main', 'calcproj/src/simplemath/add.go::Add'),
+        ('calcproj/src/calc/calc.go::main', 'calcproj/src/simplemath/sqrt.go::Sqrt'),
     ])
-    all_edges = edges_added_by_A.union(edges_added_by_B).union(edges_added_by_C)
+    all_edges = edges_added_by_A.union(edges_added_by_B)
     assert(set(ccgraph.edges()) == all_edges)

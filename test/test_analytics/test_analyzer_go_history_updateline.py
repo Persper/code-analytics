@@ -54,18 +54,17 @@ async def _test_analzyer_go(az):
     history_truth = {
 
             'H': {
-                'main.go::funcA': {'adds': 1, 'dels': 0}, 
-                'main.go::main': {'adds': 0, 'dels': 0}  
+                'main.go::funcA': {'adds': 6, 'dels': 0},
+                'main.go::main': {'adds': 3, 'dels': 0},
             },            
             'L': {
-                'main.go::funcA': {'adds': 0, 'dels': 0}, 
-                'main.go::main': {'adds': 1, 'dels': 1}  
-           }, 
-            'M': {'main.go::funcA': {'adds': 1, 'dels': 1}, 
-                'main.go::main': {'adds': 0, 'dels': 0}, 
+                'main.go::funcA': {'adds': 1, 'dels': 1},
+            },
+            'M': {
+                'main.go::funcA': {'adds': 2, 'dels': 2},
             }, 
-            'N': {'main.go::funcA': 2, 
-                'main.go::main': {'adds': 1, 'dels': 1}, 
+            'N': {
+                'main.go::funcA': {'adds': 2, 'dels': 2},
             }, 
        
         }
@@ -77,37 +76,5 @@ async def _test_analzyer_go(az):
             commit_message = commits[csha]['message']
             assert (csize == history_truth[commit_message.strip()][func])
 
-    edges_added_by_A = set([        ])
-    edges_added_by_B = set([('main.go::main', 'main.go::funcA'), ])
-    edges_added_by_C = set([
-        ])
-    edges_added_by_D = set([
-         ##should have   ('main.go::main', 'main.go::funcB')
-        ])
-    edges_added_by_E = set([
-        ])
-    edges_added_by_F = set([
-  
-        ])
-    edges_added_by_G = set([
-
-        ])        
-    edges_added_by_H = set([
-
-        ]) 
-    edges_added_by_I = set([
-        ])  
-    edges_added_by_J = set([
-        ]) 
-    edges_added_by_K = set([
-        ])     
-    edges_added_by_L = set([
-        ]) 
-    edges_added_by_M = set([
-        ])     
-    edges_added_by_N = set([
-        ])     
-    all_edges = edges_added_by_A.union(edges_added_by_B).union(edges_added_by_C).union(edges_added_by_D).union(edges_added_by_E).union(edges_added_by_F) \
-        .union(edges_added_by_G).union(edges_added_by_H).union(edges_added_by_I).union(edges_added_by_J).union(edges_added_by_K)\
-        .union(edges_added_by_L).union(edges_added_by_M).union(edges_added_by_N)
+    all_edges = set()
     assert(set(ccgraph.edges()) == all_edges)

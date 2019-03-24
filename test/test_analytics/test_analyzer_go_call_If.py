@@ -61,7 +61,6 @@ async def _test_analzyer_go(az):
                 'main.go::main':  {'adds': 3, 'dels': 1},   
             },           
             'J': {
-                'main.go::funcA':  {'adds': 0, 'dels': 0}, 
                 'main.go::main':  {'adds': 2, 'dels': 2},   
             }, 
     }
@@ -75,11 +74,12 @@ async def _test_analzyer_go(az):
             print(func)
             assert (csize == history_truth[commit_message.strip()][func])
 
-    edges_added_by_A = set([('main.go::main', 'main.go::funcA')
-        ])
+    edges_added_by_A = set([
+    ])
     edges_added_by_I = set([
-        ])  
+        ('main.go::main', 'main.go::funcA')
+    ])
     edges_added_by_J = set([
-        ])
+    ])
     all_edges = edges_added_by_A.union(edges_added_by_I).union(edges_added_by_J)
     assert(set(ccgraph.edges()) == all_edges)

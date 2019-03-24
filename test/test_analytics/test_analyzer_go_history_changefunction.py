@@ -62,9 +62,8 @@ async def _test_analzyer_go(az):
                 'main.go::main': {'adds': 1, 'dels': 1}
                 }, 
             'E': {
-                'main.go::funcA': {'adds': 0, 'dels': 0}, 
                 'main.go::funcB': {'adds': 1, 'dels': 1},                
-                'main.go::main': {'adds': 1, 'dels': 1} #'main.go::main': {'adds': 3, 'dels': 2}
+                'main.go::main': {'adds': 1, 'dels': 1},
                 }, 
         }
 
@@ -75,11 +74,11 @@ async def _test_analzyer_go(az):
             commit_message = commits[csha]['message']
             assert (csize == history_truth[commit_message.strip()][func])
 
-    edges_added_by_A = set([        ])
+    edges_added_by_A = set([])
     edges_added_by_D = set([
         ('main.go::main', 'main.go::funcB')
-        ])
+    ])
     edges_added_by_E = set([
-        ])
+    ])
     all_edges = edges_added_by_A.union(edges_added_by_D).union(edges_added_by_E)
     assert(set(ccgraph.edges()) == all_edges)

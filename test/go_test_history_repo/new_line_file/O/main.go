@@ -1,13 +1,12 @@
 package main
-import(
+
+import (
 	"fmt"
 )
 
-
-func funcA () {
+func funcA() {
 	fmt.Println("func A is called!")
 }
 
 func main() {
 }
-

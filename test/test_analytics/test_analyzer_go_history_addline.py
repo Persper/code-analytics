@@ -89,7 +89,7 @@ async def _test_analzyer_go(az):
             commit_message = commits[csha]['message']
             assert (csize == history_truth[commit_message.strip()][func])
 
-    edges_added_by_A = set([('main.go::main', 'main.go::funcA')])
+    edges_added_by_A = set([])
     edges_added_by_F = set([
         ])
     edges_added_by_G = set([

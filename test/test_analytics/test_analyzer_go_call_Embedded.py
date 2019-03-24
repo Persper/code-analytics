@@ -64,14 +64,10 @@ async def _test_analzyer_go(az):
                 'main.go::return_1': {'adds': 3, 'dels': 0}
             },
             'G': {
-                'main.go::funcB': {'adds': 0, 'dels': 0}, 
-                'main.go::main': {'adds': 2, 'dels': 0}, 
-                'main.go::return_1': {'adds': 0, 'dels': 0}
+                'main.go::main': {'adds': 2, 'dels': 0},
             },
             'H': {
-                'main.go::funcB': {'adds': 0, 'dels': 0}, 
-                'main.go::main': {'adds': 3, 'dels': 2}, 
-                'main.go::return_1': {'adds': 0, 'dels': 0}
+                'main.go::main': {'adds': 3, 'dels': 2},
             },
     }
 

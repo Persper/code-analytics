@@ -6,8 +6,7 @@ import(
 
 func funcA () {
 	fmt.Println("func A is called!")
-}
-func main() {
+} func main() {
 
 }
 
