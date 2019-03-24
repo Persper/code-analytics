@@ -12,9 +12,9 @@ from persper.analytics.graph_server import CPP_FILENAME_REGEXES
 from persper.analytics.graph_server import C_FILENAME_REGEXES
 from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from pathlib import Path
-from utils import get_config_from_yaml
-from vdev.component_aggregation import get_aggregated_modules
+from vdev.utils import get_config_from_yaml
 from vdev.analyzer_observer_vdev import AnalyzerObserverVdev
+from vdev.component_aggregation import get_aggregated_modules
 
 
 root_path = os.path.dirname(os.path.abspath(__file__))
