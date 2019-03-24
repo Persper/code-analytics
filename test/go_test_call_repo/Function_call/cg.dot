@@ -1,0 +1,3 @@
+digraph go_test_repo {
+	A -> B -> C -> D -> E;  //1.2.1.1. Function Call
+}
