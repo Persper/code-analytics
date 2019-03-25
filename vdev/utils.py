@@ -1,6 +1,7 @@
 import os
 import yaml
 from pathlib import Path
+from typing import Dict
 from datetime import datetime, timedelta
 from persper.analytics.analyzer2 import Analyzer
 from persper.analytics.c import CGraphServer
@@ -27,10 +28,6 @@ config = get_config_from_yaml(os.path.join(root_path, 'config.yaml'))
 
 
 def normalize_with_coef(scores: Dict[str, float], coef=1.0) -> Dict[str, float]:
-    """
-
-    :rtype:
-    """
     normalized_scores = {}
     score_sum = 0
     for _, score in scores.items():
@@ -177,5 +174,3 @@ def supportted_analyzer(repo_path, language):
     }
 
     return supportted_analyzers[language]
-
-

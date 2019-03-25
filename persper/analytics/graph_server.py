@@ -208,11 +208,6 @@ class GraphServer(ABC):
         pass
 
     @abstractmethod
-    def set_graph(self, graph):
-        """Reset the graph discarding all data"""
-        pass
-
-    @abstractmethod
     def filter_file(self, filename):
         """
         Check if the file should be filtered out

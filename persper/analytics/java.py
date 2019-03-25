@@ -17,6 +17,12 @@ class JavaGraphServer(GraphServer):
         self._pparser = PatchParser()
         self._seeking_mode = None
 
+    def __getstate__(self):
+        return self.__dict__.copy()
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
     def start_commit(self, hexsha: str, seeking_mode: CommitSeekingMode,
                      author_name: str, author_email: str, commit_message: str):
         self._seeking_mode = seeking_mode
@@ -75,9 +81,6 @@ class JavaGraphServer(GraphServer):
 
     def reset_graph(self):
         self._ccgraph.reset()
-
-    def set_graph(self, graph):
-        self._ccgraph = graph
 
     def filter_file(self, filename):
         for regex in self._filename_regexes:

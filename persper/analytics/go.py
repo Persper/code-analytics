@@ -87,10 +87,6 @@ class GoGraphServer(GraphServer):
         r = self._session.get(graph_url)
         return CallCommitGraph(graph_data=r.json())
 
-    def set_graph(self, graph):
-        # Todo: Pass existing ccgraph to go server and continue analyzing based on it
-        print("Go server does not support setGraph for now")
-
     def reset_graph(self):
         reset_url = urllib.parse.urljoin(self.server_addr, '/reset')
         self._session.post(reset_url)

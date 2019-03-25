@@ -13,13 +13,13 @@ class VdevAnalyzer:
         self._repo_path = repo_path
         self._repo = Repo(repo_path)
         self._observer: AnalyzerObserver = emptyAnalyzerObserver
-        self._analyzers = {}
         self._linguist = {}
-        self.check_linguist()
+        self._analyzers = {}
+        self.set_linguist()
         self.set_analyzers()
         self.saved_path = new_pickle_path
 
-    def check_linguist(self):
+    def set_linguist(self):
         response = muterun_rb(os.path.join(root_path, 'linguist.rb'), self._repo_path)
 
         if response.exitcode == 0:
@@ -41,18 +41,15 @@ class VdevAnalyzer:
     def set_analyzers(self):
         for language, value in self._linguist.items():
             if value > LANGUAGE_THRESHOLD and (language not in self._analyzers.keys()):
-                self._analyzers[language] = dict(az=supportted_analyzer(self._repo_path, language),
-                                                 graph=supportted_analyzer(self._repo_path, language).graph)
+                self._analyzers[language] = supportted_analyzer(self._repo_path, language)
 
         print(self._analyzers)
 
     async def analyzing(self):
         for language, analyzer in self._analyzers.items():    
             print('Start analyzing language, ', language)
-            analyzer['az']._graphServer.set_graph(analyzer['graph'])
-            await analyzer['az'].analyze()
-            analyzer['az'].originCommit = analyzer['az'].terminalCommit
-            analyzer['graph'] = analyzer['az'].graph
+            await analyzer.analyze()
+            analyzer.originCommit = analyzer.terminalCommit
 
         self.save()
 
@@ -60,7 +57,7 @@ class VdevAnalyzer:
         all_modules = {}
 
         for key, analyzer in self._analyzers.items():
-            all_modules.update(modules_contribution(analyzer['graph'], self._linguist[key]))
+            all_modules.update(modules_contribution(analyzer.graph, self._linguist[key]))
 
         aggregated_modules = get_aggregated_modules(all_modules)
         normalize_coef = sum(aggregated_modules.values())
@@ -70,7 +67,7 @@ class VdevAnalyzer:
         for email in dev_share.keys():
             dev_modules = {}
             for lang, analyzer in self._analyzers.items():
-                dev_modules.update(modules_contribution(analyzer['graph'], self._linguist[lang], email))
+                dev_modules.update(modules_contribution(analyzer.graph, self._linguist[lang], email))
 
             dev_share[email]['modules'] = get_aggregated_modules_on_dev(aggregated_modules, dev_modules, normalize_coef)
         return dev_share
@@ -79,7 +76,7 @@ class VdevAnalyzer:
         overall_commit_share = {}
 
         for key, analyzer in self._analyzers.items():
-            commit_share = normalize_with_coef(analyzer['graph'].commit_devranks(alpha), self._linguist[key])
+            commit_share = normalize_with_coef(analyzer.graph.commit_devranks(alpha), self._linguist[key])
 
             for commit, value in commit_share.items():
                 if key in overall_commit_share:
