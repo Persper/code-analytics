@@ -6,7 +6,7 @@ from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from persper.analytics.go import GoGraphServer
 from persper.analytics.analyzer2 import Analyzer
 from persper.util.path import root_path
-from .utility.go_graph_server import GoGraphBackend
+from test.test_analytics.utility.go_graph_server import GoGraphBackend
 
 GO_GRAPH_SERVER_PORT = 9089
 
@@ -20,9 +20,9 @@ def az():
           script_path - A string, path to the repo creator script
         test_src_path - A string, path to the dir to be passed to repo creator
     """
-    repo_path = os.path.join(root_path, 'repos/go_test_package')
+    repo_path = os.path.join(root_path, 'repos/1_1_4_1_no_new_line_eof')
     script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
-    test_src_path = os.path.join(root_path, 'test/go_test_package')
+    test_src_path = os.path.join(root_path, 'test/go_test_repos/1_1_4_1_no_new_line_eof')
     server_address = 'http://127.0.0.1:%d' % GO_GRAPH_SERVER_PORT
 
     # Always use latest source to create test repo
@@ -33,6 +33,7 @@ def az():
     subprocess.call(cmd, shell = True)
 
     return Analyzer(repo_path, GoGraphServer(server_address, GO_FILENAME_REGEXES))
+
 
 @pytest.mark.asyncio
 async def test_analzyer_go(az):
@@ -51,36 +52,22 @@ async def _test_analzyer_go(az):
     await az.analyze()
     ccgraph = az.graph
     history_truth = {
-        'A': {
-            'calcproj/src/simplemath/add.go::Add': {'adds': 3, 'dels': 0},
-            'calcproj/src/simplemath/add_test.go::TestAdd1': {'adds': 7, 'dels': 0},
-            'calcproj/src/simplemath/sqrt.go::Sqrt': {'adds': 4, 'dels': 0},
-            'calcproj/src/simplemath/sqrt_test.go::TestSqrt1': {'adds': 7, 'dels': 0},
-
-        },
-        'B': {
-            'calcproj/src/calc/calc.go::main': {'adds': 41, 'dels': 0},
-        },
-    }
+            'A': {
+                'main.go::funcA': {'adds': 3, 'dels': 0},
+                'main.go::main': {'adds': 2, 'dels': 0}
+                 },
+            'O': {},
+            'P': {},
+        }
 
     commits = ccgraph.commits()
     for func, data in ccgraph.nodes(data = True):
         history = data['history']
         for csha, csize in history.items():
             commit_message = commits[csha]['message']
-            print(commit_message.strip())
-            print(func)
             assert (csize == history_truth[commit_message.strip()][func])
 
-    edges_added_by_A = set([
-        ('calcproj/src/simplemath/sqrt.go::Sqrt', 'calcproj/src/simplemath/sqrt.go::Sqrt'),
-        ('calcproj/src/simplemath/add_test.go::TestAdd1', 'calcproj/src/simplemath/add.go::Add'),
-        ('calcproj/src/simplemath/sqrt_test.go::TestSqrt1', 'calcproj/src/simplemath/sqrt.go::Sqrt'),
-    ])
-
-    edges_added_by_B = set([
-        ('calcproj/src/calc/calc.go::main', 'calcproj/src/simplemath/add.go::Add'),
-        ('calcproj/src/calc/calc.go::main', 'calcproj/src/simplemath/sqrt.go::Sqrt'),
-    ])
-    all_edges = edges_added_by_A.union(edges_added_by_B)
+    edges_added_by_A = set([])
+    edges_added_by_O = set([])
+    all_edges = edges_added_by_A.union(edges_added_by_O)
     assert(set(ccgraph.edges()) == all_edges)

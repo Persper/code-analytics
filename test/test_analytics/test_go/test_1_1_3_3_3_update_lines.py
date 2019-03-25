@@ -6,7 +6,7 @@ from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from persper.analytics.go import GoGraphServer
 from persper.analytics.analyzer2 import Analyzer
 from persper.util.path import root_path
-from .utility.go_graph_server import GoGraphBackend
+from test.test_analytics.utility.go_graph_server import GoGraphBackend
 
 GO_GRAPH_SERVER_PORT = 9089
 
@@ -20,9 +20,9 @@ def az():
           script_path - A string, path to the repo creator script
         test_src_path - A string, path to the dir to be passed to repo creator
     """
-    repo_path = os.path.join(root_path, 'repos/update_line')
+    repo_path = os.path.join(root_path, 'repos/1_1_3_3_3_update_lines')
     script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
-    test_src_path = os.path.join(root_path, 'test/go_test_history_repo/update_line')
+    test_src_path = os.path.join(root_path, 'test/go_test_repos/1_1_3_3_3_update_lines')
     server_address = 'http://127.0.0.1:%d' % GO_GRAPH_SERVER_PORT
 
     # Always use latest source to create test repo

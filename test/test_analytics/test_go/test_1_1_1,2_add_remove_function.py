@@ -6,7 +6,7 @@ from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from persper.analytics.go import GoGraphServer
 from persper.analytics.analyzer2 import Analyzer
 from persper.util.path import root_path
-from .utility.go_graph_server import GoGraphBackend
+from test.test_analytics.utility.go_graph_server import GoGraphBackend
 
 GO_GRAPH_SERVER_PORT = 9089
 
@@ -20,9 +20,9 @@ def az():
           script_path - A string, path to the repo creator script
         test_src_path - A string, path to the dir to be passed to repo creator
     """
-    repo_path = os.path.join(root_path, 'repos/change_function')
+    repo_path = os.path.join(root_path, 'repos/1_1_1,2_add_remove_function')
     script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
-    test_src_path = os.path.join(root_path, 'test/go_test_history_repo/change_function')
+    test_src_path = os.path.join(root_path, 'test/go_test_repos/1_1_1,2_add_remove_function')
     server_address = 'http://127.0.0.1:%d' % GO_GRAPH_SERVER_PORT
 
     # Always use latest source to create test repo
@@ -56,14 +56,11 @@ async def _test_analzyer_go(az):
                 'main.go::funcA': {'adds': 3, 'dels': 0}, 
                 'main.go::main': {'adds': 3, 'dels': 0}
                  }, 
-            'D': {
-                'main.go::funcA': {'adds': 0, 'dels': 1}, 
-                'main.go::funcB': {'adds': 1, 'dels': 0},                
+            'B': {
                 'main.go::main': {'adds': 1, 'dels': 1}
                 }, 
-            'E': {
-                'main.go::funcB': {'adds': 1, 'dels': 1},                
-                'main.go::main': {'adds': 1, 'dels': 1},
+            'C': {
+                'main.go::main': {'adds': 1, 'dels': 1}                
                 }, 
         }
 
@@ -74,11 +71,12 @@ async def _test_analzyer_go(az):
             commit_message = commits[csha]['message']
             assert (csize == history_truth[commit_message.strip()][func])
 
-    edges_added_by_A = set([])
-    edges_added_by_D = set([
-        ('main.go::main', 'main.go::funcB')
+    edges_added_by_A = set([
     ])
-    edges_added_by_E = set([
+    edges_added_by_B = set([
+        ('main.go::main', 'main.go::funcA'),
     ])
-    all_edges = edges_added_by_A.union(edges_added_by_D).union(edges_added_by_E)
+    edges_added_by_C = set([
+    ])
+    all_edges = edges_added_by_A.union(edges_added_by_B).union(edges_added_by_C)
     assert(set(ccgraph.edges()) == all_edges)
