@@ -9,7 +9,7 @@ from vdev.utils import *
 
 class VdevAnalyzer:
 
-    def __init__(self, repo_path, new_pickle_path=None):
+    def __init__(self, repo_path):
         self._repo_path = repo_path
         self._repo = Repo(repo_path)
         self._observer: AnalyzerObserver = emptyAnalyzerObserver
@@ -17,7 +17,6 @@ class VdevAnalyzer:
         self._analyzers = {}
         self.set_linguist()
         self.set_analyzers()
-        self.saved_path = new_pickle_path
 
     def set_linguist(self):
         response = muterun_rb(os.path.join(root_path, 'linguist.rb'), self._repo_path)
@@ -45,13 +44,13 @@ class VdevAnalyzer:
 
         print(self._analyzers)
 
-    async def analyzing(self):
+    async def analyzing(self, saved_path=None):
         for language, analyzer in self._analyzers.items():    
             print('Start analyzing language, ', language)
             await analyzer.analyze()
             analyzer.originCommit = analyzer.terminalCommit
 
-        self.save()
+        self.save(saved_path)
 
     def module_contrib(self, dev_share):
         all_modules = {}
@@ -120,11 +119,13 @@ class VdevAnalyzer:
 
         return dev_share
 
-    def save(self):
-        if self.saved_path:
-            print('Saving pickle file')
-            with open(self.saved_path, 'wb+') as f:
+    def save(self, saved_path=None):
+        if saved_path:
+            print('Saving pickle file to:', saved_path)
+            with open(saved_path, 'wb+') as f:
                 pickle.dump(self, f)
+        else:
+            print('No pickle file saved')
 
     def basic_stats(self, alpha=0.85, show_merge=True):
         commit_share = self.project_commit_share(alpha)

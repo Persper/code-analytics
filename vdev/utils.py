@@ -27,6 +27,22 @@ root_path = os.path.dirname(os.path.abspath(__file__))
 config = get_config_from_yaml(os.path.join(root_path, 'config.yaml'))
 
 
+def check_linguist(repo_path):
+    response = muterun_rb(os.path.join(root_path, 'linguist.rb'), repo_path)
+
+    if response.exitcode == 0:
+        lang_dict = json.loads(response.stdout)
+        total_lines = sum(lang_dict.values())
+
+        for k in lang_dict.keys():
+            lang_dict[k] = lang_dict[k] * 1.0 / total_lines
+
+        return lang_dict
+    else:
+        print('Analyzing Language Error')
+        return {}
+
+
 def normalize_with_coef(scores: Dict[str, float], coef=1.0) -> Dict[str, float]:
     normalized_scores = {}
     score_sum = 0
