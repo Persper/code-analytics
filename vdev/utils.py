@@ -26,6 +26,21 @@ root_path = os.path.dirname(os.path.abspath(__file__))
 config = get_config_from_yaml(os.path.join(root_path, 'config.yaml'))
 
 
+def normalize_with_coef(scores: Dict[str, float], coef=1.0) -> Dict[str, float]:
+    """
+
+    :rtype:
+    """
+    normalized_scores = {}
+    score_sum = 0
+    for _, score in scores.items():
+        score_sum += score
+
+    for idx in scores:
+        normalized_scores[idx] = scores[idx] / score_sum * coef
+    return normalized_scores
+
+
 def get_top_commits(commits, commit_share):
     top_commits = []
     for commit in commits:

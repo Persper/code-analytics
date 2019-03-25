@@ -2,7 +2,6 @@ import json
 import pickle
 from git import Repo
 from Naked.toolshed.shell import muterun_rb
-from persper.analytics.score import normalize
 from vdev.component_aggregation import get_aggregated_modules
 from persper.analytics.analyzer2 import AnalyzerObserver, emptyAnalyzerObserver
 from vdev.utils import *
@@ -80,7 +79,7 @@ class VdevAnalyzer:
         overall_commit_share = {}
 
         for key, analyzer in self._analyzers.items():
-            commit_share = normalize(analyzer['graph'].commit_devranks(alpha), self._linguist[key])
+            commit_share = normalize_with_coef(analyzer['graph'].commit_devranks(alpha), self._linguist[key])
 
             for commit, value in commit_share.items():
                 if key in overall_commit_share:
@@ -88,7 +87,7 @@ class VdevAnalyzer:
                 else:
                     overall_commit_share[commit] = value
 
-        return normalize(overall_commit_share)
+        return normalize_with_coef(overall_commit_share)
 
     def developer_profile(self, alpha=0.85, show_merge=True):
         dev_share = {}
