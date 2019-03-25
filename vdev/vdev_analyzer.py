@@ -198,27 +198,29 @@ class VdevAnalyzer:
     def set_analyzers(self):
         for language, value in self._linguist.items():
             if value > 0.05 and (language not in self._analyzers.keys()):
-                self._analyzers[language] = supportted_analyzer(self._repo_path, language)
+                self._analyzers[language] = {
+                    'az': supportted_analyzer(self._repo_path, language),
+                    'graph': supportted_analyzer(self._repo_path, language).graph
+                }
 
         print(self._analyzers)
 
     async def analyzing(self):
-        for language, az in self._analyzers.items():    
+        for language, analyzer in self._analyzers.items():    
             print('start analyzing language, ', language)
-            print(az.originCommit)
-            # loop = asyncio.get_event_loop()
-            # loop.run_until_complete(az.analyze())
-            # loop.close()
-            await az.analyze()
-            az.originCommit = az.terminalCommit
+            print(analyzer['az'].originCommit)
+            analyzer['az']._graphServer.set_graph(analyzer['graph'])
+            await analyzer['az'].analyze()
+            analyzer['az'].originCommit = analyzer['az'].terminalCommit
+            analyzer['graph'] = analyzer['az'].graph
 
         self.save()
 
     def module_contrib(self, dev_share):
         all_modules = {}
 
-        for key, az in self._analyzers.items():
-            all_modules.update(modules_contribution(az.graph, self._linguist[key]))
+        for key, analyzer in self._analyzers.items():
+            all_modules.update(modules_contribution(analyzer['graph'], self._linguist[key]))
 
         aggregated_modules = get_aggregated_modules(all_modules)
         normalize_coef = sum(aggregated_modules.values())
@@ -227,8 +229,8 @@ class VdevAnalyzer:
 
         for email in dev_share.keys():
             dev_modules = {}
-            for lang, az in self._analyzers.items():
-                dev_modules.update(modules_contribution(az.graph, self._linguist[lang], email))
+            for lang, analyzer in self._analyzers.items():
+                dev_modules.update(modules_contribution(analyzer['graph'], self._linguist[lang], email))
 
             dev_share[email]['modules'] = get_aggregated_modules_on_dev(aggregated_modules, dev_modules, normalize_coef)
         return dev_share
@@ -236,8 +238,8 @@ class VdevAnalyzer:
     def project_commit_share(self, alpha=0.85):
         overall_commit_share = {}
 
-        for key, az in self._analyzers.items():
-            commit_share = normalize(az.graph.commit_devranks(alpha), self._linguist[key])
+        for key, analyzer in self._analyzers.items():
+            commit_share = normalize(analyzer['graph'].commit_devranks(alpha), self._linguist[key])
 
             for commit, value in commit_share.items():
                 if key in overall_commit_share:

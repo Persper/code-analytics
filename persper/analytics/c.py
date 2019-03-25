@@ -98,6 +98,9 @@ class CGraphServer(GraphServer):
     def reset_graph(self):
         self._ccgraph.reset()
 
+    def set_graph(self, graph):
+        self._ccgraph = graph
+
     def filter_file(self, filename):
         for regex in self._filename_regexes:
             if not regex.match(filename):
