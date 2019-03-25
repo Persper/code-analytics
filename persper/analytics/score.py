@@ -3,10 +3,6 @@ import numpy as np
 
 
 def normalize(scores: Dict[str, float]) -> Dict[str, float]:
-    """
-
-    :rtype:
-    """
     normalized_scores = {}
     score_sum = 0
     for _, score in scores.items():
