@@ -153,6 +153,20 @@ pipenv run pytest test/test_graphs/test_analyzer_js.py
 ```
 
 
+## Debug/Prod Mode for Java Server
+
+This is a debug and prod mode switch in Java analyzer,
+by default the server is always in a debug mode, in case
+you want to turn it into prod mode where any exception raised
+is logged in a file and processing is not interrupted.
+
+We just need to set the environment variable:
+
+``export DEBUG_JAVA=False``
+
+If this environment variable is set ot `False` then Prod mode is on
+else Debug mode is on.
+
 ## Trouble Shooting
 
 #### 1. No module named 'persper'
