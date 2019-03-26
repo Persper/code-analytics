@@ -47,8 +47,9 @@ class VdevAnalyzer:
     async def analyzing(self, saved_path=None):
         for language, analyzer in self._analyzers.items():    
             print('Start analyzing language, ', language)
+            print(analyzer.originCommit)
             await analyzer.analyze()
-            analyzer.originCommit = analyzer.terminalCommit
+            # analyzer.originCommit = analyzer.terminalCommit
 
         self.save(saved_path)
 

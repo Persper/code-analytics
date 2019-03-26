@@ -185,10 +185,10 @@ def is_merged_commit(commit):
 
 def supportted_analyzer(repo_path, language):
     supportted_analyzers = {
-        'C': Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES)),
-        'C++': Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES)),
-        'Go': Analyzer(repo_path, GoGraphServer(config['go_server_addr'], GO_FILENAME_REGEXES)),
-        'Java': Analyzer(repo_path, JavaGraphServer(JAVA_FILENAME_REGEXES))
+        'C': Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES), firstParentOnly=True),
+        'C++': Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES), firstParentOnly=True),
+        'Go': Analyzer(repo_path, GoGraphServer(config['go_server_addr'], GO_FILENAME_REGEXES), firstParentOnly=True),
+        'Java': Analyzer(repo_path, JavaGraphServer(JAVA_FILENAME_REGEXES), firstParentOnly=True)
     }
 
     return supportted_analyzers[language]

@@ -34,6 +34,7 @@ class Analyzer:
         state.pop("_s_visitedCommits", None)
         state["_originCommit"] = self._originCommit.hexsha if self._originCommit else None
         state["_terminalCommit"] = self._terminalCommit.hexsha if self._terminalCommit else None
+        state["_firstParentOnly"] = self._firstParentOnly
         state.pop("_observer", None)
         return state
 
@@ -43,6 +44,7 @@ class Analyzer:
         self.originCommit = state["_originCommit"]
         self.terminalCommit = state["_terminalCommit"]
         self._s_visitedCommits = _ReadOnlySet(self._visitedCommits)
+        self._firstParentOnly = state["_firstParentOnly"]
         self._observer: AnalyzerObserver = emptyAnalyzerObserver
 
     @property
