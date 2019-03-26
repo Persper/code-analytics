@@ -113,7 +113,7 @@ def share_distribution(commits, commit_share):
     return init_commit_date, last_commit_date, values
 
 
-def modules_contribution(ccgraph, coef, email=None, alpha=0.85, black_set=None):
+def modules_contribution(ccgraph, coef, email=None, alpha=0.5, black_set=None):
     if black_set is None:
         black_set = []
     if email is None:

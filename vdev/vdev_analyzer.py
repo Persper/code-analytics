@@ -71,7 +71,7 @@ class VdevAnalyzer:
             dev_share[email]['modules'] = get_aggregated_modules_on_dev(aggregated_modules, dev_modules, normalize_coef)
         return dev_share
 
-    def project_commit_share(self, alpha=0.85):
+    def project_commit_share(self, alpha=0.5):
         overall_commit_share = {}
 
         for key, analyzer in self._analyzers.items():
@@ -85,7 +85,7 @@ class VdevAnalyzer:
 
         return normalize_with_coef(overall_commit_share)
 
-    def developer_profile(self, alpha=0.85, show_merge=True):
+    def developer_profile(self, alpha=0.5, show_merge=True):
         dev_share = {}
 
         commit_share = self.project_commit_share(alpha)
@@ -127,7 +127,7 @@ class VdevAnalyzer:
         else:
             print('No pickle file saved')
 
-    def basic_stats(self, alpha=0.85, show_merge=True):
+    def basic_stats(self, alpha=0.5, show_merge=True):
         commit_share = self.project_commit_share(alpha)
         points = []
         for commit in self._repo.iter_commits():
