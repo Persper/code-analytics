@@ -43,6 +43,7 @@ class Analyzer:
         self.originCommit = state["_originCommit"]
         self.terminalCommit = state["_terminalCommit"]
         self._s_visitedCommits = _ReadOnlySet(self._visitedCommits)
+        self._observer: AnalyzerObserver = emptyAnalyzerObserver
 
     @property
     def graphServer(self):

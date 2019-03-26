@@ -1,7 +1,13 @@
+import os
+import ast
 from collections import defaultdict
 from antlr4 import *
 from persper.analytics.call_graph.java.Java8Listener import Java8Listener
 from persper.analytics.call_graph.java.Java8Parser import Java8Parser
+import logging
+
+DEBUG = ast.literal_eval(os.environ.get('DEBUG_JAVA', "True"))
+logging.basicConfig(filename='java.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
 
 class FunctionStatsListener(Java8Listener):
@@ -13,14 +19,23 @@ class FunctionStatsListener(Java8Listener):
     def __init__(self):
         self.function_names = list()
         self.function_ranges = list()
+        self.current_function_name = None
 
     def enterMethodDeclaration(self, ctx=Java8Parser.MethodDeclarationContext):
-        header = ctx.methodHeader()
-        declator = header.methodDeclarator()
-        name = declator.Identifier().getText()
-        self.current_function_name = name
-        self.function_names.append(name)
-        self.function_ranges.append([ctx.start.line, ctx.stop.line])
+        try:
+            header = ctx.methodHeader()
+            declator = header.methodDeclarator()
+            name = declator.Identifier().getText()
+            self.current_function_name = name
+            self.function_names.append(name)
+            self.function_ranges.append([ctx.start.line, ctx.stop.line])
+        except Exception as e:
+            if DEBUG:
+                raise
+            else:
+                logging.exception("[FunctionStatsListener][METHOD DECLARATION]")
+                self.function_names = []
+                self.function_ranges = []
 
 
 class FunctionCallerListener(Java8Listener):
@@ -28,10 +43,17 @@ class FunctionCallerListener(Java8Listener):
         self.function_names = list()
 
     def enterMethodDeclaration(self, ctx=Java8Parser.MethodDeclarationContext):
-        header = ctx.methodHeader()
-        declator = header.methodDeclarator()
-        name = declator.Identifier().getText()
-        self.function_names.append(name)
+        try:
+            header = ctx.methodHeader()
+            declator = header.methodDeclarator()
+            name = declator.Identifier().getText()
+            self.function_names.append(name)
+        except Exception as e:
+            if DEBUG:
+                raise
+            else:
+                logging.exception("[FunctionCallerListener][METHOD DECLARATION]")
+                self.function_names = []
 
 
 class FunctionCalleeListener(Java8Listener):
@@ -40,19 +62,32 @@ class FunctionCalleeListener(Java8Listener):
         self.current_function_name = None
 
     def enterMethodDeclaration(self, ctx=Java8Parser.MethodDeclarationContext):
-        header = ctx.methodHeader()
-        declator = header.methodDeclarator()
-        name = declator.Identifier().getText()
-        self.current_function_name = name
+        try:
+            header = ctx.methodHeader()
+            declator = header.methodDeclarator()
+            name = declator.Identifier().getText()
+            self.current_function_name = name
+        except Exception as e:
+            if DEBUG:
+                raise
+            else:
+                logging.exception("[FunctionCalleeListener][METHOD DECLARATION]")
+                self.current_function_name = None
 
     def enterMethodInvocation(self, ctx=Java8Parser.MethodInvocationContext):
-        if ctx.methodName():
-            name = ctx.methodName().getText()
-        else:
-            name = ctx.getText()
-        if self.current_function_name:
-            self.function_caller_callee_map[self.current_function_name].append(
-                name)
+        try:
+            if ctx.methodName():
+                name = ctx.methodName().getText()
+            else:
+                name = ctx.getText()
+            if self.current_function_name:
+                self.function_caller_callee_map[self.current_function_name].append(
+                    name)
+        except Exception as e:
+            if DEBUG:
+                raise
+            else:
+                logging.exception("[FunctionCalleeListener][METHOD INVOCATION]")
 
     def enterMethodInvocation_lfno_primary(self, ctx: Java8Parser.MethodInvocation_lfno_primaryContext):
         """
@@ -67,13 +102,19 @@ class FunctionCalleeListener(Java8Listener):
         :param ctx: context for parser
         :return:
         """
-        if ctx.methodName():
-            name = ctx.methodName().getText()
-        else:
-            name = ctx.getText()
-        if self.current_function_name:
-            self.function_caller_callee_map[self.current_function_name].append(
-                name)
+        try:
+            if ctx.methodName():
+                name = ctx.methodName().getText()
+            else:
+                name = ctx.getText()
+            if self.current_function_name:
+                self.function_caller_callee_map[self.current_function_name].append(
+                    name)
+        except Exception as e:
+            if DEBUG:
+                raise
+            else:
+                logging.exception("[FunctionCalleeListener][METHOD INVOCATION]")
 
 
 def get_function_range_java(tree):

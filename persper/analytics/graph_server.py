@@ -130,7 +130,7 @@ class GraphServer(ABC):
         """Properly save `GraphServer` internal state"""
         pass
 
-    def __setstate__(self):
+    def __setstate__(self, state):
         """Properly set `GraphServer`'s internal state using pickle file"""
         pass
 
