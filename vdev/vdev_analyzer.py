@@ -95,7 +95,7 @@ class VdevAnalyzer:
             if is_merged_commit(commit) and not show_merge:
                 continue
 
-            email = commit.author.email
+            email = commit.author.email or commit.author.name
 
             if email in dev_share:
                 dev_share[email]["commits"].append(commit)
