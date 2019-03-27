@@ -12,14 +12,13 @@ from persper.analytics.graph_server import CPP_FILENAME_REGEXES
 from persper.analytics.graph_server import C_FILENAME_REGEXES
 from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from pathlib import Path
-from utils import get_config_from_yaml
-from vdev.component_aggregation import get_aggregated_modules
+from vdev.utils import get_config_from_yaml
 from vdev.analyzer_observer_vdev import AnalyzerObserverVdev
+from vdev.component_aggregation import get_aggregated_modules
 
 
 root_path = os.path.dirname(os.path.abspath(__file__))
 config = get_config_from_yaml(os.path.join(root_path, 'config.yaml'))
-ALPHA = 0.85
 LANGUAGE_LIST = ['C', 'C++', 'Go']
 
 
@@ -38,7 +37,7 @@ async def build_analyzer2(git_url, repo_path, original_pickle_path, new_pickle_p
     if original_pickle_path and os.path.exists(original_pickle_path):
         az = pickle.load(open(original_pickle_path, 'rb'))
         az.observer = observer(config['redis']['host'], config['redis']['port'], git_url)
-        await az.analyze(git_url, new_pickle_path, continue_iter=True, end_commit_sha='HEAD', into_branches=True)
+        await az.analyze(new_pickle_path, continue_iter=True, end_commit_sha='HEAD', into_branches=True)
         return
 
     analyzer_dict = {
@@ -49,7 +48,7 @@ async def build_analyzer2(git_url, repo_path, original_pickle_path, new_pickle_p
 
     az = analyzer_dict[major_language]
     az.observer = observer(config['redis']['host'], config['redis']['port'], git_url)
-    await az.analyze(git_url, new_pickle_path, from_beginning=True, into_branches=True)
+    await az.analyze(new_pickle_path, from_beginning=True, into_branches=True)
 
 
 async def build_analyzer(git_url, repo_path, original_pickle_path, new_pickle_path):
@@ -62,11 +61,11 @@ async def build_analyzer(git_url, repo_path, original_pickle_path, new_pickle_pa
         if original_pickle_path and os.path.exists(original_pickle_path):
             az = pickle.load(open(original_pickle_path, 'rb'))
             az.observer = observer(config['redis']['host'], config['redis']['port'], git_url)
-            await az.analyze(git_url, new_pickle_path, continue_iter=True, end_commit_sha='HEAD', into_branches=True)
+            await az.analyze(new_pickle_path, continue_iter=True, end_commit_sha='HEAD', into_branches=True)
         else:
             az = Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES))
             az.observer = observer(config['redis']['host'], config['redis']['port'], git_url)
-            await az.analyze(git_url, new_pickle_path, from_beginning=True, into_branches=True)
+            await az.analyze(new_pickle_path, from_beginning=True, into_branches=True)
 
 
 def check_linguist(repo_path):
@@ -84,13 +83,13 @@ def check_linguist(repo_path):
         print('Analyzing Language Error')
         return {}
 
-def basic_stats(pickle_path, alpha=0.85, show_merge=True):
+
+def basic_stats(pickle_path, alpha=0.5, show_merge=True):
     az = pickle.load(open(pickle_path, 'rb'))
 
     commit_share = normalize(az.get_graph().commit_devranks(alpha, black_set=[]))
 
     points = []
-    
 
     for commit in az._ri.repo.iter_commits():
 
@@ -145,7 +144,7 @@ def share_distribution(commits, commit_share):
     return init_commit_date, last_commit_date, values
 
 
-def developer_profile(pickle_path, alpha=0.85, show_merge=True):
+def developer_profile(pickle_path, alpha=0.5, show_merge=True):
     dev_share = {}
     az = pickle.load(open(pickle_path, 'rb'))
 
@@ -200,7 +199,7 @@ def module_contrib(ccgraph, dev_share):
     return dev_share
 
 
-def modules_on_devs(ccgraph, email=None, alpha=0.85, black_set=[]):
+def modules_on_devs(ccgraph, email=None, alpha=0.5, black_set=[]):
     if email==None:
         graph_commits = list(ccgraph.commits().values())
         commits = [commit['hexsha'] for commit in graph_commits]
@@ -259,6 +258,7 @@ def get_aggregated_path(path, aggregated_modules):
         return (path + "/...")
     else:
         return get_aggregated_path(str(Path(path).parent), aggregated_modules)
+
 
 def get_top_commits(commits, commit_share):
     top_commits = []

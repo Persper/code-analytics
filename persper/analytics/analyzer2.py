@@ -13,7 +13,7 @@ from persper.analytics.score import commit_overall_scores
 
 class Analyzer:
     def __init__(self, repositoryRoot: str, graphServer: GraphServer,
-                 terminalCommit: str = "master",
+                 terminalCommit: str = 'HEAD',
                  firstParentOnly: bool = False,
                  commit_classifier: Optional[CommitClassifier] = None):
         self._repositoryRoot = repositoryRoot

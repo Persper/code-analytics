@@ -126,14 +126,6 @@ class GraphServer(ABC):
         """Signals the end of an analysis"""
         pass
 
-    def __getstate__(self):
-        """Properly save `GraphServer` internal state"""
-        pass
-
-    def __setstate__(self, state):
-        """Properly set `GraphServer`'s internal state using pickle file"""
-        pass
-
     def register_commit(self, hexsha, author_name, author_email,
                         commit_message):
         """
