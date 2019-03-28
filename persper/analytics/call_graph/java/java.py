@@ -166,7 +166,7 @@ def update_graph(ccgraph, ast_list, change_stats, new_fname_to_old_fname):
                     # Pass [] to files argument since we don't know
                     # which file this node belongs to
                     ccgraph.add_node(callee_name, [])
-                    ccgraph.add_edge(call, callee_name)
+                ccgraph.add_edge(call, callee_name)
 
     for func, fstat in change_stats.items():
         if func not in ccgraph:
