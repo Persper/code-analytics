@@ -79,7 +79,7 @@ class FunctionCalleeListener(Java8Listener):
             if ctx.methodName():
                 name = ctx.methodName().getText()
             else:
-                name = ctx.getText()
+                name = ctx.Identifier().getText()
             if self.current_function_name:
                 self.function_caller_callee_map[self.current_function_name].append(
                     name)
@@ -106,7 +106,7 @@ class FunctionCalleeListener(Java8Listener):
             if ctx.methodName():
                 name = ctx.methodName().getText()
             else:
-                name = ctx.getText()
+                name = ctx.Identifier().getText()
             if self.current_function_name:
                 self.function_caller_callee_map[self.current_function_name].append(
                     name)
