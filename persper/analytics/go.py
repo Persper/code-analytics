@@ -38,7 +38,7 @@ class GoGraphServer(GraphServer):
     def _set_server_state(self, server_state):
         url = urllib.parse.urljoin(self.server_addr, '/set_server_state')
         headers = {'Content-type': 'application/json'}
-        r = self._session.post(url, data=server_state, headers=headers).json()
+        r = self._session.post(url, data=server_state.encode(encoding='utf-8'), headers=headers).json()
         if r != '0':
             raise GraphServerStateRecoveryError('Failed to set golang server state.')
 
