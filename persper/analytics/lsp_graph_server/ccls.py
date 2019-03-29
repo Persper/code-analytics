@@ -3,6 +3,7 @@ ccls client-side LSP support.
 """
 import logging
 import os
+import time
 from asyncio import sleep
 from pathlib import Path, PurePath
 from typing import List, Union
@@ -50,8 +51,6 @@ class CclsLspServerStub(LspServerStub):
             kwargs = {}
         if "requestParamsOverride" not in kwargs:
             kwargs["requestParamsOverride"] = {}
-        # Role((int)Role::All - (int)Role::Definition)
-        kwargs["requestParamsOverride"]["excludeRole"] = 511 - 2
         return super().textDocumentGetSymbols(*args, **kwargs)
 
     async def cclsInfo(self):
@@ -115,6 +114,7 @@ class CclsCallGraphBuilder(CallGraphBuilder):
             raise TypeError("lspClient should be an instance of CclsLspClient.")
         super().__init__(lspClient)
         self._lspClient: CclsLspClient
+        self._openDocumentWaitDuration = 0
 
     def createLexer(self, fileStream: FileStream):
         return CPP14Lexer(fileStream)
@@ -147,9 +147,11 @@ class CclsCallGraphBuilder(CallGraphBuilder):
 
     async def openDocument(self, textDoc: TextDocument):
         self._lspClient.server.textDocumentDidOpen(textDoc)
+        t1 = time.monotonic()
         while True:
             try:
                 await self._waitForJobs()
+                self._openDocumentWaitDuration += time.monotonic() - t1
                 return True
             except JsonRpcException as ex:
                 if ex.code == -32002:
@@ -159,6 +161,10 @@ class CclsCallGraphBuilder(CallGraphBuilder):
                     _logger.warning("The file seems invalid. Server error: %s", ex.message)
                     return False
                 raise
+
+    def logOpenDocumentWaitDuration(self):
+        _logger.info("openDocument waitForJobs takes %.2f s.", self._openDocumentWaitDuration)
+        self._openDocumentWaitDuration = 0
 
 
 class CclsGraphServer(LspClientGraphServer):
@@ -191,7 +197,10 @@ class CclsGraphServer(LspClientGraphServer):
                                    "enableCacheWrite": self._cacheRoot != None,
                                    "clang": {
                                        "excludeArgs": [],
-                                       "extraArgs": ["-nocudalib"],
+                                       "extraArgs": [
+                                           "-nocudalib",
+                                           "-fno-delayed-template-parsing"      # fix for not parsing templates on windows-msvc
+                                       ],
                                        "pathMappings": [],
                                        "resourceDir": ""
             },
@@ -209,3 +218,9 @@ class CclsGraphServer(LspClientGraphServer):
             str(self._workspaceRoot.joinpath("**/*.[Cc][Xx][Xx]"))
         ]
         self._callGraphManager = CallGraphManager(self._callGraphBuilder, self._callGraph)
+
+    async def end_commit(self, hexsha: str):
+        try:
+            await super().end_commit(hexsha)
+        finally:
+            self._callGraphBuilder.logOpenDocumentWaitDuration()
