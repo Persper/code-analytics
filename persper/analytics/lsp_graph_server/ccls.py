@@ -219,6 +219,18 @@ class CclsGraphServer(LspClientGraphServer):
         ]
         self._callGraphManager = CallGraphManager(self._callGraphBuilder, self._callGraph)
 
+    def _orderAffectedFiles(self, paths: List[Path]):
+        # put cpp files ahead of h files to ensure h files are parsed correctly (e.g. stdafx.h/pch.h)
+        otherFiles = []
+        for p in paths:
+            p: Path
+            if p.name.endswith(".c") or p.name.endswith(".cc") or p.name.endswith(".cpp"):
+                yield p
+            else:
+                otherFiles.append(p)
+        for p in otherFiles:
+            yield p
+
     async def end_commit(self, hexsha: str):
         try:
             await super().end_commit(hexsha)

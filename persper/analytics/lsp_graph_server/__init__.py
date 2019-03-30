@@ -208,7 +208,7 @@ class LspClientGraphServer(GraphServer):
         self._stashedPatches.clear()
 
         # ensure the files in the next commit has a different timestamp from this commit.
-        
+
         if datetime.now() - self._lastFileWrittenTime < timedelta(seconds=1):
             await asyncio.sleep(1)
 
@@ -285,6 +285,9 @@ class LspClientGraphServer(GraphServer):
             path = Path(path).resolve()
         self._invalidatedFiles.add(path)
 
+    def _orderAffectedFiles(self, paths: List[Path]):
+        return paths
+
     async def updateGraph(self):
         if not self._invalidatedFiles:
             return
@@ -293,7 +296,7 @@ class LspClientGraphServer(GraphServer):
         await self._callGraphBuilder.waitForFileSystem()
         # update vertices
         # Use scope full name as identifier.
-        for path in affectedFiles:
+        for path in self._orderAffectedFiles(affectedFiles):
             path: Path
             if not path.exists():
                 continue
