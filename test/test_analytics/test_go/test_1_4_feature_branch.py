@@ -7,6 +7,7 @@ from persper.analytics.go import GoGraphServer
 from persper.analytics.analyzer2 import Analyzer
 from persper.util.path import root_path
 from test.test_analytics.utility.go_graph_server import GoGraphBackend
+from test.test_analytics.utility.graph_helper import reduce_graph_history_truth, reduce_graph_edge_truth
 
 GO_GRAPH_SERVER_PORT = 9089
 
@@ -119,13 +120,13 @@ async def _test_analzyer_go(az):
                 "func.go::return_1":{'adds': 0, 'dels': 0}, 
            }, 
         }
-
+    reduced_history_truth = reduce_graph_history_truth(history_truth)
     commits = ccgraph.commits()
     for func, data in ccgraph.nodes(data = True):
         history = data['history']
         for csha, csize in history.items():
             commit_message = commits[csha]['message']
-            assert (csize == history_truth[commit_message.strip()][func])
+            assert (csize == reduced_history_truth[commit_message.strip()][func])
 
     edges_added_by_A = set([        ])
     edges_added_by_B = set([('main.go::main', 'main.go::funcA'), ])
@@ -161,4 +162,5 @@ async def _test_analzyer_go(az):
     all_edges = edges_added_by_A.union(edges_added_by_B).union(edges_added_by_C).union(edges_added_by_D).union(edges_added_by_E).union(edges_added_by_F) \
         .union(edges_added_by_G).union(edges_added_by_H).union(edges_added_by_I).union(edges_added_by_J).union(edges_added_by_K)\
         .union(edges_added_by_L).union(edges_added_by_M).union(edges_added_by_N)
-    assert(set(ccgraph.edges()) == all_edges)
+    reduced_edges = reduce_graph_edge_truth(all_edges)
+    assert (set(ccgraph.edges()) == reduced_edges)

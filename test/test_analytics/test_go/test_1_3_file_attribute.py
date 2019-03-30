@@ -7,6 +7,7 @@ from persper.analytics.go import GoGraphServer
 from persper.analytics.analyzer2 import Analyzer
 from persper.util.path import root_path
 from test.test_analytics.utility.go_graph_server import GoGraphBackend
+from test.test_analytics.utility.graph_helper import reduce_graph_history_truth, reduce_graph_edge_truth
 
 GO_GRAPH_SERVER_PORT = 9089
 
@@ -61,4 +62,5 @@ async def _test_analzyer_go(az):
 
     for func, data in ccgraph.nodes(data=True):
         files = data['files']
+        print(files)
         assert (files == files_truth[func])
