@@ -8,6 +8,7 @@ from glob import iglob
 from os import path
 from pathlib import Path, PurePath
 from typing import Dict, Iterable, List, Type, Union
+import time
 
 from antlr4 import FileStream, Lexer, Token
 from antlr4.error.ErrorListener import ErrorListener
@@ -369,6 +370,8 @@ class CallGraphBuilder(ABC):
         counter = 0
         thisDoc = await self.getTokenizedDocument(srcPath)
         textDoc = TextDocument.loadFile(srcPath, self.inferLanguageId(srcPath))
+        swGotoDefintion = 0
+        ctGotoDefintion = 0
         if not await self.openDocument(textDoc):
             return
         try:
@@ -379,7 +382,15 @@ class CallGraphBuilder(ABC):
                 # Put the cursor to the middle.
                 line, col = node.pos.line, node.pos.character + node.length//2
                 _logger.debug(node)
-                task = self._lspClient.server.textDocumentGotoDefinition(textDoc.uri, (line, col))
+
+                async def stopWatchedGotoDefintion():
+                    nonlocal swGotoDefintion, ctGotoDefintion
+                    t1 = time.monotonic()
+                    result = await self._lspClient.server.textDocumentGotoDefinition(textDoc.uri, (line, col))
+                    swGotoDefintion += time.monotonic() - t1
+                    ctGotoDefintion += 1
+                    return result
+                task = stopWatchedGotoDefintion()
                 nodeScope = thisDoc.scopeAt(line, col)
                 defs = await task
                 defNodes = []
@@ -411,7 +422,8 @@ class CallGraphBuilder(ABC):
                         yield CallGraphBranch(nodeScope, ds, node, dn)
         finally:
             await self.closeDocument(textDoc.uri)
-        _logger.debug("Yielded %d branches.", counter)
+        _logger.info("Performed %d gotoDefintion used %.2f s. Yielded %d branches.",
+                     ctGotoDefintion, swGotoDefintion, counter)
 
     async def enumScopesInFile(self, fileName: str) -> Iterable[CallGraphScope]:
         """
