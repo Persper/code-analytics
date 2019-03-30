@@ -156,6 +156,7 @@ class Analyzer:
                     if self._firstParentOnly:
                         assert lastCommit == commit.parents[0].hexsha, \
                             "git should traverse along first parent, but actually not."
+                            # TODO we should use MergeCommit?
                         await self._analyzeCommit(commit, lastCommit, CommitSeekingMode.NormalForward)
                     else:
                         await self._analyzeCommit(commit, lastCommit, CommitSeekingMode.MergeCommit)
@@ -190,9 +191,11 @@ class Analyzer:
         if type(commit) != Commit:
             commit = self._repo.commit(commit)
 
+        # t0: Total time usage
         t0 = time.monotonic()
         self._observer.onBeforeCommit(self, commit, seekingMode)
 
+        # t1: start_commit time
         t1 = time.monotonic()
         result = self._graphServer.start_commit(commit.hexsha, seekingMode,
                                                 commit.author.name, commit.author.email, commit.message)
@@ -207,6 +210,7 @@ class Analyzer:
             prob = self._commit_classifier.predict(commit, diff_index)
             self._clf_results[commit.hexsha] = prob
 
+        # t2: update_graph time
         t2 = time.monotonic()
         for diff in diff_index:
             old_fname, new_fname = _get_fnames(diff)
@@ -237,6 +241,7 @@ class Analyzer:
                     await result
         t2 = time.monotonic() - t2
 
+        # t3: end_commit time
         t3 = time.monotonic()
         result = self._graphServer.end_commit(commit.hexsha)
         if asyncio.iscoroutine(result):

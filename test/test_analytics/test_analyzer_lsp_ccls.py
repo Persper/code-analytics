@@ -6,7 +6,6 @@ import subprocess
 from pathlib import Path
 from tempfile import mkdtemp
 
-import networkx.readwrite.json_graph
 import pytest
 from git import Commit
 from networkx import Graph
