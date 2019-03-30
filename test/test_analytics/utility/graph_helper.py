@@ -25,3 +25,14 @@ def reduce_graph_edge_truth(edge_truth):
     for edge in edge_truth:
         reduced.add((edge[0].split(':')[2], edge[1].split(':')[2]))
     return reduced
+
+
+def reduce_graph_file_truth(file_truth):
+    reduced = {}
+    for fid, files in file_truth.items():
+        fn = fid.split(':')[2]
+        if fn in reduced:
+            reduced[fn] = reduced[fn].union(files)
+        else:
+            reduced[fn] = files
+    return reduced
