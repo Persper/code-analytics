@@ -2,13 +2,10 @@ import pytest
 from persper.analytics.graph_server import GO_FILENAME_REGEXES
 from persper.analytics.go import GoGraphServer
 
-GO_GRAPH_SERVER_PORT = 9089
-
 
 @pytest.fixture(scope='module')
 def gs():
-    server_address = 'http://127.0.0.1:%d' % GO_GRAPH_SERVER_PORT
-    return GoGraphServer(server_address, GO_FILENAME_REGEXES)
+    return GoGraphServer(None, GO_FILENAME_REGEXES)
 
 
 def test_analzyer_go(gs):
