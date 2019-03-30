@@ -4,11 +4,19 @@
             "addedBy": "A",
             "weight": null
         },
+        "ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)|->|ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)": {
+            "addedBy": "A",
+            "weight": null
+        },
         "ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)|->|TStream OpenAndValidate(const TPath arg1)": {
             "addedBy": "A",
             "weight": null
         },
         "ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)|->|void ConfigurationParser::Load(std::istream &inputStream)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "ConfigurationParser::ConfigurationParser(std::istream &inputStream)|->|ConfigurationParser::ConfigurationParser(std::istream &inputStream)": {
             "addedBy": "A",
             "weight": null
         },
@@ -24,6 +32,14 @@
             "addedBy": "A",
             "weight": null
         },
+        "TStream OpenAndValidate(const TPath arg1)|->|std::string StreamStatusToString(const TStream &stream)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const|->|bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const": {
+            "addedBy": "A",
+            "weight": null
+        },
         "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const|->|bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
             "addedBy": "A",
             "weight": null
@@ -32,8 +48,44 @@
             "addedBy": "A",
             "weight": null
         },
+        "bool Confirm(const std::string &prompt)|->|bool Confirm(const std::string &prompt)": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)|->|bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)": {
+            "addedBy": "B",
+            "weight": null
+        },
         "bool Equal(const std::string &lhs, const std::string &rhs, StringComparison comparision)|->|enum class StringComparison : int {}": {
             "addedBy": "B",
+            "weight": null
+        },
+        "const char *FriendlyNameOf()|->|TEnum operator|(TEnum lhs, TEnum rhs)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "const char *FriendlyNameOf()|->|const char *FriendlyNameOf(const type_info &type)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "const char *FriendlyNameOf(const ReliabilityNetworkEntry &instance)|->|const char *FriendlyNameOf()": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "const char *FriendlyNameOf(const std::type_index &type)|->|const char *FriendlyNameOf()": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "const char *FriendlyNameOf(const type_info &type)|->|const char *FriendlyNameOf()": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "double ConfigurationParser::GetDouble(const std::string &key, double defaultValue) const|->|double ConfigurationParser::GetDouble(const std::string &key, double defaultValue) const": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "int ConfigurationParser::GetInt(const std::string &key, int defaultValue) const|->|int ConfigurationParser::GetInt(const std::string &key, int defaultValue) const": {
+            "addedBy": "A",
             "weight": null
         },
         "int main(int argc, char *argv[])|->|TStream OpenAndValidate(const TPath arg1)": {
@@ -54,6 +106,22 @@
         },
         "int main(int argc, char *argv[])|->|void ReportException(const std::exception &ex, int level)": {
             "addedBy": "B",
+            "weight": null
+        },
+        "std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const|->|std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "void ConfigurationParser::Load(std::istream &inputStream)|->|void ConfigurationParser::Load(std::istream &inputStream)": {
+            "addedBy": "A",
+            "weight": null
+        },
+        "void ReportException(const std::exception &ex, int level)|->|void ReportException(const std::exception &ex, int level)": {
+            "addedBy": "B",
+            "weight": null
+        },
+        "void ValidateStream(const TStream &stream)|->|std::string StreamStatusToString(const TStream &stream)": {
+            "addedBy": "A",
             "weight": null
         }
     },
@@ -216,11 +284,12 @@
         },
         "ConfigurationParser::ConfigurationParser(std::filesystem::path filePath)": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 5,
+                    "adds": 6,
                     "dels": 0
                 }
             },
@@ -228,11 +297,12 @@
         },
         "ConfigurationParser::ConfigurationParser(std::istream &inputStream)": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 4,
+                    "adds": 5,
                     "dels": 0
                 }
             },
@@ -276,11 +346,12 @@
         },
         "RowReader &operator>>(RowReader &reader, bool &rhs)": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 24,
+                    "adds": 25,
                     "dels": 0
                 }
             },
@@ -288,11 +359,12 @@
         },
         "RowReader &operator>>(RowReader &reader, double &rhs)": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 6,
+                    "adds": 7,
                     "dels": 0
                 }
             },
@@ -300,11 +372,12 @@
         },
         "RowReader &operator>>(RowReader &reader, float &rhs)": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 6,
+                    "adds": 7,
                     "dels": 0
                 }
             },
@@ -312,11 +385,12 @@
         },
         "RowReader &operator>>(RowReader &reader, int &rhs)": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 6,
+                    "adds": 7,
                     "dels": 0
                 }
             },
@@ -324,11 +398,12 @@
         },
         "RowReader &operator>>(RowReader &reader, long &rhs)": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 6,
+                    "adds": 7,
                     "dels": 0
                 }
             },
@@ -336,11 +411,12 @@
         },
         "RowReader &operator>>(RowReader &reader, std::string &rhs)": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 16,
+                    "adds": 17,
                     "dels": 0
                 }
             },
@@ -364,7 +440,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 1,
+                    "adds": 7,
                     "dels": 0
                 }
             },
@@ -376,7 +452,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 1,
+                    "adds": 5,
                     "dels": 0
                 }
             },
@@ -388,7 +464,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 1,
+                    "adds": 5,
                     "dels": 0
                 }
             },
@@ -424,7 +500,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 1,
+                    "adds": 54,
                     "dels": 0
                 }
             },
@@ -436,7 +512,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 1,
+                    "adds": 10,
                     "dels": 0
                 }
             },
@@ -484,7 +560,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 1,
+                    "adds": 5,
                     "dels": 0
                 }
             },
@@ -496,7 +572,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 1,
+                    "adds": 4,
                     "dels": 0
                 }
             },
@@ -516,11 +592,12 @@
         },
         "bool ConfigurationParser::GetBool(const std::string &key, bool defaultValue) const": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 16,
+                    "adds": 17,
                     "dels": 0
                 }
             },
@@ -532,7 +609,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 17,
+                    "adds": 18,
                     "dels": 0
                 }
             },
@@ -544,7 +621,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 29,
+                    "adds": 30,
                     "dels": 0
                 }
             },
@@ -580,7 +657,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 1,
+                    "adds": 4,
                     "dels": 0
                 }
             },
@@ -592,7 +669,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 1,
+                    "adds": 4,
                     "dels": 0
                 }
             },
@@ -611,6 +688,42 @@
             "size": null
         },
         "const char *FriendlyNameOf()": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 4,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "const char *FriendlyNameOf(const ReliabilityNetworkEntry &instance)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "const char *FriendlyNameOf(const std::type_index &type)": {
+            "files": [
+                "Utility.h"
+            ],
+            "history": {
+                "A": {
+                    "adds": 1,
+                    "dels": 0
+                }
+            },
+            "size": null
+        },
+        "const char *FriendlyNameOf(const type_info &type)": {
             "files": [
                 "Utility.h"
             ],
@@ -648,11 +761,12 @@
         },
         "double ConfigurationParser::GetDouble(const std::string &key, double defaultValue) const": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 12,
+                    "adds": 13,
                     "dels": 0
                 }
             },
@@ -732,11 +846,12 @@
         },
         "int ConfigurationParser::GetInt(const std::string &key, int defaultValue) const": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 12,
+                    "adds": 13,
                     "dels": 0
                 }
             },
@@ -788,7 +903,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 1,
+                    "adds": 7,
                     "dels": 0
                 }
             },
@@ -796,11 +911,12 @@
         },
         "std::string ConfigurationParser::GetString(const std::string &key, const std::string &defaultValue) const": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 6,
+                    "adds": 7,
                     "dels": 0
                 }
             },
@@ -812,7 +928,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 1,
+                    "adds": 8,
                     "dels": 0
                 }
             },
@@ -820,11 +936,12 @@
         },
         "void ConfigurationParser::Load(std::istream &inputStream)": {
             "files": [
-                "TextFileParsers.cpp"
+                "TextFileParsers.cpp",
+                "TextFileParsers.h"
             ],
             "history": {
                 "A": {
-                    "adds": 23,
+                    "adds": 24,
                     "dels": 0
                 }
             },
@@ -836,7 +953,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 20,
+                    "adds": 21,
                     "dels": 0
                 }
             },
@@ -860,7 +977,7 @@
             ],
             "history": {
                 "A": {
-                    "adds": 1,
+                    "adds": 8,
                     "dels": 0
                 }
             },
