@@ -82,7 +82,6 @@ async def _test_analzyer_go(az):
         }
     }
     reduced_history_truth = reduce_graph_history_truth(history_truth)
-
     commits = ccgraph.commits()
     for func, data in ccgraph.nodes(data=True):
         history = data['history']

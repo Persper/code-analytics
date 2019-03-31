@@ -9,6 +9,7 @@ from persper.analytics.analyzer2 import Analyzer
 from persper.util.path import root_path
 from test.test_analytics.utility.go_graph_server import GoGraphBackend
 from test.test_analytics.utility.graph_helper import reduce_graph_history_truth, reduce_graph_edge_truth
+from test.test_analytics.utility.graph_helper import reduce_graph_history_truth, reduce_graph_edge_truth
 
 GO_GRAPH_SERVER_PORT = 9089
 

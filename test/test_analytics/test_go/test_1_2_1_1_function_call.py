@@ -7,6 +7,7 @@ from persper.analytics.go import GoGraphServer
 from persper.analytics.analyzer2 import Analyzer
 from persper.util.path import root_path
 from test.test_analytics.utility.go_graph_server import GoGraphBackend
+from test.test_analytics.utility.graph_helper import reduce_graph_history_truth, reduce_graph_edge_truth
 
 GO_GRAPH_SERVER_PORT = 9089
 
@@ -72,7 +73,7 @@ async def _test_analzyer_go(az):
                 }, 
 
     }
-
+    reduced_history_truth = reduce_graph_history_truth(history_truth)
     commits = ccgraph.commits()
     for func, data in ccgraph.nodes(data = True):
         history = data['history']
@@ -80,7 +81,7 @@ async def _test_analzyer_go(az):
             commit_message = commits[csha]['message']
             print(commit_message.strip())
             print(func)
-            assert (csize == history_truth[commit_message.strip()][func])
+            assert (csize == reduced_history_truth[commit_message.strip()][func])
 
     edges_added_by_A = set([
     ])
@@ -96,4 +97,5 @@ async def _test_analzyer_go(az):
     ])
 
     all_edges = edges_added_by_A.union(edges_added_by_B).union(edges_added_by_C).union(edges_added_by_D).union(edges_added_by_E)
-    assert(set(ccgraph.edges()) == all_edges)
+    reduced_edges = reduce_graph_edge_truth(all_edges)
+    assert (set(ccgraph.edges()) == reduced_edges)
