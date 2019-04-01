@@ -51,7 +51,9 @@ async def test_analyzer_master_only(az):
     }
 
     edges_truth = [
-        ('doStuff', 'newA().foo()'),
+        ('addFunction', 'doStuff'),
+        ('main', 'doStuff'),
+        ('doStuff', 'foo'),
         ('doStuff', 'callSum'),
         ('addNewFunction', 'doNewStuff')
     ]
