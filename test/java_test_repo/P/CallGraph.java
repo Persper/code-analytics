@@ -69,7 +69,7 @@ public class CallGraphs
     }
 
     public static int FunctionCallerLoops(){
-        for(int i = getValue(30); i < length("Farhaan"); i++ ){
+        for(int i = getValue(30); i < str.length("Farhaan"); i++ ){
             doSomething(i);
 
         }

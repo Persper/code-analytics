@@ -129,23 +129,29 @@ async def test_analyzer_master_only(az):
     }
 
     edges_truth = [
-        ('doStuff', 'newA().foo()'),
         # caller callee relationship
         ('FunctionCaller', 'summation'),
+        ('main', 'doStuff'),
+        ('doStuff', 'foo'),
+        ('addFunction', 'doStuff'),
+        ('AddChangeFunction', 'doStuff'),
+        ('FunctionCaller', 'AddChangeFunction'),
         # modifying function call
         ('FunctionCaller', 'summation_new'),
         # Statement expressions
         ('FunctionCaller', 'addMore'),
-        ('FunctionCaller', 'addNewNumber'),
+        ('FunctionCaller', 'doStuff'),
         # Embedded functions
         ('FunctionCaller', 'add40'),
         ('FunctionCaller', 'returnBigValues'),
         ('FunctionCaller', 'sumValue'),
         ('FunctionCaller', 'anotherValue'),
+        ('FunctionCaller', 'addNewNumber'),
         # If conditionals
         ('FunctionCallerConditionals', 'addMoreAgain'),
         ('FunctionCallerConditionals', 'greater30'),
         ('FunctionCallerConditionals', 'anotherValueAgain'),
+        ('FunctionCallerConditionals', 'add40'),
         # Switch Test
         ('FunctionCallerConditionalsSwitch', 'getDay'),
         ('FunctionCallerConditionalsSwitch', 'getNumDay'),
@@ -155,6 +161,7 @@ async def test_analyzer_master_only(az):
         ('FunctionCallerLoops', 'doSomething'),
         ('FunctionCallerLoops', 'doSomthingMore'),
         ('FunctionCallerLoops', 'parseIt'),
+        ('FunctionCallerLoops', 'length'),
         # New file with same function name
         ('doStuff', 'callSum')
     ]

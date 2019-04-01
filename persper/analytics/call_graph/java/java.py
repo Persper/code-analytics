@@ -79,7 +79,7 @@ class FunctionCalleeListener(Java8Listener):
             if ctx.methodName():
                 name = ctx.methodName().getText()
             else:
-                name = ctx.getText()
+                name = ctx.Identifier().getText()
             if self.current_function_name:
                 self.function_caller_callee_map[self.current_function_name].append(
                     name)
@@ -106,7 +106,7 @@ class FunctionCalleeListener(Java8Listener):
             if ctx.methodName():
                 name = ctx.methodName().getText()
             else:
-                name = ctx.getText()
+                name = ctx.Identifier().getText()
             if self.current_function_name:
                 self.function_caller_callee_map[self.current_function_name].append(
                     name)
@@ -166,7 +166,7 @@ def update_graph(ccgraph, ast_list, change_stats, new_fname_to_old_fname):
                     # Pass [] to files argument since we don't know
                     # which file this node belongs to
                     ccgraph.add_node(callee_name, [])
-                    ccgraph.add_edge(call, callee_name)
+                ccgraph.add_edge(call, callee_name)
 
     for func, fstat in change_stats.items():
         if func not in ccgraph:
