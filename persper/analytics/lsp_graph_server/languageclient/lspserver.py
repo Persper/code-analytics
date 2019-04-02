@@ -39,7 +39,8 @@ DEFAULT_CAPABILITIES = {
         "workspaceFolders": False
     },
     "textDocument": {
-        "publishDiagnostics": None,
+        # ccls requires we use an object here, though LSP allows null.
+        "publishDiagnostics": {},
         "synchronization": {
             "dynamicRegistration": True,
             "willSave": True,
