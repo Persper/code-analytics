@@ -1,13 +1,19 @@
+import os
 import json
 import pickle
 from git import Repo
 from Naked.toolshed.shell import muterun_rb
-from vdev.component_aggregation import get_aggregated_modules
 from persper.analytics.analyzer2 import AnalyzerObserver, emptyAnalyzerObserver
-from vdev.utils import *
+from persper.util.supported_analyzer import supported_analyzer
+from persper.util.path import root_path
+from persper.util.normalize_score import normalize_with_coef
 
 
-class VdevAnalyzer:
+LANGUAGE_LIST = ['C', 'C++']
+LANGUAGE_THRESHOLD = 0.3
+
+
+class MultiAnalyzer:
 
     def __init__(self, repo_path):
         self._repo_path = repo_path
@@ -19,7 +25,7 @@ class VdevAnalyzer:
         self.set_analyzers()
 
     def set_linguist(self):
-        response = muterun_rb(os.path.join(root_path, 'linguist.rb'), self._repo_path)
+        response = muterun_rb(os.path.join(root_path, 'persper', 'util', 'linguist.rb'), self._repo_path)
 
         if response.exitcode == 0:
             lang_dict = json.loads(response.stdout)
@@ -35,41 +41,22 @@ class VdevAnalyzer:
             print(self._linguist)
 
         else:
-            print('Analyzing Language Error')
+            print('Analyzing Language Error from Linguist')
 
     def set_analyzers(self):
         for language, value in self._linguist.items():
             if value > LANGUAGE_THRESHOLD and (language not in self._analyzers.keys()):
-                self._analyzers[language] = supportted_analyzer(self._repo_path, language)
+                self._analyzers[language] = supported_analyzer(self._repo_path, language)
 
         print(self._analyzers)
 
     async def analyzing(self, saved_path=None):
         for language, analyzer in self._analyzers.items():    
-            print('Start analyzing language, ', language)
+            print('Start Analyzing Language, ', language)
             analyzer.terminalCommit = analyzer._repo.head.commit
             await analyzer.analyze()
 
         self.save(saved_path)
-
-    def module_contrib(self, dev_share):
-        all_modules = {}
-
-        for key, analyzer in self._analyzers.items():
-            all_modules.update(modules_contribution(analyzer.graph, self._linguist[key]))
-
-        aggregated_modules = get_aggregated_modules(all_modules)
-        normalize_coef = sum(aggregated_modules.values())
-        if normalize_coef == 0:
-            normalize_coef = 1.0
-
-        for email in dev_share.keys():
-            dev_modules = {}
-            for lang, analyzer in self._analyzers.items():
-                dev_modules.update(modules_contribution(analyzer.graph, self._linguist[lang], email))
-
-            dev_share[email]['modules'] = get_aggregated_modules_on_dev(aggregated_modules, dev_modules, normalize_coef)
-        return dev_share
 
     def project_commit_share(self, alpha=0.5):
         overall_commit_share = {}
@@ -85,40 +72,6 @@ class VdevAnalyzer:
 
         return normalize_with_coef(overall_commit_share)
 
-    def developer_profile(self, alpha=0.5, show_merge=True):
-        dev_share = {}
-
-        commit_share = self.project_commit_share(alpha)
-
-        for commit in self._repo.iter_commits():
-
-            if is_merged_commit(commit) and not show_merge:
-                continue
-
-            email = commit.author.email or commit.author.name
-
-            if email in dev_share:
-                dev_share[email]["commits"].append(commit)
-            else:
-                dev_share[email] = {}
-                dev_share[email]["commits"] = [commit]
-                dev_share[email]["email"] = email
-
-        for item in dev_share.values():
-            init_commit_date, last_commit_date, values = share_distribution(item['commits'], commit_share)
-        
-            item['distrib'] = {
-                'init_commit_date': init_commit_date,
-                'last_commit_date': last_commit_date,
-                'values': values
-            }
-            item['dev_value'] = sum(values)
-            item['top_commits'] = get_top_commits(item['commits'], commit_share)
-
-        dev_share = self.module_contrib(dev_share)
-
-        return dev_share
-
     def save(self, saved_path=None):
         if saved_path:
             print('Saving pickle file to:', saved_path)
@@ -132,7 +85,7 @@ class VdevAnalyzer:
         points = []
         for commit in self._repo.iter_commits():
 
-            if is_merged_commit(commit) and not show_merge:
+            if _is_merged_commit(commit) and not show_merge:
                 continue
 
             if commit.hexsha in commit_share:
@@ -141,3 +94,10 @@ class VdevAnalyzer:
                 points.append(0.0)
 
         return list(reversed(points))
+
+
+def _is_merged_commit(commit):
+    if len(commit.parents) > 1:
+        return True
+    else:
+        return False
