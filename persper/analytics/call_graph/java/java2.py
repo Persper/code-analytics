@@ -70,10 +70,12 @@ class FunctionCalleeListener(JavaParserListener):
 
     def enterMethodCall(self, ctx: JavaParser.MethodCallContext):
         try:
-            name = ctx.IDENTIFIER().getText()
-            if self.current_function_name:
-                self.function_caller_callee_map[self.current_function_name].append(
-                    name)
+            # The condition is there to avoid functions like `this()` or `super()`
+            if ctx.IDENTIFIER():
+                name = ctx.IDENTIFIER().getText()
+                if self.current_function_name:
+                    self.function_caller_callee_map[self.current_function_name].append(
+                        name)
         except Exception as e:
             if DEBUG:
                 raise
