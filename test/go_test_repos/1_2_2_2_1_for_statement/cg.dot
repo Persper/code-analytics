@@ -1,3 +1,0 @@
-digraph go_test_repo {
-	A -> M -> N ; //1.2.2.2.1. for statement
-}

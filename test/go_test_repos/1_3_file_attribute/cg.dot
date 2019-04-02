@@ -1,3 +1,0 @@
-digraph go_test_file {
-	A -> B -> C -> D;
-}

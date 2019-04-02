@@ -1,5 +1,0 @@
-digraph go_test_repo {
-	H -> L -> M -> N ;  //1.1.3.3.3. update lines in function body
-							//1.1.4.1.  No new line at end of file
-							//1.1.4.2. No new line between functions
-}

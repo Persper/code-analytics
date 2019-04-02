@@ -1,4 +1,0 @@
-digraph go_test_repo {
-	A -> F -> G -> H; //1.2.1.2. Embedded Expression
-					 //1.2.2.1. Conditional Statement
-}
