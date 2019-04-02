@@ -4,9 +4,9 @@ from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.patch_parser import PatchParser
 from persper.analytics.c import function_change_stats
 from persper.analytics.call_graph.java.ast_creater import ASTCreater
-from persper.analytics.call_graph.java.Java8Lexer import Java8Lexer
-from persper.analytics.call_graph.java.Java8Parser import Java8Parser
-from persper.analytics.call_graph.java.java import get_function_range_java, update_graph
+from persper.parser.java.JavaLexer import JavaLexer
+from persper.parser.java.JavaParser import JavaParser
+from persper.analytics.call_graph.java.java2 import get_function_range_java, update_graph
 
 
 class JavaGraphServer(GraphServer):
@@ -39,7 +39,7 @@ class JavaGraphServer(GraphServer):
 
         # Parse source codes into ASTs
         if old_src:
-            ast_obj = ASTCreater(Java8Parser, Java8Lexer,
+            ast_obj = ASTCreater(JavaParser, JavaLexer,
                                  old_filename, old_src)
             ast_obj()
             old_ast = ast_obj.tree
@@ -47,7 +47,7 @@ class JavaGraphServer(GraphServer):
                 return -1
 
         if new_src:
-            ast_obj = ASTCreater(Java8Parser, Java8Lexer,
+            ast_obj = ASTCreater(JavaParser, JavaLexer,
                                  new_filename, new_src)
             ast_obj()
             new_ast = ast_obj.tree
