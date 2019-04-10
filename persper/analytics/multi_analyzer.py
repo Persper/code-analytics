@@ -3,17 +3,18 @@ import json
 import pickle
 from git import Repo
 from Naked.toolshed.shell import muterun_rb
-from persper.analytics.analyzer2 import AnalyzerObserver, emptyAnalyzerObserver
-from persper.util.supported_analyzer import supported_analyzer
 from persper.util.path import root_path
+from persper.analytics.c import CGraphServer
+from persper.analytics.cpp import CPPGraphServer
 from persper.util.normalize_score import normalize_with_coef
-
-
-LANGUAGE_LIST = ['C', 'C++']
-LANGUAGE_THRESHOLD = 0.3
+from persper.analytics.graph_server import C_FILENAME_REGEXES
+from persper.analytics.graph_server import CPP_FILENAME_REGEXES
+from persper.analytics.analyzer2 import Analyzer, AnalyzerObserver, emptyAnalyzerObserver
 
 
 class MultiAnalyzer:
+
+    LANGUAGE_THRESHOLD = 0.3
 
     def __init__(self, repo_path):
         self._repo_path = repo_path
@@ -21,10 +22,10 @@ class MultiAnalyzer:
         self._observer: AnalyzerObserver = emptyAnalyzerObserver
         self._linguist = {}
         self._analyzers = {}
-        self.set_linguist()
-        self.set_analyzers()
+        self._set_linguist()
+        self._set_analyzers()
 
-    def set_linguist(self):
+    def _set_linguist(self):
         response = muterun_rb(os.path.join(root_path, 'persper', 'util', 'linguist.rb'), self._repo_path)
 
         if response.exitcode == 0:
@@ -35,7 +36,7 @@ class MultiAnalyzer:
                 lang_dict[k] = lang_dict[k] * 1.0 / total_lines
 
             for lang, value in lang_dict.items():
-                if lang in LANGUAGE_LIST:
+                if lang in self._supported_analyzers().keys():
                     self._linguist[lang] = value
 
             print(self._linguist)
@@ -43,10 +44,10 @@ class MultiAnalyzer:
         else:
             print('Analyzing Language Error from Linguist')
 
-    def set_analyzers(self):
+    def _set_analyzers(self):
         for language, value in self._linguist.items():
-            if value > LANGUAGE_THRESHOLD and (language not in self._analyzers.keys()):
-                self._analyzers[language] = supported_analyzer(self._repo_path, language)
+            if value > self.__class__.LANGUAGE_THRESHOLD and (language not in self._analyzers.keys()):
+                self._analyzers[language] = self._supported_analyzers(language)
 
         print(self._analyzers)
 
@@ -94,6 +95,17 @@ class MultiAnalyzer:
                 points.append(0.0)
 
         return list(reversed(points))
+
+    def _supported_analyzers(self, language=None):
+        analyzers = {
+            'C': Analyzer(self._repo_path, CGraphServer(C_FILENAME_REGEXES), firstParentOnly=True),
+            'C++': Analyzer(self._repo_path, CPPGraphServer(CPP_FILENAME_REGEXES), firstParentOnly=True)
+        }
+
+        if language:
+            return analyzers[language]
+        else:
+            return analyzers
 
 
 def _is_merged_commit(commit):
