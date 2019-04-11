@@ -78,6 +78,7 @@ def src_to_tree(filename, src):
         root = etree.parse(xml_path).getroot()
     except:
         print("ERROR: src_to_tree unable to parse xml file.")
+        return None
     finally:
         if not f.closed:
             f.close()
