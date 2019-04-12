@@ -149,31 +149,35 @@ class Analyzer:
                 if commit.hexsha in self._visitedCommits:
                     printCommitStatus(logging.DEBUG, "Already visited.")
                     continue
-                if len(commit.parents) > 1:
+                if len(commit.parents) > 1 and not self._firstParentOnly:
                     # merge commit
-                    # process connection, do not process diff
+                    # GraphServer should processes connection of current graph, but does not process LOC diff.
+                    # We assume GraphServer is actually independent of the value of `lastCommit`;
+                    # thus there is no need to rewind.
                     printCommitStatus(logging.INFO, "Going forward (merge).")
-                    if self._firstParentOnly:
-                        assert lastCommit == commit.parents[0].hexsha, \
-                            "git should traverse along first parent, but actually not."
-                            # TODO we should use MergeCommit?
-                        await self._analyzeCommit(commit, lastCommit, CommitSeekingMode.NormalForward)
-                    else:
-                        await self._analyzeCommit(commit, lastCommit, CommitSeekingMode.MergeCommit)
-                elif not commit.parents:
-                    printCommitStatus(
-                        logging.INFO, "Going forward (initial commit).")
-                    await self._analyzeCommit(commit, None, CommitSeekingMode.NormalForward)
+                    await self._analyzeCommit(commit, lastCommit, CommitSeekingMode.MergeCommit)
                 else:
-                    parent: Commit = commit.parents[0]
-                    if lastCommit != parent.hexsha:
-                        printCommitStatus(
-                            logging.INFO, "Rewind to parent: {0}.".format(parent.hexsha))
+                    expectedParentCommit = None
+                    message = None
+                    if not commit.parents:
+                        message = "Going forward (initial commit)."
+                        expectedParentCommit = None
+                    else:
+                        if len(commit.parents) > 1:
+                            assert self._firstParentOnly
+                            # We trust git would traverse along first parent.
+                            # _firstParentOnly will make merge commit author take the merit of all the merged changes.
+                            message = "Going forward (merge)."
+                        else:
+                            message = "Going forward."
+                        expectedParentCommit = commit.parents[0].hexsha
+                    if lastCommit != expectedParentCommit:
+                        printCommitStatus(logging.INFO, "Rewind to parent: {0}.".format(expectedParentCommit or "<empty>"))
                         # jumping to the parent commit first
-                        await self._analyzeCommit(parent, lastCommit, CommitSeekingMode.Rewind)
+                        await self._analyzeCommit(expectedParentCommit, lastCommit, CommitSeekingMode.Rewind)
                     # then go on with current commit
-                    printCommitStatus(logging.INFO, "Going forward.")
-                    await self._analyzeCommit(commit, parent, CommitSeekingMode.NormalForward)
+                    printCommitStatus(logging.INFO, message)
+                    await self._analyzeCommit(commit, expectedParentCommit, CommitSeekingMode.NormalForward)
                 self._visitedCommits.add(commit.hexsha)
                 analyzedCommits += 1
         except Exception as ex:
