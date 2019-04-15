@@ -8,6 +8,9 @@ import subprocess
 import tempfile
 from lxml import etree
 
+# Create our custom xml parser to handle very deep documents
+xml_parser = etree.XMLParser(huge_tree=True)
+
 
 def copy_dir(src, dst, *, follow_sym=True):
     if os.path.isdir(dst):
@@ -75,7 +78,7 @@ def src_to_tree(filename, src):
     cmd = 'srcml {} --position --filename {} -o {}'.format(f.name, '\"/' + filename + '\"', xml_path)
     subprocess.call(cmd, shell=True)
     try:
-        root = etree.parse(xml_path).getroot()
+        root = etree.parse(xml_path, parser=xml_parser).getroot()
     except:
         print("ERROR: src_to_tree unable to parse xml file.")
         return None
