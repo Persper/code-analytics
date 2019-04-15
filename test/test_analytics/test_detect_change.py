@@ -34,12 +34,12 @@ def test_detect_change():
         'MigrationController::InputBlocks': 3
     }
 
-    with open(os.path.join(dir_path, 'example.patch'), 'r') as f:
+    with open(os.path.join(dir_path, 'patch_test_files/example.patch'), 'r') as f:
         example_patch = f.read()
         parsing_result = parser.parse(example_patch)
         assert parsing_result == parsing_truth
 
-    with open(os.path.join(dir_path, 'example.cc'), 'r') as f:
+    with open(os.path.join(dir_path, 'patch_test_files/example.cc'), 'r') as f:
         root = src_to_tree('example.cc', f.read())
         func_ranges_result = get_func_ranges_cpp(root)
         assert func_ranges_result == func_ranges_truth
@@ -60,7 +60,7 @@ def test_get_changed_functions():
     )
 
     parser = PatchParser()
-    with open(os.path.join(dir_path, 'example7.patch'), 'r') as f:
+    with open(os.path.join(dir_path, 'patch_test_files/example7.patch'), 'r') as f:
         example_patch = f.read()
         parsing_result = parser.parse(example_patch)
 
@@ -90,7 +90,7 @@ def test_patch_parser():
         [[0, 6]],
         []
     )
-    with open(os.path.join(dir_path, 'example2.patch'), 'r') as f:
+    with open(os.path.join(dir_path, 'patch_test_files/example2.patch'), 'r') as f:
         example2_patch = f.read()
         parsing_result = parser.parse(example2_patch)
         assert parsing_result == patch2_truth
@@ -101,7 +101,7 @@ def test_patch_parser():
         [[10, 4], [12, 1], [14, 1], [17, 13]],
         [[9, 10], [12, 12], [14, 14]]
     )
-    with open(os.path.join(dir_path, 'example3.patch'), 'r') as f:
+    with open(os.path.join(dir_path, 'patch_test_files/example3.patch'), 'r') as f:
         example3_patch = f.read()
         parsing_result = parser.parse(example3_patch)
         assert parsing_result == patch3_truth
@@ -112,7 +112,7 @@ def test_patch_parser():
         [[0, 27]],
         []
     )
-    with open(os.path.join(dir_path, 'example4.patch'), 'r') as f:
+    with open(os.path.join(dir_path, 'patch_test_files/example4.patch'), 'r') as f:
         example4_patch = f.read()
         parsing_result = parser.parse(example4_patch)
         assert parsing_result == patch4_truth
@@ -123,7 +123,7 @@ def test_no_newline_at_the_end_of_file():
     patch5_truth = (
         [[12, 1]], [[12, 12]]
     )
-    with open(os.path.join(dir_path, 'example5.patch'), 'r') as f:
+    with open(os.path.join(dir_path, 'patch_test_files/example5.patch'), 'r') as f:
         example5_patch = f.read()
         parsing_result = parser.parse(example5_patch)
         assert parsing_result == patch5_truth
@@ -132,7 +132,7 @@ def test_no_newline_at_the_end_of_file():
         [[17, 1], [20, 3], [30, 5]],
         [[12, 12], [17, 17], [20, 20], [22, 22], [24, 30]]
     )
-    with open(os.path.join(dir_path, 'example6.patch'), 'r') as f:
+    with open(os.path.join(dir_path, 'patch_test_files/example6.patch'), 'r') as f:
         example6_patch = f.read()
         parsing_result = parser.parse(example6_patch)
         assert parsing_result == patch6_truth
