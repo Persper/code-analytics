@@ -43,17 +43,22 @@ class CGraphServer(GraphServer):
         self._filename_regexes = [re.compile(regex_str) for regex_str in filename_regex_strs]
         self._pparser = PatchParser()
         self._seeking_mode = None
+        self._workspace_commit_hexsha = None
 
     def start_commit(self, hexsha: str, seeking_mode: CommitSeekingMode,
                      author_name: str, author_email: str, commit_message: str):
         self._seeking_mode = seeking_mode
         self._ccgraph.add_commit(hexsha, author_name, author_email,
                                  commit_message)
+        self._workspace_commit_hexsha = hexsha
 
     def register_commit(self, hexsha, author_name, author_email,
                         commit_message):
         self._ccgraph.add_commit(hexsha, author_name, author_email,
                                  commit_message)
+
+    def get_workspace_commit_hexsha(self):
+        return self._workspace_commit_hexsha
 
     def update_graph(self, old_filename, old_src, new_filename, new_src, patch):
         ast_list = []
