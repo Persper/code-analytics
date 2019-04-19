@@ -8,6 +8,7 @@ from glob import iglob
 from os import path
 from pathlib import Path, PurePath
 from typing import Dict, Iterable, List, Type, Union
+import time
 
 from antlr4 import FileStream, Lexer, Token
 from antlr4.error.ErrorListener import ErrorListener
@@ -365,10 +366,12 @@ class CallGraphBuilder(ABC):
         Build call graph branches asynchronously in the specified file.
         """
         srcPath = self.pathFromUri(fileName)
-        _logger.info("Build call graph in: %s", srcPath)
+        _logger.debug("Build call graph in: %s", srcPath)
         counter = 0
         thisDoc = await self.getTokenizedDocument(srcPath)
         textDoc = TextDocument.loadFile(srcPath, self.inferLanguageId(srcPath))
+        swGotoDefintion = 0
+        ctGotoDefintion = 0
         if not await self.openDocument(textDoc):
             return
         try:
@@ -379,7 +382,15 @@ class CallGraphBuilder(ABC):
                 # Put the cursor to the middle.
                 line, col = node.pos.line, node.pos.character + node.length//2
                 _logger.debug(node)
-                task = self._lspClient.server.textDocumentGotoDefinition(textDoc.uri, (line, col))
+
+                async def stopWatchedGotoDefintion():
+                    nonlocal swGotoDefintion, ctGotoDefintion
+                    t1 = time.monotonic()
+                    result = await self._lspClient.server.textDocumentGotoDefinition(textDoc.uri, (line, col))
+                    swGotoDefintion += time.monotonic() - t1
+                    ctGotoDefintion += 1
+                    return result
+                task = stopWatchedGotoDefintion()
                 nodeScope = thisDoc.scopeAt(line, col)
                 defs = await task
                 defNodes = []
@@ -411,7 +422,8 @@ class CallGraphBuilder(ABC):
                         yield CallGraphBranch(nodeScope, ds, node, dn)
         finally:
             await self.closeDocument(textDoc.uri)
-        _logger.info("Yielded %d branches.", counter)
+        _logger.info("Performed %d gotoDefintion used %.2f s. Yielded %d branches.",
+                     ctGotoDefintion, swGotoDefintion, counter)
 
     async def enumScopesInFile(self, fileName: str) -> Iterable[CallGraphScope]:
         """
@@ -448,7 +460,7 @@ class CallGraphBuilder(ABC):
                 if p.exists():
                     await asyncio.sleep(0.1)
                 else:
-                    _logger.info("Confirm deleted: %s", p)
+                    _logger.debug("Confirm deleted: %s", p)
             self._lspClient.server.workspaceDidChangeWatchedFiles(
                 [FileEvent(TextDocument.fileNameToUri(p), FileChangeType.Deleted) for p in self._deletePendingPaths])
             self._deletePendingPaths.clear()
@@ -474,6 +486,5 @@ class CallGraphBuilder(ABC):
             f.write(newContent)
         uri = TextDocument.fileNameToUri(filePath)
         self._lspClient.server.workspaceDidChangeWatchedFiles(
-            [FileEvent(uri,
-                       FileChangeType.Changed if prevFileExists else FileChangeType.Created)])
-        _logger.info("Modified %s.", filePath)
+            [FileEvent(uri, FileChangeType.Changed if prevFileExists else FileChangeType.Created)])
+        _logger.debug("Modified %s.", filePath)

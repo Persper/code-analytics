@@ -39,7 +39,8 @@ DEFAULT_CAPABILITIES = {
         "workspaceFolders": False
     },
     "textDocument": {
-        "publishDiagnostics": None,
+        # ccls requires we use an object here, though LSP allows null.
+        "publishDiagnostics": {},
         "synchronization": {
             "dynamicRegistration": True,
             "willSave": True,
@@ -158,22 +159,26 @@ class LspServerStub():
     def textDocumentDidClose(self, documentUri: str):
         self.notify("textDocument/didClose", {"textDocument": {"uri": documentUri}})
 
-    async def textDocumentGotoDefinition(self, documentUri: str, position: Union[Tuple[int, int], Position]):
-        result = await self.request(
-            "textDocument/definition",
-            {
-                "textDocument": {"uri": documentUri},
-                "position": Position.parse(position).toDict()
-            }
-        )
+    async def textDocumentGotoDefinition(self, documentUri: str, position: Union[Tuple[int, int], Position],
+                                         requestParamsOverride: dict = None):
+        requestParams = {
+            "textDocument": {"uri": documentUri},
+            "position": Position.parse(position).toDict()
+        }
+        if requestParamsOverride:
+            requestParams.update(requestParamsOverride)
+        result = await self.request("textDocument/definition", requestParams)
         if not result:
             return []
         if isinstance(result, Iterable):
             return [Location.fromDict(r) for r in result]
         return [Location.fromDict(result)]
 
-    async def textDocumentGetSymbols(self, documentUri: str) -> List[DocumentSymbol]:
-        result = await self.request("textDocument/documentSymbol", {"textDocument": {"uri": documentUri}})
+    async def textDocumentGetSymbols(self, documentUri: str, requestParamsOverride: dict = None) -> List[DocumentSymbol]:
+        requestParams = {"textDocument": {"uri": documentUri}}
+        if requestParamsOverride:
+            requestParams.update(requestParamsOverride)
+        result = await self.request("textDocument/documentSymbol", requestParams)
         if not result:
             return []
 

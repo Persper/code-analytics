@@ -97,4 +97,5 @@ ENV/
 /bin
 /bin-*
 .pytest_cache
-test/test_analytics/actualdump
+/test/test_analytics/actualdump
+/test_scripts

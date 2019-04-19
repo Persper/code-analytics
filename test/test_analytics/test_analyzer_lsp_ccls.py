@@ -6,7 +6,6 @@ import subprocess
 from pathlib import Path
 from tempfile import mkdtemp
 
-import networkx.readwrite.json_graph
 import pytest
 from git import Commit
 from networkx import Graph
@@ -20,9 +19,13 @@ from persper.util.path import root_path
 from .utility.graph_baseline import GraphDumpAnalyzerObserver
 
 # Whether we are generating graph dump baseline, rather than testing for regression.
-IS_GENERATING_BASELINE = True
+IS_GENERATING_BASELINE = False
 
+logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger()
+
+if IS_GENERATING_BASELINE:
+    _logger.warning("We are generating graph dump baseline.")
 
 testDataRoot = os.path.dirname(os.path.abspath(__file__))
 

@@ -3,6 +3,7 @@ ccls client-side LSP support.
 """
 import logging
 import os
+import time
 from asyncio import sleep
 from pathlib import Path, PurePath
 from typing import List, Union
@@ -44,6 +45,13 @@ class CclsInfo(LspContractObject):
 class CclsLspServerStub(LspServerStub):
     def __init__(self, endpoint: Endpoint):
         super().__init__(endpoint)
+
+    def textDocumentGetSymbols(self, *args, **kwargs):
+        if kwargs == None:
+            kwargs = {}
+        if "requestParamsOverride" not in kwargs:
+            kwargs["requestParamsOverride"] = {}
+        return super().textDocumentGetSymbols(*args, **kwargs)
 
     async def cclsInfo(self):
         """
@@ -106,6 +114,7 @@ class CclsCallGraphBuilder(CallGraphBuilder):
             raise TypeError("lspClient should be an instance of CclsLspClient.")
         super().__init__(lspClient)
         self._lspClient: CclsLspClient
+        self._openDocumentWaitDuration = 0
 
     def createLexer(self, fileStream: FileStream):
         return CPP14Lexer(fileStream)
@@ -138,9 +147,11 @@ class CclsCallGraphBuilder(CallGraphBuilder):
 
     async def openDocument(self, textDoc: TextDocument):
         self._lspClient.server.textDocumentDidOpen(textDoc)
+        t1 = time.monotonic()
         while True:
             try:
                 await self._waitForJobs()
+                self._openDocumentWaitDuration += time.monotonic() - t1
                 return True
             except JsonRpcException as ex:
                 if ex.code == -32002:
@@ -150,6 +161,10 @@ class CclsCallGraphBuilder(CallGraphBuilder):
                     _logger.warning("The file seems invalid. Server error: %s", ex.message)
                     return False
                 raise
+
+    def logOpenDocumentWaitDuration(self):
+        _logger.info("openDocument waitForJobs takes %.2f s.", self._openDocumentWaitDuration)
+        self._openDocumentWaitDuration = 0
 
 
 class CclsGraphServer(LspClientGraphServer):
@@ -163,7 +178,9 @@ class CclsGraphServer(LspClientGraphServer):
                  graph: CallCommitGraph = None):
         super().__init__(workspaceRoot, languageServerCommand=languageServerCommand,
                          dumpLogs=dumpLogs, graph=graph)
-        self._cacheRoot = Path(cacheRoot).resolve() if cacheRoot else self._workspaceRoot.joinpath(".ccls-cache")
+        if cacheRoot == True:
+            cacheRoot = self._workspaceRoot.joinpath(".ccls-cache")
+        self._cacheRoot = Path(cacheRoot).resolve() if cacheRoot else None
         self._c_requireScopeDefinitionMatch = True
 
     async def startLspClient(self):
@@ -176,11 +193,14 @@ class CclsGraphServer(LspClientGraphServer):
             initializationOptions={"cacheDirectory": str(self._cacheRoot),
                                    "diagnostics": {"onParse": False, "onType": False},
                                    "discoverSystemIncludes": True,
-                                   "enableCacheRead": True,
-                                   "enableCacheWrite": True,
+                                   "enableCacheRead": self._cacheRoot != None,
+                                   "enableCacheWrite": self._cacheRoot != None,
                                    "clang": {
                                        "excludeArgs": [],
-                                       "extraArgs": ["-nocudalib"],
+                                       "extraArgs": [
+                                           "-nocudalib",
+                                           "-fno-delayed-template-parsing"      # fix for not parsing templates on windows-msvc
+                                       ],
                                        "pathMappings": [],
                                        "resourceDir": ""
             },
@@ -198,3 +218,21 @@ class CclsGraphServer(LspClientGraphServer):
             str(self._workspaceRoot.joinpath("**/*.[Cc][Xx][Xx]"))
         ]
         self._callGraphManager = CallGraphManager(self._callGraphBuilder, self._callGraph)
+
+    def _orderAffectedFiles(self, paths: List[Path]):
+        # put cpp files ahead of h files to ensure h files are parsed correctly (e.g. stdafx.h/pch.h)
+        otherFiles = []
+        for p in paths:
+            p: Path
+            if p.name.endswith(".c") or p.name.endswith(".cc") or p.name.endswith(".cpp"):
+                yield p
+            else:
+                otherFiles.append(p)
+        for p in otherFiles:
+            yield p
+
+    async def end_commit(self, hexsha: str):
+        try:
+            await super().end_commit(hexsha)
+        finally:
+            self._callGraphBuilder.logOpenDocumentWaitDuration()
