@@ -1,34 +1,30 @@
 from abc import ABC, abstractclassmethod, abstractproperty
-from typing import IO, Iterable
+from typing import IO, Iterable, Union, List
+
 from aenum import IntFlag
 
 
-class CommitInfo():
+class IRepositoryWorkspaceFileFilter(ABC):
     """
-    An immutable (git) commit information.
+    Provides functionality for filtering files and folders by their name and path in the workspace.
     """
+    @abstractclassmethod
+    def filter_file(self, file_name: str, file_path: str) -> bool:
+        """
+        Tests whether the specified file passes the filter.
+        remarks
+            The caller of this function does not guarantee the parent folder of the file passes the filter.
+        """
+        return False
 
-    def __init__(self, hexsha: str = None, message: str = None, author_name: str = None, author_email: str = None):
-        self._hexsha = hexsha
-        self._message = message
-        self._author_name = author_name
-        self._author_email = author_email
-
-    @property
-    def hexsha(self):
-        return self._hexsha
-
-    @property
-    def message(self):
-        return self._message
-
-    @property
-    def author_name(self):
-        return self._author_name
-
-    @property
-    def author_email(self):
-        return self._author_email
+    @abstractclassmethod
+    def filter_folder(self, folder_name: str, folder_path) -> bool:
+        """
+        Tests whether the specified folder passes the filter.
+        remarks
+            This method is usually provided for pruning by folders during traversing.
+        """
+        return False
 
 
 class IFileInfo(ABC):
@@ -66,6 +62,58 @@ class IFileInfo(ABC):
 
     @abstractproperty
     def raw_content_stream(self) -> IO:
+        pass
+
+
+class ICommitInfo(ABC):
+    """
+    A commit information.
+    """
+
+    @abstractproperty
+    def hexsha(self) -> str:
+        return ""
+
+    @abstractproperty
+    def message(self) -> str:
+        return ""
+
+    @abstractproperty
+    def author_name(self) -> str:
+        return ""
+
+    @abstractproperty
+    def author_email(self) -> str:
+        return ""
+
+    @abstractproperty
+    def parents(self) -> List[ICommitInfo]:
+        """
+        Gets the parent commits of the current commit.
+        """
+        return None
+
+    @abstractclassmethod
+    def get_files(self, filter: IRepositoryWorkspaceFileFilter = None) -> Iterable[IFileInfo]:
+        """
+        Enumerates all the files in the current commit.
+        """
+        pass
+
+    @abstractclassmethod
+    def diff_from(self, base_commit_ref: Union[str, ICommitInfo],
+                  current_commit_filter: IRepositoryWorkspaceFileFilter = None,
+                  base_commit_filter: IRepositoryWorkspaceFileFilter = None) -> Iterable[IFileDiff]:
+        """
+        Compares the current commit to the specified commit.
+        params
+            base_commit_ref: Base commit ref or `ICommitInfo` to perform diff from. Use `None` for empty tree.
+            current_commit_filter: Used to filter workspace files of current commit.
+            base_commit_filter: Used to filter workspace files of base commit.
+        remarks
+            If a file has been renamed and/or it cannot pass either one of `current_commit_filter` and `base_commit_filter`,
+            the returned `IFileDiff` will be as if the file does not exists in current commit or base commit.
+        """
         pass
 
 
@@ -110,52 +158,15 @@ class IRepositoryHistoryProvider(ABC):
     Provides functionality for accessing commit history of a specified commit.
     """
     @abstractclassmethod
-    def enum_commits(self, origin_commit_ref: str, terminal_commit_ref: str) -> Iterable[CommitInfo]:
+    def get_commit_info(self, commit_ref: str) -> ICommitInfo:
+        pass
+
+    @abstractclassmethod
+    def enum_commits(self, origin_commit_ref: str, terminal_commit_ref: str) -> Iterable[ICommitInfo]:
         """
         Enumerates commits between the specified commit refs.
         params
             origin_commit_ref: commit ref from which to start enumeration. Use `None` to indicate the first commit.
             terminal_commit_ref: commit ref at which to end enumeration (inclusive). Use `master`/`HEAD` to indicate the latest commit.
         """
-        pass
-
-
-class IRepositoryWorkspaceFileFilter(ABC):
-    """
-    Provides functionality for filtering files and folders by their name and path in the workspace.
-    """
-    @abstractclassmethod
-    def filter_file(self, file_name: str, file_path: str) -> bool:
-        """
-        Tests whether the specified file passes the filter.
-        remarks
-            The caller of this function does not guarantee the parent folder of the file passes the filter.
-        """
-        return False
-
-    @abstractclassmethod
-    def filter_folder(self, folder_name: str, folder_path) -> bool:
-        """
-        Tests whether the specified folder passes the filter.
-        remarks
-            This method is usually provided for pruning by folders during traversing.
-        """
-        return False
-
-
-class IRepositoryWorkspaceProvider(ABC):
-    """
-    Provides functionality for accessing the workspace files and their diff of the specified commit ref.
-    """
-    @abstractclassmethod
-    def get_commit_info(self, commit_ref: str) -> CommitInfo:
-        pass
-
-    @abstractclassmethod
-    def get_files(self, commit_ref: str, filter: IRepositoryWorkspaceFileFilter = None) -> Iterable[IFileInfo]:
-        pass
-
-    def diff_between(self, base_commit_ref: str, current_commit_ref: str,
-                     base_commit_filter: IRepositoryWorkspaceFileFilter = None,
-                     current_commit_filter: IRepositoryWorkspaceFileFilter = None) -> Iterable[IFileDiff]:
         pass

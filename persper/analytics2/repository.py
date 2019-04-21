@@ -1,20 +1,21 @@
 import logging
 from io import TextIOWrapper
 from time import monotonic
+from typing import Union
 
 from git import Blob, Commit, Diff, DiffIndex, Repo
 
-from .abstractions.repository import (CommitInfo, FileDiffOperation, IFileDiff,
-                                      IFileInfo, IRepositoryHistoryProvider,
-                                      IRepositoryWorkspaceFileFilter,
-                                      IRepositoryWorkspaceProvider)
+from .abstractions.repository import (CommitInfo, FileDiffOperation,
+                                      ICommitInfo, IFileDiff, IFileInfo,
+                                      IRepositoryHistoryProvider,
+                                      IRepositoryWorkspaceFileFilter)
 
 _logger = logging.getLogger(__name__)
 
 EMPTY_TREE_SHA = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
-class GitRepository(IRepositoryHistoryProvider, IRepositoryWorkspaceProvider):
+class GitRepository(IRepositoryHistoryProvider):
     def __init__(self, repo_path: str, first_parent_only: bool = False):
         self._repo = Repo(repo_path)
         self._first_parent_only = first_parent_only
@@ -43,16 +44,52 @@ class GitRepository(IRepositoryHistoryProvider, IRepositoryWorkspaceProvider):
         _logger.debug("enum_commits starts on %s, first_parent=%s",
                       commitSpec, self._first_parent_only)
         for commit in self._repo.iter_commits(commitSpec, topo_order=True, reverse=True, first_parent=self._first_parent_only):
-            yield GitRepository._commit_info_from_commit(commit)
+            yield GitCommitInfo(commit)
         _logger.debug("enum_commits finishes on %s", commitSpec)
 
     def get_commit_info(self, commit_ref: str):
         commit = self._repo.rev_parse(commit_ref)
-        return GitRepository._commit_info_from_commit(commit)
+        return GitCommitInfo(commit)
 
-    def get_files(self, commit_ref: str, filter: IRepositoryWorkspaceFileFilter = None):
-        commit = self._repo.rev_parse(commit_ref)
 
+class GitCommitInfo(ICommitInfo):
+    """
+    An immutable (git) commit information.
+    """
+
+    def __init__(self, commit: Commit):
+        self._commit = commit
+        self._parents = None
+
+    @property
+    def hexsha(self):
+        return self._commit.hexsha
+
+    @property
+    def message(self):
+        return self._commit.message
+
+    @property
+    def author_name(self):
+        return self._commit.author.name
+
+    @property
+    def author_email(self):
+        return self._commit.author.email
+
+    @property
+    def parents(self):
+        if self._parents is None:
+            self._parents = [GitCommitInfo(c) for c in self._commit.parents]
+        return self._parents
+
+    def get_file(self, file_path: str):
+        blob = self._commit.tree[file_path]
+        if blob:
+            return GitFileInfo(blob)
+        return None
+
+    def get_files(self, filter: IRepositoryWorkspaceFileFilter = None):
         def filterPred(i: Blob, d):
             return i.type == "blob"
 
@@ -62,19 +99,21 @@ class GitRepository(IRepositoryHistoryProvider, IRepositoryWorkspaceProvider):
             elif i.type == "blob":
                 return filter and not filter.filter_file(i.name, i.path)
             return False
-        blobs = commit.tree.traverse() if not filter else commit.tree.traverse(
-            filterPred, prunePred)
+        blobs = self._commit.tree.traverse() if not filter \
+            else self._commit.tree.traverse(filterPred, prunePred)
         for blob in blobs:
             yield GitFileInfo(blob)
 
-    def diff_between(self, base_commit_ref: str, current_commit_ref: str,
-                     base_commit_filter: IRepositoryWorkspaceFileFilter = None,
-                     current_commit_filter: IRepositoryWorkspaceFileFilter = None):
+    def diff_from(self, base_commit_ref: Union[str, ICommitInfo],
+                  current_commit_filter: IRepositoryWorkspaceFileFilter = None,
+                  base_commit_filter: IRepositoryWorkspaceFileFilter = None):
+        if isinstance(base_commit_ref, ICommitInfo):
+            base_commit_ref = base_commit_ref.hexsha
         t0 = monotonic()
         diff_index = GitRepository._diff_with_commit(
-            self._repo, current_commit_ref, base_commit_ref)
+            self._repo, self._commit.hexsha, base_commit_ref)
         _logger.debug("diff_between %s and %s used %.2fs.",
-                      base_commit_ref, current_commit_ref, monotonic() - t0)
+                      base_commit_ref, self._commit.hexsha, monotonic() - t0)
         for diff in diff_index:
             hide_base_file = base_commit_filter and diff.a_blob and not base_commit_filter.filter_file(
                 diff.a_blob.name, diff.a_blob.path)
