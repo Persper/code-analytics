@@ -3,6 +3,8 @@ from typing import IO, Iterable, NoReturn
 
 from aenum import Enum
 
+from .repository import ICommitInfo
+
 
 class CommitAnalysisStopReason(Enum):
     _init_ = "value __doc__"
@@ -78,7 +80,7 @@ class ICommitAnalyzer(ABC):
         The implementation will decide where to put the analysis result.
     """
     @abstractclassmethod
-    def analyze(self, commit_ref: str) -> None:
+    def analyze(self, commit: ICommitInfo) -> None:
         pass
 
 
