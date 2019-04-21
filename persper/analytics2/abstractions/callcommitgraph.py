@@ -95,11 +95,11 @@ class IReadOnlyCallCommitGraph(ABC):
         return Edge()
 
     @abstractclassmethod
-    def get_nodes_count(language: str = None, from_id: NodeId = None, to_id: NodeId = None) -> Iterable[Edge]:
+    def get_nodes_count(name: str = None, language: str = None, from_id: NodeId = None, to_id: NodeId = None) -> Iterable[Node]:
         return None
 
     @abstractclassmethod
-    def enum_nodes(language: str = None, from_id: NodeId = None, to_id: NodeId = None) -> Iterable[Edge]:
+    def enum_nodes(name: str = None, language: str = None, from_id: NodeId = None, to_id: NodeId = None) -> Iterable[Node]:
         return None
 
     @abstractclassmethod

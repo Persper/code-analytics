@@ -4,7 +4,7 @@ from typing import IO, Iterable, Union, List
 from aenum import IntFlag
 
 
-class IRepositoryWorkspaceFileFilter(ABC):
+class IWorkspaceFileFilter(ABC):
     """
     Provides functionality for filtering files and folders by their name and path in the workspace.
     """
@@ -94,7 +94,7 @@ class ICommitInfo(ABC):
         return None
 
     @abstractclassmethod
-    def get_files(self, filter: IRepositoryWorkspaceFileFilter = None) -> Iterable[IFileInfo]:
+    def get_files(self, filter: IWorkspaceFileFilter = None) -> Iterable[IFileInfo]:
         """
         Enumerates all the files in the current commit.
         """
@@ -102,8 +102,8 @@ class ICommitInfo(ABC):
 
     @abstractclassmethod
     def diff_from(self, base_commit_ref: Union[str, ICommitInfo],
-                  current_commit_filter: IRepositoryWorkspaceFileFilter = None,
-                  base_commit_filter: IRepositoryWorkspaceFileFilter = None) -> Iterable[IFileDiff]:
+                  current_commit_filter: IWorkspaceFileFilter = None,
+                  base_commit_filter: IWorkspaceFileFilter = None) -> Iterable[IFileDiff]:
         """
         Compares the current commit to the specified commit.
         params
