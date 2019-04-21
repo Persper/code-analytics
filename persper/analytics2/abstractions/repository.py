@@ -150,6 +150,13 @@ class IFileDiff(ABC):
 
     @abstractproperty
     def patch(self) -> bytes:
+        """
+        Gets the (git) patch between old file and new file content.
+        remarks
+            This property might be unapplicable in certain situation,
+            (e.g. the old file / new file has been filtered out, while the other one filtered in)
+            in which case an Exception can be thrown.
+        """
         return b""
 
 

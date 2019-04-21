@@ -119,7 +119,8 @@ class GitCommitInfo(ICommitInfo):
                 diff.a_blob.name, diff.a_blob.path)
             hide_current_file = current_commit_filter and diff.b_blob and not current_commit_filter.filter_file(
                 diff.b_blob.name, diff.b_blob.path)
-            yield GitFileDiff(diff, hide_base_file, hide_current_file)
+            if not hide_base_file or not hide_current_file:
+                yield GitFileDiff(diff, hide_base_file, hide_current_file)
 
 
 class GitFileInfo(IFileInfo):
