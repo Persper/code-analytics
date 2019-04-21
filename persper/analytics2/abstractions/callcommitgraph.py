@@ -113,16 +113,16 @@ class IReadOnlyCallCommitGraph(ABC):
 
 class IWriteOnlyCallCommitGraph(ABC):
     @abstractclassmethod
-    def add_node(id: NodeId) -> bool:
-        return False
+    def add_node(id: NodeId) -> None:
+        pass
 
     @abstractclassmethod
-    def add_node_history(id: NodeId, commit_id: str, added_lines: int, removed_lines: int) -> bool:
-        return False
+    def add_node_history(id: NodeId, commit_id: str, added_lines: int, removed_lines: int) -> None:
+        pass
 
     @abstractclassmethod
-    def add_edge(commit_id: str, from_id: NodeId, to_id: NodeId) -> bool:
-        return False
+    def add_edge(commit_id: str, from_id: NodeId, to_id: NodeId) -> None:
+        pass
 
 
 class ICallCommitGraph(IReadOnlyCallCommitGraph, IWriteOnlyCallCommitGraph):
