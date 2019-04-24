@@ -3,7 +3,7 @@ from typing import IO, Iterable, NoReturn
 
 from aenum import Enum
 
-from .repository import ICommitInfo
+from persper.analytics2.abstractions.repository import ICommitInfo
 
 
 class CommitAnalysisStopReason(Enum):

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod, abstractproperty
 from typing import IO, Iterable, NamedTuple
 
-from .repository import ICommitInfo
+from persper.analytics2.abstractions.repository import ICommitInfo
 
 
 class NodeId(NamedTuple):

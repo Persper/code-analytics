@@ -5,10 +5,11 @@ from typing import Union
 
 from git import Blob, Commit, Diff, DiffIndex, Repo
 
-from .abstractions.repository import (CommitInfo, FileDiffOperation,
-                                      ICommitInfo, IFileDiff, IFileInfo,
-                                      IRepositoryHistoryProvider,
-                                      IRepositoryWorkspaceFileFilter)
+from persper.analytics2.abstractions.repository import (FileDiffOperation,
+                                                        ICommitInfo, IFileDiff,
+                                                        IFileInfo,
+                                                        IRepositoryHistoryProvider,
+                                                        IWorkspaceFileFilter)
 
 _logger = logging.getLogger(__name__)
 
@@ -89,7 +90,7 @@ class GitCommitInfo(ICommitInfo):
             return GitFileInfo(blob)
         return None
 
-    def get_files(self, filter: IRepositoryWorkspaceFileFilter = None):
+    def get_files(self, filter: IWorkspaceFileFilter = None):
         def filterPred(i: Blob, d):
             return i.type == "blob"
 
@@ -105,13 +106,13 @@ class GitCommitInfo(ICommitInfo):
             yield GitFileInfo(blob)
 
     def diff_from(self, base_commit_ref: Union[str, ICommitInfo],
-                  current_commit_filter: IRepositoryWorkspaceFileFilter = None,
-                  base_commit_filter: IRepositoryWorkspaceFileFilter = None):
+                  current_commit_filter: IWorkspaceFileFilter = None,
+                  base_commit_filter: IWorkspaceFileFilter = None):
         if isinstance(base_commit_ref, ICommitInfo):
             base_commit_ref = base_commit_ref.hexsha
         t0 = monotonic()
         diff_index = GitRepository._diff_with_commit(
-            self._repo, self._commit.hexsha, base_commit_ref)
+            self._commit.repo, self._commit.hexsha, base_commit_ref)
         _logger.debug("diff_between %s and %s used %.2fs.",
                       base_commit_ref, self._commit.hexsha, monotonic() - t0)
         for diff in diff_index:

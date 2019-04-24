@@ -87,23 +87,23 @@ class ICommitInfo(ABC):
         return ""
 
     @abstractproperty
-    def parents(self) -> List[ICommitInfo]:
+    def parents(self) -> List["ICommitInfo"]:
         """
         Gets the parent commits of the current commit.
         """
         return None
 
     @abstractmethod
-    def get_files(self, filter: IWorkspaceFileFilter = None) -> Iterable[IFileInfo]:
+    def get_files(self, filter: IWorkspaceFileFilter = None) -> Iterable["IFileInfo"]:
         """
         Enumerates all the files in the current commit.
         """
         pass
 
     @abstractmethod
-    def diff_from(self, base_commit_ref: Union[str, ICommitInfo],
+    def diff_from(self, base_commit_ref: Union[str, "ICommitInfo"],
                   current_commit_filter: IWorkspaceFileFilter = None,
-                  base_commit_filter: IWorkspaceFileFilter = None) -> Iterable[IFileDiff]:
+                  base_commit_filter: IWorkspaceFileFilter = None) -> Iterable["IFileDiff"]:
         """
         Compares the current commit to the specified commit.
         params

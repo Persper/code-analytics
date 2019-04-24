@@ -1,11 +1,12 @@
 from typing import Iterable
 
-from .abstractions.analyzers import (AnalysisStatus, ICommitAnalyzer,
-                                     IPostAnalyzer)
-from .abstractions.callcommitgraph import (IGraphServer,
-                                           IReadOnlyCallCommitGraph,
-                                           IWriteOnlyCallCommitGraph)
-from .abstractions.repository import ICommitInfo
+from persper.analytics2.abstractions.analyzers import (AnalysisStatus,
+                                                       ICommitAnalyzer,
+                                                       IPostAnalyzer)
+from persper.analytics2.abstractions.callcommitgraph import (IGraphServer,
+                                                             IReadOnlyCallCommitGraph,
+                                                             IWriteOnlyCallCommitGraph)
+from persper.analytics2.abstractions.repository import ICommitInfo
 
 
 class CallCommitGraphAnalyzer(ICommitAnalyzer):
