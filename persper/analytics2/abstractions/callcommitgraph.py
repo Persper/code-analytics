@@ -1,4 +1,4 @@
-from abc import ABC, abstractclassmethod, abstractproperty
+from abc import ABC, abstractmethod, abstractproperty
 from typing import IO, Iterable, NamedTuple
 
 from .repository import ICommitInfo
@@ -86,42 +86,42 @@ class Edge():
 
 
 class IReadOnlyCallCommitGraph(ABC):
-    @abstractclassmethod
-    def get_node(id: NodeId) -> Node:
+    @abstractmethod
+    def get_node(self, id: NodeId) -> Node:
         return Node()
 
-    @abstractclassmethod
-    def get_edge(from_id: NodeId, to_id: NodeId) -> Edge:
+    @abstractmethod
+    def get_edge(self, from_id: NodeId, to_id: NodeId) -> Edge:
         return Edge()
 
-    @abstractclassmethod
-    def get_nodes_count(name: str = None, language: str = None, from_id: NodeId = None, to_id: NodeId = None) -> Iterable[Node]:
+    @abstractmethod
+    def get_nodes_count(self, name: str = None, language: str = None, from_id: NodeId = None, to_id: NodeId = None) -> Iterable[Node]:
         return None
 
-    @abstractclassmethod
-    def enum_nodes(name: str = None, language: str = None, from_id: NodeId = None, to_id: NodeId = None) -> Iterable[Node]:
+    @abstractmethod
+    def enum_nodes(self, name: str = None, language: str = None, from_id: NodeId = None, to_id: NodeId = None) -> Iterable[Node]:
         return None
 
-    @abstractclassmethod
-    def get_edges_count(from_name: str = None, from_language: str = None, to_name: str = None, to_language: str = None) -> Iterable[Edge]:
+    @abstractmethod
+    def get_edges_count(self, from_name: str = None, from_language: str = None, to_name: str = None, to_language: str = None) -> Iterable[Edge]:
         return None
 
-    @abstractclassmethod
-    def enum_edges(from_name: str = None, from_language: str = None, to_name: str = None, to_language: str = None) -> Iterable[Edge]:
+    @abstractmethod
+    def enum_edges(self, from_name: str = None, from_language: str = None, to_name: str = None, to_language: str = None) -> Iterable[Edge]:
         return None
 
 
 class IWriteOnlyCallCommitGraph(ABC):
-    @abstractclassmethod
-    def add_node(id: NodeId) -> None:
+    @abstractmethod
+    def add_node(self, id: NodeId) -> None:
         pass
 
-    @abstractclassmethod
-    def add_node_history(id: NodeId, commit_id: str, added_lines: int, removed_lines: int) -> None:
+    @abstractmethod
+    def add_node_history(self, id: NodeId, commit_id: str, added_lines: int, removed_lines: int) -> None:
         pass
 
-    @abstractclassmethod
-    def add_edge(commit_id: str, from_id: NodeId, to_id: NodeId) -> None:
+    @abstractmethod
+    def add_edge(self, commit_id: str, from_id: NodeId, to_id: NodeId) -> None:
         pass
 
 
@@ -130,6 +130,6 @@ class ICallCommitGraph(IReadOnlyCallCommitGraph, IWriteOnlyCallCommitGraph):
 
 
 class IGraphServer(ABC):
-    @abstractclassmethod
+    @abstractmethod
     def update_graph(self, commit: ICommitInfo) -> None:
         pass

@@ -1,4 +1,4 @@
-from abc import ABC, abstractclassmethod, abstractproperty
+from abc import ABC, abstractmethod, abstractproperty
 from typing import IO, Iterable, Union, List
 
 from aenum import IntFlag
@@ -8,7 +8,7 @@ class IWorkspaceFileFilter(ABC):
     """
     Provides functionality for filtering files and folders by their name and path in the workspace.
     """
-    @abstractclassmethod
+    @abstractmethod
     def filter_file(self, file_name: str, file_path: str) -> bool:
         """
         Tests whether the specified file passes the filter.
@@ -17,7 +17,7 @@ class IWorkspaceFileFilter(ABC):
         """
         return False
 
-    @abstractclassmethod
+    @abstractmethod
     def filter_folder(self, folder_name: str, folder_path) -> bool:
         """
         Tests whether the specified folder passes the filter.
@@ -56,7 +56,7 @@ class IFileInfo(ABC):
     def raw_content(self) -> bytes:
         return b""
 
-    @abstractclassmethod
+    @abstractmethod
     def get_content_text(self, encoding: str = 'utf-8') -> str:
         return ""
 
@@ -93,14 +93,14 @@ class ICommitInfo(ABC):
         """
         return None
 
-    @abstractclassmethod
+    @abstractmethod
     def get_files(self, filter: IWorkspaceFileFilter = None) -> Iterable[IFileInfo]:
         """
         Enumerates all the files in the current commit.
         """
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def diff_from(self, base_commit_ref: Union[str, ICommitInfo],
                   current_commit_filter: IWorkspaceFileFilter = None,
                   base_commit_filter: IWorkspaceFileFilter = None) -> Iterable[IFileDiff]:
@@ -164,11 +164,11 @@ class IRepositoryHistoryProvider(ABC):
     """
     Provides functionality for accessing commit history of a specified commit.
     """
-    @abstractclassmethod
+    @abstractmethod
     def get_commit_info(self, commit_ref: str) -> ICommitInfo:
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def enum_commits(self, origin_commit_ref: str, terminal_commit_ref: str) -> Iterable[ICommitInfo]:
         """
         Enumerates commits between the specified commit refs.

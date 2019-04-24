@@ -1,4 +1,4 @@
-from abc import ABC, abstractclassmethod, abstractproperty
+from abc import ABC, abstractmethod, abstractproperty
 from typing import IO, Iterable, NoReturn
 
 from aenum import Enum
@@ -79,7 +79,7 @@ class ICommitAnalyzer(ABC):
     remarks
         The implementation will decide where to put the analysis result.
     """
-    @abstractclassmethod
+    @abstractmethod
     def analyze(self, commit: ICommitInfo) -> None:
         pass
 
@@ -89,6 +89,6 @@ class IPostAnalyzer(ABC):
     Provides functionality for doing post-analysis after the commit analysis ends due to
     completion or exception.
     """
-    @abstractclassmethod
+    @abstractmethod
     def analyze(self, status: AnalysisStatus) -> None:
         pass
