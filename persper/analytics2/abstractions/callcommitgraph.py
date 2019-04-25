@@ -27,23 +27,23 @@ class NodeHistoryItem:
 
 
 class Node:
-    def __init__(self, id: NodeId = None, added_by: str = None,
+    def __init__(self, id_: NodeId = None, added_by: str = None,
                  history: Iterable[NodeHistoryItem] = None, files: Iterable[str] = None):
-        self._id = id
+        self._id_ = id_
         self._added_by = added_by
         self._history = history or ()
         self._files = files or ()
 
     @property
-    def id(self) -> NodeId:
-        return self._id
+    def id_(self) -> NodeId:
+        return self._id_
 
-    @id.setter
-    def id(self, value: NodeId):
+    @id_.setter
+    def id_(self, value: NodeId):
         if value and not isinstance(value, NodeId):
             raise TypeError(
                 "Expect NodeId but {0} is given.".format(type(value)))
-        self._id = value
+        self._id_ = value
 
     @property
     def added_by(self) -> str:
@@ -76,10 +76,10 @@ class Node:
         self._files = value or ()
 
     def __repr__(self):
-        return "Node(id={0}, history=[{1}], files=[{2}])".format(self._id, len(self._history), len(self._files))
+        return "Node(id={0}, history=[{1}], files=[{2}])".format(self._id_, len(self._history), len(self._files))
 
     def __str__(self):
-        return str(self._id) or "<anonymous node>"
+        return str(self._id_) or "<anonymous node>"
 
 
 class Edge:
