@@ -76,7 +76,7 @@ class Node:
         self._files = value or ()
 
     def __repr__(self):
-        return "Node(id={0}, history=[{1}], files=[{2}])".format(self._id_, len(self._history), len(self._files))
+        return "Node(id_={0}, history=[{1}], files=[{2}])".format(self._id_, len(self._history), len(self._files))
 
     def __str__(self):
         return str(self._id_) or "<anonymous node>"
@@ -121,7 +121,7 @@ class Commit:
 
 class IReadOnlyCallCommitGraph(ABC):
     @abstractmethod
-    def get_node(self, id: NodeId) -> Node:
+    def get_node(self, id_: NodeId) -> Node:
         pass
 
     @abstractmethod
@@ -159,16 +159,16 @@ class IReadOnlyCallCommitGraph(ABC):
 
 class IWriteOnlyCallCommitGraph(ABC):
     @abstractmethod
-    def add_node(self, id: NodeId, commit_hex_sha: str) -> None:
+    def add_node(self, id_: NodeId, commit_hex_sha: str) -> None:
         """Add Node
-        :param id:
+        :param id_:
         :param commit_hex_sha: if added_by is not set
         :return:
         """
         pass
 
     @abstractmethod
-    def add_node_history(self, id: NodeId, commit_hex_sha: str, added_lines: int, removed_lines: int) -> None:
+    def add_node_history(self, id_: NodeId, commit_hex_sha: str, added_lines: int, removed_lines: int) -> None:
         """Add Node History
         if commit_hex_sha doesn't exist in history, add the entry to history.
         if commit_hex_sha exists in history, sum existing added_lines/removed_lines and new one
@@ -176,7 +176,7 @@ class IWriteOnlyCallCommitGraph(ABC):
         pass
 
     @abstractmethod
-    def add_node_file(self, id: NodeId, file: str) -> None:
+    def add_node_file(self, id_: NodeId, file: str) -> None:
         pass
 
     @abstractmethod
