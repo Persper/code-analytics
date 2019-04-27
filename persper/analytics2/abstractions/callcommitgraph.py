@@ -188,6 +188,7 @@ class IWriteOnlyCallCommitGraph(ABC):
                    committer_email: str, committer_name: str, commit_date: str, message: str) -> None:
         pass
 
+    @abstractmethod
     def add_commit_parent(self, hex_sha: str, parent: str) -> None:
         pass
 
