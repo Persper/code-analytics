@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod, abstractproperty
-from typing import IO, Iterable, NamedTuple
+from typing import IO, Collection, Iterable, NamedTuple
 
 from persper.analytics2.abstractions.repository import ICommitInfo
 
@@ -13,40 +13,52 @@ class NodeId(NamedTuple):
 
 
 class NodeHistoryItem:
-    def __init__(self, commit_id: str = None, added_lines: int = 0, removed_lines: int = 0):
-        self.commit_id = commit_id
+    """
+    Represents an entry of node history, indicated by the commit hexsha and modified lines of code.
+    """
+    def __init__(self, hexsha: str = None, added_lines: int = 0, removed_lines: int = 0):
+        self.hexsha = hexsha
         self.added_lines = added_lines
         self.removed_lines = removed_lines
 
     def __repr__(self):
-        return "NodeHistoryItem(commit_id={0}, added_lines={1}, removed_lines={2})". \
-            format(self.commit_id, self.added_lines, self.removed_lines)
+        return "NodeHistoryItem(hexsha={0}, added_lines={1}, removed_lines={2})". \
+            format(self.hexsha, self.added_lines, self.removed_lines)
 
     def __str__(self):
-        return "{0}: +{1}, -{2}".format(self.commit_id, self.added_lines, self.removed_lines)
+        return "{0}: +{1}, -{2}".format(self.hexsha, self.added_lines, self.removed_lines)
 
 
 class Node:
-    def __init__(self, id_: NodeId = None, added_by: str = None,
-                 history: Iterable[NodeHistoryItem] = None, files: Iterable[str] = None):
-        self._id_ = id_
-        self._added_by = added_by
-        self._history = history or ()
-        self._files = files or ()
+    """
+    Represents a node in the call commit graph.
+    remarks
+        The modifications made to this class are not guaranteed to be persisted
+        to the call commit graph. Use `IWriteOnlyCallCommitGraph` to make such changes.
+    """
+    def __init__(self, node_id: NodeId = None, added_by: str = None,
+                 history: Collection[NodeHistoryItem] = None, files: Collection[str] = None):
+        self.node_id = node_id
+        self.added_by = added_by
+        self.history = history or ()
+        self.files = files or ()
 
     @property
-    def id_(self) -> NodeId:
-        return self._id_
+    def node_id(self) -> NodeId:
+        return self._node_id
 
-    @id_.setter
-    def id_(self, value: NodeId):
+    @node_id.setter
+    def node_id(self, value: NodeId):
         if value and not isinstance(value, NodeId):
             raise TypeError(
                 "Expect NodeId but {0} is given.".format(type(value)))
-        self._id_ = value
+        self._node_id = value
 
     @property
     def added_by(self) -> str:
+        """
+        Gets the commit hexsha that first added this node.
+        """
         return self._added_by
 
     @added_by.setter
@@ -54,14 +66,14 @@ class Node:
         self._added_by = value
 
     @property
-    def history(self) -> Iterable[NodeHistoryItem]:
+    def history(self) -> Collection[NodeHistoryItem]:
         return self._history
 
     @history.setter
-    def history(self, value: Iterable[NodeHistoryItem]):
-        if value and not isinstance(value, Iterable):
+    def history(self, value: Collection[NodeHistoryItem]):
+        if value and not isinstance(value, Collection):
             raise TypeError(
-                "Expect Iterable[NodeHistoryItem] but {0} is given.".format(type(value)))
+                "Expect Collection[NodeHistoryItem] but {0} is given.".format(type(value)))
         self._history = value or ()
 
     @property
@@ -69,24 +81,30 @@ class Node:
         return self._history
 
     @files.setter
-    def files(self, value: Iterable[str]):
-        if value and not isinstance(value, Iterable):
+    def files(self, value: Collection[str]):
+        if value and not isinstance(value, Collection):
             raise TypeError(
-                "Expect Iterable[str] but {0} is given.".format(type(value)))
+                "Expect Collection[str] but {0} is given.".format(type(value)))
         self._files = value or ()
 
     def __repr__(self):
-        return "Node(id_={0}, history=[{1}], files=[{2}])".format(self._id_, len(self._history), len(self._files))
+        return "Node(node_id={0}, history=[{1}], files=[{2}])".format(self._node_id, len(self._history), len(self._files))
 
     def __str__(self):
-        return str(self._id_) or "<anonymous node>"
+        return str(self._node_id) or "<anonymous node>"
 
 
 class Edge:
+    """
+    Represents an edge in the call commit graph.
+    remarks
+        The modifications made to this class are not guaranteed to be persisted
+        to the call commit graph. Use `IWriteOnlyCallCommitGraph` to make such changes.
+    """
     def __init__(self, from_id: NodeId = None, to_id: NodeId = None, added_by: str = None):
         self.from_id = from_id
+        # Gets the commit hexsha that first added this edge.
         self.to_id = to_id
-        # added_by is a commit ID
         self.added_by = added_by
 
     def __repr__(self):
@@ -97,10 +115,16 @@ class Edge:
 
 
 class Commit:
-    def __init__(self, hex_sha: str, author_email: str, author_name: str, author_date: str,
+    """
+    Represents a commit in the call commit graph storage.
+    remarks
+        The modifications made to this class are not guaranteed to be persisted
+        to the call commit graph. Use `IWriteOnlyCallCommitGraph` to make such changes.
+    """
+    def __init__(self, hexsha: str, author_email: str, author_name: str, author_date: str,
                  committer_email: str, committer_name: str, commit_date: str, message: str,
                  parent: Iterable[str] = None):
-        self.hex_sha = hex_sha
+        self.hexsha = hexsha
         self.author_email = author_email
         self.author_name = author_name
         self.author_date = author_date
@@ -149,7 +173,7 @@ class IReadOnlyCallCommitGraph(ABC):
         pass
 
     @abstractmethod
-    def get_commit(self, hex_sha: str) -> Commit:
+    def get_commit(self, hexsha: str) -> Commit:
         pass
 
     @abstractmethod
@@ -159,41 +183,47 @@ class IReadOnlyCallCommitGraph(ABC):
 
 class IWriteOnlyCallCommitGraph(ABC):
     @abstractmethod
-    def add_node(self, id_: NodeId, commit_hex_sha: str) -> None:
-        """Add Node
-        :param id_:
-        :param commit_hex_sha: if added_by is not set
-        :return:
+    def update_node_history(self, node_id: NodeId, commit_hexsha: str, added_lines: int, removed_lines: int) -> None:
+        """
+        Sets or replaces the modification information of the specified node ID and commit hexsha.
+        remarks
+            If the node does not exist, it will be created.
+            If commit_hexsha doesn't exist in history, add the entry to history.
+            If commit_hexsha exists in history, the entry will be replaced.
         """
         pass
 
     @abstractmethod
-    def add_node_history(self, id_: NodeId, commit_hex_sha: str, added_lines: int, removed_lines: int) -> None:
-        """Add Node History
-        if commit_hex_sha doesn't exist in history, add the entry to history.
-        if commit_hex_sha exists in history, sum existing added_lines/removed_lines and new one
+    def update_node_files(self, node_id: NodeId, files: Iterable[str]) -> None:
+        """
+        Updates the list of files that contains this node in the latest commit.
+        This method will replace the whole file list.
         """
         pass
 
     @abstractmethod
-    def add_node_file(self, id_: NodeId, file: str) -> None:
+    def add_edge(self, from_id: NodeId, to_id: NodeId, commit_hexsha: str) -> None:
+        """
+        Adds an edge connecting 2 nodes on the specified commit hexsha in the call commit graph.
+        It will do nothing if the specified edge already exists.
+        remarks
+            The nodes will be created it either of them does not exist.
+        """
         pass
 
     @abstractmethod
-    def add_edge(self, from_id: NodeId, to_id: NodeId, commit_hex_sha: str) -> None:
-        pass
-
-    @abstractmethod
-    def add_commit(self, hex_sha: str, author_email: str, author_name: str, author_date: str,
-                   committer_email: str, committer_name: str, commit_date: str, message: str) -> None:
-        pass
-
-    @abstractmethod
-    def add_commit_parent(self, hex_sha: str, parent: str) -> None:
+    def update_commit(self, commit: Commit) -> None:
+        """
+        Adds a commit to the call commit graph.
+        It will replace the existing commit if the specified commit hexsha already exists.
+        """
         pass
 
     @abstractmethod
     def flush(self) -> None:
+        """
+        Ensures all the pending underlying write operations have been performed.
+        """
         pass
 
 
