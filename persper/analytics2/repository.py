@@ -22,10 +22,6 @@ class GitRepository(IRepositoryHistoryProvider):
         self._first_parent_only = first_parent_only
 
     @staticmethod
-    def _commit_info_from_commit(commit: Commit):
-        return CommitInfo(commit.hexsha, commit.message, commit.author.name, commit.author.email)
-
-    @staticmethod
     def _diff_with_commit(repo: Repo, current_commit: str, base_commit_sha: str):
         if not base_commit_sha:
             base_commit = repo.tree(EMPTY_TREE_SHA)
