@@ -145,7 +145,7 @@ class IReadOnlyCallCommitGraph(ABC):
     Represents a read-only call commit graph.
     """
     @abstractmethod
-    def get_node(self, id_: NodeId) -> Node:
+    def get_node(self, node_id: NodeId) -> Node:
         """
         Try to get a node from its specified node ID.
         """
