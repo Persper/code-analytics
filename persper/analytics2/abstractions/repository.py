@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod, abstractproperty
-from typing import IO, Iterable, Union, List
+from datetime import datetime
+from typing import IO, Iterable, List, Union
 
 from aenum import IntFlag
 
@@ -85,6 +86,22 @@ class ICommitInfo(ABC):
     @abstractproperty
     def author_email(self) -> str:
         return ""
+
+    @abstractproperty
+    def authored_time(self) -> datetime:
+        return datetime(2000, 1, 1)
+
+    @abstractproperty
+    def committer_name(self) -> str:
+        return ""
+
+    @abstractproperty
+    def committer_email(self) -> str:
+        return ""
+
+    @abstractproperty
+    def committed_time(self) -> datetime:
+        return datetime(2000, 1, 1)
 
     @abstractproperty
     def parents(self) -> List["ICommitInfo"]:

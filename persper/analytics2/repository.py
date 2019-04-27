@@ -75,6 +75,22 @@ class GitCommitInfo(ICommitInfo):
         return self._commit.author.email
 
     @property
+    def authored_time(self):
+        return self._commit.authored_datetime
+
+    @property
+    def committer_name(self):
+        return self._commit.committer.name
+
+    @property
+    def committer_email(self):
+        return self._commit.committer.email
+
+    @property
+    def committed_time(self):
+        return self._commit.committed_datetime
+
+    @property
     def parents(self):
         if self._parents is None:
             self._parents = [GitCommitInfo(c) for c in self._commit.parents]

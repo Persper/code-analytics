@@ -126,16 +126,16 @@ class Commit:
         to the call commit graph. Use `IWriteOnlyCallCommitGraph` to make such changes.
     """
 
-    def __init__(self, hexsha: str, author_email: str, author_name: str, author_date: datetime,
-                 committer_email: str, committer_name: str, commit_date: datetime, message: str,
-                 parents: Iterable[str] = None):
+    def __init__(self, hexsha: str, author_email: str, author_name: str, authored_time: datetime,
+                 committer_email: str, committer_name: str, committed_time: datetime,
+                 message: str, parents: Iterable[str] = None):
         self.hexsha = hexsha
         self.author_email = author_email
         self.author_name = author_name
-        self.author_date = author_date
+        self.authored_time = authored_time
         self.committer_email = committer_email
         self.committer_name = committer_name
-        self.commit_date = commit_date
+        self.committed_time = committed_time
         self.message = message
         self.parents = parents or ()
 
