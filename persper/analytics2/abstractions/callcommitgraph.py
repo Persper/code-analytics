@@ -40,8 +40,8 @@ class Node:
                  history: Collection[NodeHistoryItem] = None, files: Collection[str] = None):
         self.node_id = node_id
         self.added_by = added_by
-        self.history = history or ()
-        self.files = files or ()
+        self.history = [] if history == None else history
+        self.files = [] if files == None else files
 
     @property
     def node_id(self) -> NodeId:
