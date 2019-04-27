@@ -128,7 +128,7 @@ class Commit:
 
     def __init__(self, hexsha: str, author_email: str, author_name: str, author_date: datetime,
                  committer_email: str, committer_name: str, commit_date: datetime, message: str,
-                 parent: Iterable[str] = None):
+                 parents: Iterable[str] = None):
         self.hexsha = hexsha
         self.author_email = author_email
         self.author_name = author_name
@@ -137,36 +137,71 @@ class Commit:
         self.committer_name = committer_name
         self.commit_date = commit_date
         self.message = message
-        self.parent = parent or ()
+        self.parents = parents or ()
 
 
 class IReadOnlyCallCommitGraph(ABC):
+    """
+    Represents a read-only call commit graph.
+    """
     @abstractmethod
     def get_node(self, id_: NodeId) -> Node:
+        """
+        Try to get a node from its specified node ID.
+        """
         pass
 
     @abstractmethod
-    def enum_nodes(self, name: str = None, language: str = None, from_id: NodeId = None, to_id: NodeId = None) -> \
-            Iterable[Node]:
+    def enum_nodes(self, name: str = None, language: str = None,
+                   from_id: NodeId = None, to_id: NodeId = None) -> Iterable[Node]:
+        """
+        Enumerates all the nodes that satisfy the given filter condition(s).
+        params
+            name: filter by node name.
+            language: filter by node language.
+            from_id: filter by the corresponding call site node.
+            to_id: filter by the corresponding defintion node.
+        """
         pass
 
     @abstractmethod
-    def get_nodes_count(self, name: str = None, language: str = None, from_id: NodeId = None,
-                        to_id: NodeId = None) -> int:
+    def get_nodes_count(self, name: str = None, language: str = None,
+                        from_id: NodeId = None, to_id: NodeId = None) -> int:
+        """
+        Gets the count of the nodes that satisfy the given filter condition(s).
+        params
+            See `enum_nodes` for more information.
+        """
         pass
 
     @abstractmethod
     def get_edge(self, from_id: NodeId, to_id: NodeId) -> Edge:
+        """
+        Gets the edge connecting the specified nodes indicated by node ID.
+        """
         pass
 
     @abstractmethod
-    def enum_edges(self, from_name: str = None, from_language: str = None, to_name: str = None,
-                   to_language: str = None) -> Iterable[Edge]:
+    def enum_edges(self, from_name: str = None, from_language: str = None,
+                   to_name: str = None, to_language: str = None) -> Iterable[Edge]:
+        """
+        Enumerates all the edges that satisfy the given filter condition(s).
+        params
+            from_name: filter by call site node name.
+            from_language: filter by call site node language.
+            to_name: filter by defintion node name.
+            to_language: filter by defintion node language.
+        """
         pass
 
     @abstractmethod
-    def get_edges_count(self, from_name: str = None, from_language: str = None, to_name: str = None,
-                        to_language: str = None) -> int:
+    def get_edges_count(self, from_name: str = None, from_language: str = None,
+                        to_name: str = None, to_language: str = None) -> int:
+        """
+        Gets the count of all the edges that satisfy the given filter condition(s).
+        params
+            See `enum_edges` for more information.
+        """
         pass
 
     @abstractmethod
@@ -179,8 +214,11 @@ class IReadOnlyCallCommitGraph(ABC):
 
 
 class IWriteOnlyCallCommitGraph(ABC):
+    """
+    Represents a write-only call commit graph.
+    """
     @abstractmethod
-    def update_node_history(self, node_id: NodeId, commit_hexsha: str, added_lines: int, removed_lines: int) -> None:
+    def update_node_history(self, node_id: NodeId, commit_hexsha: str, added_lines: int = 0, removed_lines: int = 0) -> None:
         """
         Sets or replaces the modification information of the specified node ID and commit hexsha.
         remarks
@@ -203,6 +241,9 @@ class IWriteOnlyCallCommitGraph(ABC):
         """
         Adds an edge connecting 2 nodes on the specified commit hexsha in the call commit graph.
         It will do nothing if the specified edge already exists.
+        params
+            from_id: ID of the call site node.
+            to_id: ID of the defintion node.
         remarks
             The nodes will be created it either of them does not exist.
         """
@@ -225,10 +266,21 @@ class IWriteOnlyCallCommitGraph(ABC):
 
 
 class ICallCommitGraph(IReadOnlyCallCommitGraph, IWriteOnlyCallCommitGraph):
+    """
+    Represents a readable/writable call commit graph.
+    This is the recommended interface to implement for a common call commit graph.
+    """
     pass
 
 
 class IGraphServer(ABC):
+    """
+    Provides basic functionality to trigger the commit analysis on graph server. 
+    """
     @abstractmethod
     def update_graph(self, commit: ICommitInfo) -> None:
+        """
+        When implemented, updates the call commit graph with the information
+        provided by the current commit.
+        """
         pass
