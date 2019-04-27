@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod, abstractproperty
+from datetime import datetime
 from typing import IO, Collection, Iterable, NamedTuple
 
 from persper.analytics2.abstractions.repository import ICommitInfo
@@ -16,6 +17,7 @@ class NodeHistoryItem:
     """
     Represents an entry of node history, indicated by the commit hexsha and modified lines of code.
     """
+
     def __init__(self, hexsha: str = None, added_lines: int = 0, removed_lines: int = 0):
         self.hexsha = hexsha
         self.added_lines = added_lines
@@ -36,6 +38,7 @@ class Node:
         The modifications made to this class are not guaranteed to be persisted
         to the call commit graph. Use `IWriteOnlyCallCommitGraph` to make such changes.
     """
+
     def __init__(self, node_id: NodeId = None, added_by: str = None,
                  history: Collection[NodeHistoryItem] = None, files: Collection[str] = None):
         self.node_id = node_id
@@ -101,6 +104,7 @@ class Edge:
         The modifications made to this class are not guaranteed to be persisted
         to the call commit graph. Use `IWriteOnlyCallCommitGraph` to make such changes.
     """
+
     def __init__(self, from_id: NodeId = None, to_id: NodeId = None, added_by: str = None):
         self.from_id = from_id
         # Gets the commit hexsha that first added this edge.
@@ -121,8 +125,9 @@ class Commit:
         The modifications made to this class are not guaranteed to be persisted
         to the call commit graph. Use `IWriteOnlyCallCommitGraph` to make such changes.
     """
-    def __init__(self, hexsha: str, author_email: str, author_name: str, author_date: str,
-                 committer_email: str, committer_name: str, commit_date: str, message: str,
+
+    def __init__(self, hexsha: str, author_email: str, author_name: str, author_date: datetime,
+                 committer_email: str, committer_name: str, commit_date: datetime, message: str,
                  parent: Iterable[str] = None):
         self.hexsha = hexsha
         self.author_email = author_email
@@ -132,15 +137,7 @@ class Commit:
         self.committer_name = committer_name
         self.commit_date = commit_date
         self.message = message
-        self.parent = parent
-
-    @property
-    def parent(self) -> Iterable[str]:
-        return self.parent
-
-    @parent.setter
-    def parent(self, value: Iterable[str]):
-        self._parent = value
+        self.parent = parent or ()
 
 
 class IReadOnlyCallCommitGraph(ABC):
@@ -194,7 +191,7 @@ class IWriteOnlyCallCommitGraph(ABC):
         pass
 
     @abstractmethod
-    def update_node_files(self, node_id: NodeId, files: Iterable[str]) -> None:
+    def update_node_files(self, node_id: NodeId, added_files: Iterable[str] = None, removed_files: Iterable[str] = None) -> None:
         """
         Updates the list of files that contains this node in the latest commit.
         This method will replace the whole file list.
