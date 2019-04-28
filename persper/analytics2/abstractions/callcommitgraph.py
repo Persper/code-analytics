@@ -248,7 +248,7 @@ class IWriteOnlyCallCommitGraph(ABC):
     def update_node_files(self, node_id: NodeId, files: Iterable[str] = None) -> None:
         """
         Sets or replaces the list of files that contains this node in the latest commit.
-        This method will replace the whole file list.
+        Note that this method will replace the whole file list of the specified node.
         """
         pass
 
