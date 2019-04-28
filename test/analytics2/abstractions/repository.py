@@ -1,6 +1,6 @@
 from persper.analytics2.abstractions.repository import ICommitInfo, IRepositoryHistoryProvider, IFileDiff, FileDiffOperation
 from itertools import islice
-from datetime import datetime
+from datetime import datetime, timezone
 from random import randint
 import logging
 
@@ -32,13 +32,14 @@ def test_repository_history_provider(rhp: IRepositoryHistoryProvider):
         # Sanity check
         assert "@" in c.author_email
         assert "@" in c.committer_email
-        assert datetime(1990, 1, 1) <= c.authored_time <= datetime(2200, 1, 1)
-        assert datetime(1990, 1, 1) <= c.committed_time <= datetime(2200, 1, 1)
+        assert datetime(1990, 1, 1, tzinfo=timezone.utc) <= c.authored_time <= datetime(2200, 1, 1, tzinfo=timezone.utc)
+        assert datetime(1990, 1, 1, tzinfo=timezone.utc) <= c.committed_time <= datetime(
+            2200, 1, 1, tzinfo=timezone.utc)
         assert c.authored_time <= c.committed_time
 
     def getPathTuple(diff: IFileDiff):
-        return (diff.old_file.path if diff.old_file else None,
-                diff.new_file.path if diff.new_file else None)
+        return (diff.old_file.path if diff.old_file else "",
+                diff.new_file.path if diff.new_file else "")
 
     def reverseFileDiffOperation(op: FileDiffOperation):
         result = FileDiffOperation.Unchanged
@@ -48,12 +49,10 @@ def test_repository_history_provider(rhp: IRepositoryHistoryProvider):
             result |= FileDiffOperation.Added
         if op & FileDiffOperation.Modified:
             result |= FileDiffOperation.Modified
-        return op
+        return result
 
-    startIndex = randint(0, len(commits) - 2)
-    endIndex = randint(startIndex, len(commits))
     prevCommit: ICommitInfo = None
-    for c in islice(commits, startIndex, endIndex):
+    for c in islice(commits, 0, 100):
         # Diff with self
         diff = list(c.diff_from(c))
         assert len(diff) == 0
@@ -61,11 +60,14 @@ def test_repository_history_provider(rhp: IRepositoryHistoryProvider):
             diff = list(c.diff_from(prevCommit))
             diffr = list(prevCommit.diff_from(c))
             assert len(diff) == len(diffr)
-            diff.sort(getPathTuple)
-            diffr.sort(getPathTuple)
+            diff.sort(key=getPathTuple)
+            diffr.sort(key=getPathTuple)
             for d, dr in zip(diff, diffr):
                 assert isinstance(d, IFileDiff)
                 assert isinstance(dr, IFileDiff)
+                print(prevCommit, c)
+                print(d.old_file, d.new_file)
+                print(dr.old_file, dr.new_file)
                 assert (d.old_file != None) == (dr.new_file != None)
                 assert (d.new_file != None) == (dr.old_file != None)
                 path1, path2 = getPathTuple(d)

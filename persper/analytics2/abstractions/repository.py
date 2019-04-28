@@ -4,6 +4,12 @@ from typing import IO, Iterable, List, Union
 
 from aenum import IntFlag
 
+def repr_hexsha(hexsha: str):
+    if hexsha == None:
+        return "None"
+    if len(hexsha) >= 10:
+        return hexsha[:7] + "..."
+    return hexsha
 
 class IWorkspaceFileFilter(ABC):
     """
@@ -64,6 +70,9 @@ class IFileInfo(ABC):
     @abstractproperty
     def raw_content_stream(self) -> IO:
         pass
+
+    def __repr__(self):
+        return "{0}(path={1}, size={2})".format(type(self).__name__, self.path, self.size)
 
 
 class ICommitInfo(ABC):
@@ -132,6 +141,15 @@ class ICommitInfo(ABC):
             the returned `IFileDiff` will be as if the file does not exists in current commit or base commit.
         """
         pass
+
+    def __repr__(self):
+        m = self.message
+        mr = None
+        if len(m) > 10:
+            mr = repr(m[:10]) + "..."
+        else:
+            mr = repr(m)
+        return "{0}(hexsha={1}, message={2})".format(type(self).__name__, repr_hexsha(self.hexsha), mr)
 
 
 class FileDiffOperation(IntFlag):

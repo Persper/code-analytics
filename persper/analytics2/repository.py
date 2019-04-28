@@ -18,6 +18,12 @@ EMPTY_TREE_SHA = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 class GitRepository(IRepositoryHistoryProvider):
     def __init__(self, repo_path: str, first_parent_only: bool = False):
+        """
+        params
+            repo_path: Path to the local git repository.
+            first_parent_only: Whether to only traverse along the first parent of each commit.
+                                This will cause trunk commit will be traversed only.
+        """
         self._repo = Repo(repo_path)
         self._first_parent_only = first_parent_only
 
