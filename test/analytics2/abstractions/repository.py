@@ -1,8 +1,10 @@
-from persper.analytics2.abstractions.repository import ICommitInfo, IRepositoryHistoryProvider, IFileDiff, FileDiffOperation
-from itertools import islice
-from datetime import datetime, timezone
-from random import randint
 import logging
+from datetime import datetime, timezone
+from itertools import islice
+from random import randint
+
+from persper.analytics2.abstractions.repository import (
+    FileDiffOperation, ICommitInfo, IFileDiff, IRepositoryHistoryProvider)
 
 _logger = logging.getLogger(__file__)
 
@@ -11,11 +13,12 @@ def test_repository_history_provider(rhp: IRepositoryHistoryProvider):
     assert rhp
     # We enumerate from the beginning
     commits = list(islice(rhp.enum_commits(None, "HEAD"), 1000))
+    print("Retrieved {} commits.".format(len(commits)))
     if len(commits) < 2:
         _logger.warn("Skipped commit tests because there are too few commits in the repository.")
         return
     # First commit should not have parent
-    assert len(commits[0].parents) == 0
+    assert len(commits[0].parents) == 0, "First commit has parent. Are you using shallow-cloned repository?"
     seenCommits = set()
     for c in commits:
         assert isinstance(c, ICommitInfo)
@@ -49,6 +52,8 @@ def test_repository_history_provider(rhp: IRepositoryHistoryProvider):
             result |= FileDiffOperation.Added
         if op & FileDiffOperation.Modified:
             result |= FileDiffOperation.Modified
+        if op & FileDiffOperation.Renamed:
+            result |= FileDiffOperation.Renamed
         return result
 
     prevCommit: ICommitInfo = None
@@ -57,21 +62,21 @@ def test_repository_history_provider(rhp: IRepositoryHistoryProvider):
         diff = list(c.diff_from(c))
         assert len(diff) == 0
         if prevCommit != None:
+            print("Enter commit: prev={}, current={}".format(prevCommit, c))
             diff = list(c.diff_from(prevCommit))
             diffr = list(prevCommit.diff_from(c))
             assert len(diff) == len(diffr)
             diff.sort(key=getPathTuple)
-            diffr.sort(key=getPathTuple)
+            diffr.sort(key=lambda d: getPathTuple(d)[::-1])
+            print("Commit diffs={}".format(len(diff)))
             for d, dr in zip(diff, diffr):
                 assert isinstance(d, IFileDiff)
                 assert isinstance(dr, IFileDiff)
-                print(prevCommit, c)
-                print(d.old_file, d.new_file)
-                print(dr.old_file, dr.new_file)
+                print("File diff [d]: ", d)
+                print("File diff [dr]: ", dr)
                 assert (d.old_file != None) == (dr.new_file != None)
                 assert (d.new_file != None) == (dr.old_file != None)
-                path1, path2 = getPathTuple(d)
-                assert getPathTuple(dr) == (path2, path1)
+                assert getPathTuple(dr) == getPathTuple(d)[::-1]
                 assert d.operation == reverseFileDiffOperation(dr.operation)
                 if d.old_file:
                     assert d.old_file.size == dr.new_file.size

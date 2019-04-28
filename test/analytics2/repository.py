@@ -1,7 +1,6 @@
 import os.path
 import subprocess
-from test.analytics2.abstractions.repository import \
-    test_repository_history_provider
+import test.analytics2.abstractions.repository as repositoryhelper
 
 from persper.analytics2.repository import GitRepository
 from persper.util.path import root_path
@@ -21,5 +20,7 @@ def prepare_repository(repo_name: str):
 
 def test_git_repository():
     repoPath = prepare_repository("test_feature_branch")
+    # TODO introduce some really complex repo, such as
+    # repoPath = r"F:\WRS\testrepos\ccls"
     repo = GitRepository(repoPath)
-    test_repository_history_provider(repo)
+    repositoryhelper.test_repository_history_provider(repo)

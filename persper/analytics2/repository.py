@@ -1,15 +1,14 @@
 import logging
+import os.path
 from io import TextIOWrapper
 from time import monotonic
 from typing import Union
 
 from git import Blob, Commit, Diff, DiffIndex, Repo
 
-from persper.analytics2.abstractions.repository import (FileDiffOperation,
-                                                        ICommitInfo, IFileDiff,
-                                                        IFileInfo,
-                                                        IRepositoryHistoryProvider,
-                                                        IWorkspaceFileFilter)
+from persper.analytics2.abstractions.repository import (
+    FileDiffOperation, ICommitInfo, IFileDiff, IFileInfo,
+    IRepositoryHistoryProvider, IWorkspaceFileFilter)
 
 _logger = logging.getLogger(__name__)
 
@@ -123,58 +122,115 @@ class GitCommitInfo(ICommitInfo):
         for blob in blobs:
             yield GitFileInfo(blob)
 
-    def diff_from(self, base_commit_ref: Union[str, ICommitInfo],
+    def diff_from(self, base_commit: Union[str, ICommitInfo],
                   current_commit_filter: IWorkspaceFileFilter = None,
                   base_commit_filter: IWorkspaceFileFilter = None):
-        if isinstance(base_commit_ref, ICommitInfo):
-            base_commit_ref = base_commit_ref.hexsha
+        base_commit_hexsha = base_commit
+        if isinstance(base_commit, ICommitInfo):
+            base_commit_hexsha = base_commit.hexsha
+        base_commit_ref = base_commit_hexsha
+        if isinstance(base_commit, GitCommitInfo):
+            base_commit_ref = base_commit._commit
         t0 = monotonic()
         diff_index = GitRepository._diff_with_commit(
-            self._commit.repo, self._commit.hexsha, base_commit_ref)
+            self._commit.repo, self._commit.hexsha, base_commit_hexsha)
         _logger.debug("diff_between %s and %s used %.2fs.",
-                      base_commit_ref, self._commit.hexsha, monotonic() - t0)
+                      base_commit_hexsha, self._commit.hexsha, monotonic() - t0)
         for diff in diff_index:
             hide_base_file = base_commit_filter and diff.a_blob and not base_commit_filter.filter_file(
                 diff.a_blob.name, diff.a_blob.path)
             hide_current_file = current_commit_filter and diff.b_blob and not current_commit_filter.filter_file(
                 diff.b_blob.name, diff.b_blob.path)
             if not hide_base_file or not hide_current_file:
-                yield GitFileDiff(diff, hide_base_file, hide_current_file)
+                yield GitFileDiff(self._commit.repo, diff, base_commit_ref, self._commit, hide_base_file, hide_current_file)
 
 
 class GitFileInfo(IFileInfo):
-    def __init__(self, blob: Blob):
+    def __init__(self, blob: Blob = None, commit: Commit = None, path: str = None):
+        """
+        Initializes an instance either by an existing `Blob`, or the `Commit` and path reference.
+        """
+        if (blob != None) == (commit != None or path != None):
+            raise ValueError("Either blob or (commit, path) need to be set.")
         self._blob = blob
+        if commit != None or path != None:
+            if not (commit != None and path != None):
+                raise ValueError("commit and path should both be specified.")
+            self._commit = commit
+            self._path = path
+        self._is_missing = None
+
+    def _ensure_blob(self):
+        if not self._blob:
+            self._blob = self._commit.tree[self._path]
 
     @property
     def name(self) -> str:
-        return self._blob.name
+        if self._blob:
+            return self._blob.name
+        return os.path.basename(self._path)
 
     @property
     def path(self) -> str:
-        return self._blob.path
+        if self._blob:
+            return self._blob.path
+        return self._path
 
     @property
     def size(self) -> int:
+        self._ensure_blob()
+        if self.is_missing:
+            return None
         return self._blob.size
 
     @property
+    def hexsha(self):
+        self._ensure_blob()
+        return self._blob.hexsha
+
+    @property
     def raw_content(self) -> bytes:
+        self._ensure_blob()
+        if self.is_missing:
+            return None
         return self._blob.data_stream.read()
 
     def get_content_text(self, encoding: str = 'utf-8') -> str:
+        self._ensure_blob()
+        if self.is_missing:
+            return None
         with TextIOWrapper(self._blob.data_stream, encoding, "replace") as t:
             return t.read()
 
     @property
     def raw_content_stream(self):
+        self._ensure_blob()
+        if self.is_missing:
+            return None
         return self._blob.data_stream
+
+    @property
+    def is_missing(self):
+        """
+        Determine whether the file content is unavailable due to blob being missing.
+        Or the usual case is when the “file” is acually a submodule entrypoint.
+        """
+        if self._is_missing == None:
+            try:
+                x = self._blob.size
+                self._is_missing = False
+            except ValueError as ex:
+                if " missing" in str(ex):
+                    self._is_missing = True
+        return self._is_missing
 
 
 class GitFileDiff(IFileDiff):
     _LAZY_SENTINEL = object()
 
-    def __init__(self, diff: Diff, hide_old_file: bool = False, hide_new_file: bool = False):
+    def __init__(self, repo: Repo, diff: Diff,
+                 old_commit: Union[Commit, str], new_commit: Union[Commit, str],
+                 hide_old_file: bool = False, hide_new_file: bool = False):
         """
         params
             hide_old_file: whether to treat the old file as if it does not exist in base commit.
@@ -184,6 +240,18 @@ class GitFileDiff(IFileDiff):
         self._diff = diff
         self._old_file = GitFileDiff._LAZY_SENTINEL if not hide_old_file and diff.a_blob else None
         self._new_file = GitFileDiff._LAZY_SENTINEL if not hide_new_file and diff.b_blob else None
+        if diff.renamed_file:
+            # Renamed files with identical content may have None blob content in diff view.
+            if not hide_old_file and not diff.a_blob:
+                if not isinstance(old_commit, Commit):
+                    old_commit = repo.commit(old_commit)
+                self._old_file = GitFileInfo(
+                    commit=old_commit, path=diff.a_path)
+            if not hide_new_file and not diff.b_blob:
+                if not isinstance(new_commit, Commit):
+                    new_commit = repo.commit(new_commit)
+                self._new_file = GitFileInfo(
+                    commit=new_commit, path=diff.b_path)
         self._patch_applicable = not hide_old_file and not hide_new_file
         self._operation = FileDiffOperation.Unchanged
         if hide_old_file or diff.new_file:
@@ -191,8 +259,6 @@ class GitFileDiff(IFileDiff):
         if hide_new_file or diff.deleted_file:
             self._operation |= FileDiffOperation.Deleted
         if not hide_old_file and not hide_new_file and diff.renamed_file:
-            # GitPython ensured two Blob objects have different paths, even if they shares the same blob.
-            assert diff.a_blob.path != diff.b_blob.path
             self._operation |= FileDiffOperation.Renamed
         if not hide_old_file and not hide_new_file and diff.a_blob and diff.b_blob and diff.a_blob != diff.b_blob:
             self._operation |= FileDiffOperation.Modified

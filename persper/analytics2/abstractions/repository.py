@@ -4,12 +4,14 @@ from typing import IO, Iterable, List, Union
 
 from aenum import IntFlag
 
+
 def repr_hexsha(hexsha: str):
     if hexsha == None:
         return "None"
     if len(hexsha) >= 10:
         return hexsha[:7] + "..."
     return hexsha
+
 
 class IWorkspaceFileFilter(ABC):
     """
@@ -58,6 +60,13 @@ class IFileInfo(ABC):
         Gets the length of the file.
         """
         return -1
+
+    @abstractproperty
+    def hexsha(self) -> str:
+        """
+        Gets the hexsha of the file content, if available.
+        """
+        return ""
 
     @abstractproperty
     def raw_content(self) -> bytes:
@@ -193,6 +202,10 @@ class IFileDiff(ABC):
             in which case an Exception can be thrown.
         """
         return b""
+
+    def __repr__(self):
+        return "{0}(old_file={1}, new_file={2}, operation={3})".format(
+            type(self).__name__, self.old_file, self.new_file, str(self.operation))
 
 
 class IRepositoryHistoryProvider(ABC):
