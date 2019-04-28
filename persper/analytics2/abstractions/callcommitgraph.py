@@ -129,6 +129,7 @@ class Commit:
     def __init__(self, hexsha: str, author_email: str, author_name: str, authored_time: datetime,
                  committer_email: str, committer_name: str, committed_time: datetime,
                  message: str, parents: Iterable[str] = None):
+        # TODO We need to encapsulate the properties
         self.hexsha = hexsha
         self.author_email = author_email
         self.author_name = author_name
@@ -138,6 +139,15 @@ class Commit:
         self.committed_time = committed_time
         self.message = message
         self.parents = parents or ()
+
+    @staticmethod
+    def from_commit_info(commit_info: ICommitInfo):
+        """
+        Creates a new `Commit` instance from the information contained in `ICommitInfo`.
+        """
+        return Commit(commit_info.hexsha, commit_info.author_email, commit_info.author_name, commit_info.authored_time,
+                      commit_info.committer_email, commit_info.committer_name, commit_info.committed_time,
+                      commit_info.message, [p.hexsha for p in commit_info.parents])
 
 
 class IReadOnlyCallCommitGraph(ABC):
@@ -206,10 +216,16 @@ class IReadOnlyCallCommitGraph(ABC):
 
     @abstractmethod
     def get_commit(self, hexsha: str) -> Commit:
+        """
+        Tries to get the commit information with the specified hexsha.
+        """
         pass
 
     @abstractmethod
-    def get_commits(self) -> Iterable[Commit]:
+    def enum_commits(self) -> Iterable[Commit]:
+        """
+        Enumerates all the known commits in this call commit graph.
+        """
         pass
 
 
@@ -252,7 +268,7 @@ class IWriteOnlyCallCommitGraph(ABC):
     @abstractmethod
     def update_commit(self, commit: Commit) -> None:
         """
-        Adds a commit to the call commit graph.
+        Adds or updates a commit in the call commit graph.
         It will replace the existing commit if the specified commit hexsha already exists.
         """
         pass
