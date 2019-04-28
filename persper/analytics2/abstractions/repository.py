@@ -111,7 +111,7 @@ class ICommitInfo(ABC):
         return None
 
     @abstractmethod
-    def get_files(self, filter: IWorkspaceFileFilter = None) -> Iterable["IFileInfo"]:
+    def enum_files(self, filter: IWorkspaceFileFilter = None) -> Iterable["IFileInfo"]:
         """
         Enumerates all the files in the current commit.
         """
@@ -191,6 +191,9 @@ class IRepositoryHistoryProvider(ABC):
         Enumerates commits between the specified commit refs.
         params
             origin_commit_ref: commit ref from which to start enumeration. Use `None` to indicate the first commit.
-            terminal_commit_ref: commit ref at which to end enumeration (inclusive). Use `master`/`HEAD` to indicate the latest commit.
+            terminal_commit_ref: commit ref at which to end enumeration (inclusive). Use "master"/"HEAD" to indicate the latest commit.
+        remarks
+            The commits should be enumerated by topological order, i.e., the parents of a commit should already been enumerated,
+            as long as they are in the range of `origin_commit_ref..terminal_commit_ref`.
         """
         pass

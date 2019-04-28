@@ -7,6 +7,7 @@ from persper.analytics2.abstractions.callcommitgraph import (Commit, Edge,
                                                              ICallCommitGraph,
                                                              Node, NodeId)
 
+
 def commit_equals(x: Commit, y: Commit):
     if not x or not y:
         return not x and not y
@@ -57,12 +58,13 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     javanode1 = NodeId("TestNS.Wrappers.MyClass.Foo()", "java")
     cppFiles = ["MyClass.h", "MyClass.cpp"]
     csFiles = ["MyClass.cs"]
+    javaFiles = ["MyClass.java"]
     ccg.update_node_files(cppnode1, added_files=cppFiles)
     ccg.update_node_files(cppnode2, added_files=cppFiles)
     ccg.update_node_files(cppnode3, added_files=cppFiles)
     ccg.update_node_files(csnode2, added_files=csFiles)
     ccg.update_node_files(csnode3, added_files=csFiles)
-    ccg.update_node_files(javanode1, added_files=["MyClass.java"])
+    ccg.update_node_files(javanode1, added_files=javaFiles)
     ccg.update_node_history(cppnode1, commit1.hexsha, 10, 0)
     # 10 will be overwritten
     ccg.update_node_history(cppnode1, commit1.hexsha, 20, -10)
@@ -109,3 +111,5 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     assertNode(csnode1, added_by=commit3.hexsha, files=csFiles)
     assertNode(csnode2, added_by=commit2.hexsha, files=csFiles)
     assertNode(csnode3, added_by=commit2.hexsha, files=csFiles)
+    # javanode1 is not connected nor has node history, so it shouldn't have added_by.
+    assertNode(javanode1, added_by=None, files=javaFiles)

@@ -102,7 +102,7 @@ class GitCommitInfo(ICommitInfo):
             return GitFileInfo(blob)
         return None
 
-    def get_files(self, filter: IWorkspaceFileFilter = None):
+    def enum_files(self, filter: IWorkspaceFileFilter = None):
         def filterPred(i: Blob, d):
             return i.type == "blob"
 
@@ -112,8 +112,8 @@ class GitCommitInfo(ICommitInfo):
             elif i.type == "blob":
                 return filter and not filter.filter_file(i.name, i.path)
             return False
-        blobs = self._commit.tree.traverse() if not filter \
-            else self._commit.tree.traverse(filterPred, prunePred)
+        blobs = (self._commit.tree.traverse() if not filter
+                 else self._commit.tree.traverse(filterPred, prunePred))
         for blob in blobs:
             yield GitFileInfo(blob)
 
