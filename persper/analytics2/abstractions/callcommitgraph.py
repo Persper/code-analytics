@@ -240,7 +240,8 @@ class IWriteOnlyCallCommitGraph(ABC):
         remarks
             If the node does not exist, it will be created.
             If commit_hexsha doesn't exist in history, add the entry to history.
-            If commit_hexsha exists in history, the entry will be replaced.
+            If commit_hexsha exists in history, the entry will be *replaced*.
+                Note the entire node history entry of this hexsha will be replaced rather than merged.
         """
         pass
 
