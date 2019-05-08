@@ -242,6 +242,7 @@ class IWriteOnlyCallCommitGraph(ABC):
             If commit_hexsha doesn't exist in history, add the entry to history.
             If commit_hexsha exists in history, the entry will be *replaced*.
                 Note the entire node history entry of this hexsha will be replaced rather than merged.
+            To accumulate multiple modifications to a node in the same commit, use `NodeHistoryAccumulator` helper class.
         """
         pass
 
