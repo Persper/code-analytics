@@ -41,10 +41,10 @@ class Node:
 
     def __init__(self, node_id: NodeId = None, added_by: str = None,
                  history: Collection[NodeHistoryItem] = None, files: Collection[str] = None):
-        self.node_id = node_id
-        self.added_by = added_by
-        self.history = [] if history == None else history
-        self.files = [] if files == None else files
+        self._node_id = node_id
+        self._added_by = added_by
+        self._history = [] if history == None else history
+        self._files = [] if files == None else files
 
     @property
     def node_id(self) -> NodeId:
@@ -77,18 +77,18 @@ class Node:
         if value and not isinstance(value, Collection):
             raise TypeError(
                 "Expect Collection[NodeHistoryItem] but {0} is given.".format(type(value)))
-        self._history = value or ()
+        self._history = value or []
 
     @property
     def files(self) -> Iterable[str]:
-        return self._history
+        return self._files
 
     @files.setter
     def files(self, value: Collection[str]):
         if value and not isinstance(value, Collection):
             raise TypeError(
                 "Expect Collection[str] but {0} is given.".format(type(value)))
-        self._files = value or ()
+        self._files = value or []
 
     def __repr__(self):
         return "Node(node_id={0}, history=[{1}], files=[{2}])".format(self._node_id, len(self._history), len(self._files))
@@ -240,7 +240,8 @@ class IWriteOnlyCallCommitGraph(ABC):
         remarks
             If the node does not exist, it will be created.
             If commit_hexsha doesn't exist in history, add the entry to history.
-            If commit_hexsha exists in history, the entry will be replaced.
+            If commit_hexsha exists in history, the entry will be *replaced*.
+                Note the entire node history entry of this hexsha will be replaced rather than merged.
         """
         pass
 
@@ -248,7 +249,7 @@ class IWriteOnlyCallCommitGraph(ABC):
     def update_node_files(self, node_id: NodeId, files: Iterable[str] = None) -> None:
         """
         Sets or replaces the list of files that contains this node in the latest commit.
-        This method will replace the whole file list.
+        Note that this method will replace the whole file list of the specified node.
         """
         pass
 
