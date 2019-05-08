@@ -208,7 +208,7 @@ class IFileDiff(ABC):
             type(self).__name__, self.old_file, self.new_file, str(self.operation))
 
 
-class IRepositoryHistoryProvider(ABC):
+class ICommitRepository(ABC):
     """
     Provides functionality for accessing commit history of a specified commit.
     """
