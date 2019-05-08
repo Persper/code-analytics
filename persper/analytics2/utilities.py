@@ -12,9 +12,15 @@ class NodeHistoryAccumulator():
         self._nodes = {}
 
     def clear(self):
+        """
+        Clears all the accumulated histroy information contained in this instance.
+        """
         self._nodes.clear()
 
     def add(self, node_id: NodeId, added_lines: int = 0, removed_lines: int = 0):
+        """
+        Accumulates the added/removed lines of code to the specific node_id.
+        """
         info = self._nodes.get(node_id, None)
         if info == None:
             if not isinstance(node_id, NodeId):

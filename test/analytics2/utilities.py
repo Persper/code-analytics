@@ -1,6 +1,7 @@
 from persper.analytics2.utilities import NodeHistoryAccumulator
 from persper.analytics2.abstractions.callcommitgraph import NodeId
 
+
 def test_node_history_accumulator():
     nodeHistory = NodeHistoryAccumulator()
     testId0 = NodeId("CTest0", "cpp")
@@ -13,3 +14,7 @@ def test_node_history_accumulator():
     assert nodeHistory.get(testId1) == (15, 15)
     assert nodeHistory.get(testId2) == (-10, 20)
     # TODO test `apply` with MemoryCCG
+    nodeHistory.clear()
+    assert nodeHistory.get(testId0) == (0, 0)
+    assert nodeHistory.get(testId1) == (0, 0)
+    assert nodeHistory.get(testId2) == (0, 0)
