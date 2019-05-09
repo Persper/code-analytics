@@ -108,7 +108,7 @@ class MetaAnalyzer():
                     _logger.debug("Finished analyzing commit [%s].", repr_hexsha(lastCommitRef))
             except Exception as ex:
                 _logger.error("Failed to analyze commit [%s] with analyzer [%d][%s].\n%s",
-                              lastCommitRef, analyzerIndex, analyzer, ex)
+                              lastCommitRef, analyzerIndex, analyzer, traceback.format_exc())
                 failedAnalyzer = analyzer
                 failedAnalyzerException = ex
                 stopReason = CommitAnalysisStopReason.FatalError
@@ -137,6 +137,6 @@ class MetaAnalyzer():
                 _logger.info("Finished post-analyzing in %.2fs.", monotonic() - t0)
             except Exception as ex:
                 _logger.error("Failed during post-analysis with analyzer [%d][%s].\n%s",
-                              analyzerIndex, analyzer, ex)
+                              analyzerIndex, analyzer, traceback.format_exc())
                 # We can do nothing about it. Crash the caller.
                 raise
