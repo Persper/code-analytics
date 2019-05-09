@@ -1,6 +1,7 @@
 import logging
 import re
 import traceback
+from time import monotonic
 from typing import Iterable
 
 from persper.analytics2.abstractions.analyzers import (
@@ -62,7 +63,13 @@ class MetaAnalyzer():
         # XXX determine whether we need to add this into AnalysisStatus
         failedAnalyzer = None
         failedAnalyzerException = None
+        t0 = monotonic()
+        tAnalyzer = None
+        analyzerEllapsedTime = 0
         for commit in self._repository.enum_commits(self._origin_commit, self._terminal_commit):
+            if tAnalyzer is not None:
+                analyzerEllapsedTime += monotonic() - tAnalyzer
+            tAnalyzer = monotonic()
             assert isinstance(commit, ICommitInfo)
             if len(analyzedCommits) >= max_commits:
                 _logger.info("Max analyzed commits reached.")
@@ -108,7 +115,13 @@ class MetaAnalyzer():
                 break
             analyzedCommits.append(lastCommitRef)
             self._analyzed_commits.add(lastCommitRef)
+        if tAnalyzer is not None:
+            analyzerEllapsedTime += monotonic() - tAnalyzer
+        _logger.info("Analyzed %d commits in %.2fs, analyzer exclusive %.2fs.",
+                     len(analyzedCommits), monotonic() - t0, analyzerEllapsedTime)
         # Post analysis
+        t0 = monotonic()
+        _logger.info("Start post-analyzing: %s..%s .", self._origin_commit, self._terminal_commit)
         if self._post_analyzers:
             analyzer = None
             analyzerIndex = 0
@@ -121,6 +134,7 @@ class MetaAnalyzer():
                     _logger.debug("Post-analyzing with [%d]: %s .", analyzerIndex, analyzer)
                     analyzer.analyze(status)
                     analyzerIndex += 1
+                _logger.info("Finished post-analyzing in %.2fs.", monotonic() - t0)
             except Exception as ex:
                 _logger.error("Failed during post-analysis with analyzer [%d][%s].\n%s",
                               analyzerIndex, analyzer, ex)
