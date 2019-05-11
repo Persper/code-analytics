@@ -51,7 +51,7 @@ class MetaAnalyzer():
     def terminal_commit(self, value: str):
         self._terminal_commit = value
 
-    def analyze(self, max_commits: int = 100):
+    def analyze(self, max_commits: int = 100) -> AnalysisStatus:
         _logger.info("Start analyzing: %s..%s, max_commits=%d .",
                      self._origin_commit, self._terminal_commit, max_commits)
         analyzedCommits = []
@@ -89,7 +89,7 @@ class MetaAnalyzer():
                              currentSkippedCommits, currentSkippedFirstCommit, currentSkippedLastCommit)
                 currentSkippedFirstCommit = None
             # Analyze commit
-            if _logger.getEffectiveLevel <= logging.INFO:
+            if _logger.getEffectiveLevel() <= logging.INFO:
                 briefMessage = commit.message
                 trimmed = len(briefMessage) > 50
                 briefMessage = re.sub(_whitespace_re, " ", briefMessage[:60])[:47]
@@ -104,7 +104,7 @@ class MetaAnalyzer():
                     _logger.debug("Analyzing with [%d]: %s .", analyzerIndex, analyzer)
                     analyzer.analyze(commit)
                     analyzerIndex += 1
-                if _logger.getEffectiveLevel <= logging.DEBUG:
+                if _logger.getEffectiveLevel() <= logging.DEBUG:
                     _logger.debug("Finished analyzing commit [%s].", repr_hexsha(lastCommitRef))
             except Exception as ex:
                 _logger.error("Failed to analyze commit [%s] with analyzer [%d][%s].\n%s",
@@ -120,23 +120,23 @@ class MetaAnalyzer():
         _logger.info("Analyzed %d commits in %.2fs, analyzer exclusive %.2fs.",
                      len(analyzedCommits), monotonic() - t0, analyzerEllapsedTime)
         # Post analysis
+        status = AnalysisStatus(stop_reason=stopReason, exception=failedAnalyzerException,
+                        origin_commit_ref=self._origin_commit, terminal_commit_ref=self._terminal_commit,
+                        analyzed_commits_ref=analyzedCommits, last_commit_ref=lastCommitRef)
         t0 = monotonic()
         _logger.info("Start post-analyzing: %s..%s .", self._origin_commit, self._terminal_commit)
-        if self._post_analyzers:
-            analyzer = None
-            analyzerIndex = 0
-            status = AnalysisStatus(stop_reason=stopReason, exception=failedAnalyzerException,
-                                    origin_commit_ref=self._origin_commit, terminal_commit_ref=self._terminal_commit,
-                                    analyzed_commits_ref=analyzedCommits, last_commit_ref=lastCommitRef)
-            try:
-                for analyzer in self._post_analyzers:
-                    assert isinstance(analyzer, IPostAnalyzer)
-                    _logger.debug("Post-analyzing with [%d]: %s .", analyzerIndex, analyzer)
-                    analyzer.analyze(status)
-                    analyzerIndex += 1
-                _logger.info("Finished post-analyzing in %.2fs.", monotonic() - t0)
-            except Exception as ex:
-                _logger.error("Failed during post-analysis with analyzer [%d][%s].\n%s",
-                              analyzerIndex, analyzer, traceback.format_exc())
-                # We can do nothing about it. Crash the caller.
-                raise
+        analyzer = None
+        analyzerIndex = 0
+        try:
+            for analyzer in self._post_analyzers:
+                assert isinstance(analyzer, IPostAnalyzer)
+                _logger.debug("Post-analyzing with [%d]: %s .", analyzerIndex, analyzer)
+                analyzer.analyze(status)
+                analyzerIndex += 1
+            _logger.info("Finished post-analyzing in %.2fs.", monotonic() - t0)
+        except Exception as ex:
+            _logger.error("Failed during post-analysis with analyzer [%d][%s].\n%s",
+                            analyzerIndex, analyzer, traceback.format_exc())
+            # We can do nothing about it. Crash the caller.
+            raise
+        return status
