@@ -293,8 +293,31 @@ class ICallCommitGraph(IReadOnlyCallCommitGraph, IWriteOnlyCallCommitGraph):
 
 class IGraphServer(ABC):
     """
-    Provides basic functionality to trigger the commit analysis on graph server. 
+    Provides basic functionality to trigger the commit analysis on graph server.
+    remarks
+        The call sequence:
+        * start
+        * update_graph
+        * update_graph
+        * ...
+        * update_graph
+        * stop
     """
+    @abstractmethod
+    def start(self) -> None:
+        """
+        When implemented, starts the graph server and get ready for commit analysis, if applicable.
+        This includes starting the graph server process, preparing workspace folder, etc.
+        """
+        pass
+
+    @abstractmethod
+    def stop(self) -> None:
+        """
+        When implemented, stops the graph server and do necessary cleanup, if applicable.
+        """
+        pass
+
     @abstractmethod
     def update_graph(self, commit: ICommitInfo) -> None:
         """
