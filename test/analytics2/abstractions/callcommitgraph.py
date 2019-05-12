@@ -31,7 +31,7 @@ def create_dummy_commit(message: str = None, parents: Iterable[str] = None):
 
 
 def test_call_commit_graph(ccg: ICallCommitGraph):
-    #assert ccg
+    # assert ccg
     # commits
     commit1 = create_dummy_commit()
     commit2 = create_dummy_commit()
@@ -59,12 +59,13 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     cppFiles = ["MyClass.h", "MyClass.cpp"]
     csFiles = ["MyClass.cs"]
     javaFiles = ["MyClass.java"]
-    ccg.update_node_files(cppnode1, added_files=cppFiles)
-    ccg.update_node_files(cppnode2, added_files=cppFiles)
-    ccg.update_node_files(cppnode3, added_files=cppFiles)
-    ccg.update_node_files(csnode2, added_files=csFiles)
-    ccg.update_node_files(csnode3, added_files=csFiles)
-    ccg.update_node_files(javanode1, added_files=javaFiles)
+    ccg.update_node_files(cppnode1, commit1.hexsha, files=cppFiles)
+    ccg.update_node_files(cppnode2, commit1.hexsha, files=cppFiles)
+    ccg.update_node_files(cppnode3, commit1.hexsha, files=cppFiles)
+    ccg.update_node_files(csnode1, commit2.hexsha, files=csFiles)
+    ccg.update_node_files(csnode2, commit2.hexsha, files=csFiles)
+    ccg.update_node_files(csnode3, commit2.hexsha, files=csFiles)
+    ccg.update_node_files(javanode1, commit3.hexsha, files=javaFiles)
     ccg.update_node_history(cppnode1, commit1.hexsha, 10, 0)
     # 10 will be overwritten
     ccg.update_node_history(cppnode1, commit1.hexsha, 20, -10)
@@ -72,6 +73,7 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     ccg.update_node_history(cppnode3, commit1.hexsha, 10, 0)
     ccg.update_node_history(csnode2, commit2.hexsha, 5, 0)
     ccg.update_node_history(csnode3, commit2.hexsha, 4, 0)
+    ccg.update_node_history(csnode1, commit2.hexsha, 4, 0)
     ccg.add_edge(cppnode2, cppnode1, commit1.hexsha)
     ccg.add_edge(cppnode3, cppnode1, commit1.hexsha)
     # csnode1 is implicitly added
@@ -79,7 +81,6 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     ccg.add_edge(csnode2, csnode1, commit1.hexsha)
     ccg.add_edge(csnode3, csnode2, commit1.hexsha)
     ccg.flush()
-
     assert ccg.get_nodes_count() == 7
     assert ccg.get_nodes_count(name=csnode2.name) == 2
     assert ccg.get_nodes_count(name=csnode2.name, language=csnode2.language) == 1
@@ -91,7 +92,7 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     assert ccg.get_nodes_count(language="non_existent") == 0
     assert ccg.get_edges_count() == 5
     assert ccg.get_edges_count(from_language="cs") == 3
-    assert ccg.get_edges_count(to_language="cpp") == 4
+    assert ccg.get_edges_count(to_language="cpp") == 3
     assert ccg.get_edges_count(from_language="cs", to_language="cpp") == 1
     assert ccg.get_edges_count(to_name=cppnode1.name) == 3
 
@@ -101,15 +102,15 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
         assert node.node_id == node_id
         assert node.added_by == added_by
         assert set(node.files) == set(files)
+
         return node
 
-    assert ccg.get_node(NodeId("non_existent", "cpp")) == None
-    assert ccg.get_node(NodeId(cppnode1.name, "non_existent")) == None
+    assert ccg.get_node(NodeId("non_existent", "cpp")) is None
+    assert ccg.get_node(NodeId(cppnode1.name, "non_existent")) is None
     assertNode(cppnode1, added_by=commit1.hexsha, files=cppFiles)
     assertNode(cppnode2, added_by=commit1.hexsha, files=cppFiles)
     assertNode(cppnode3, added_by=commit1.hexsha, files=cppFiles)
-    assertNode(csnode1, added_by=commit3.hexsha, files=csFiles)
+    assertNode(csnode1, added_by=commit2.hexsha, files=csFiles)
     assertNode(csnode2, added_by=commit2.hexsha, files=csFiles)
     assertNode(csnode3, added_by=commit2.hexsha, files=csFiles)
-    # javanode1 is not connected nor has node history, so it shouldn't have added_by.
-    assertNode(javanode1, added_by=None, files=javaFiles)
+    assertNode(javanode1, added_by=commit3.hexsha, files=javaFiles)
