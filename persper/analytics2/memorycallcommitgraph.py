@@ -1,44 +1,78 @@
+import json
 import logging
 import sys
 from collections import defaultdict
+from typing import Iterable, TextIO
 
 from persper.analytics2.abstractions.callcommitgraph import (Commit, Edge,
                                                              ICallCommitGraph,
                                                              Node,
                                                              NodeHistoryItem,
                                                              NodeId)
-from persper.analytics2.abstractions.repository import (
-    ICommitInfo, IRepositoryHistoryProvider)
-from typing import Iterable
+from persper.analytics2.abstractions.repository import (ICommitInfo,
+                                                        ICommitRepository)
+
+
+def serialize_node_id(d: NodeId) -> dict:
+    return {"name": d.name, "language": d.language}
+
+
+def deserialize_node_id(d: dict) -> NodeId:
+    return NodeId(d["name"], d["language"])
+
+
+def deserialize_node_history_item(d: dict) -> NodeHistoryItem:
+    return NodeHistoryItem(hexsha=d["hexsha"], added_lines=d["added_lines"], removed_lines=d["removed_lines"])
+
+
+def deserialize_node(d: dict) -> NodeId:
+    return Node(node_id=deserialize_node_id(d["id"]), added_by=d["added_by"],
+                history=[deserialize_node_history_item(i) for i in d["history"]],
+                files=list(d["files"]))
+
+
+def deserialize_edge(d: dict) -> Edge:
+    return Edge(from_id=deserialize_node_id(d["from_id"]), to_id=d["to_id"], added_by=d["added_by"])
+
+
+def deserialize_commit(d: dict) -> Commit:
+    return Commit(d["hex_sha"],
+                  d["author_email"], d['author_name'], d['author_date'],
+                  d['committer_email'], d['committer_name'], d['commit_date'],
+                  d['message'], d['parents'])
+
 
 class MemoryCallCommitGraph(ICallCommitGraph):
-    def __init__(self, graph_data: dict = None):
+    def __init__(self):
         self._nodes_dict = {}
         self._edges_dict = {}
         self._commits = {}
         self._from_edges = defaultdict(list)
         self._to_edges = defaultdict(list)
-        if graph_data:
-            for i in graph_data["nodes"]:
-                nodeid = NodeId(i["id"]['name'], i["id"]['language'])
-                for commit_id, history in i['history'].items:
-                    self.update_node_history(
-                        nodeid, commit_id, history['adds'], history['dels'])
-                files = []
-                for file in i["files"]:
-                    files.append(file)
-                self.update_node_files(nodeid, files)
-            for i in graph_data["edges"]:
-                from_id = NodeId(i['from_id']["name"],
-                                 i['from_id']["language"])
-                to_id = NodeId(i['to_id']["name"], i['to_id']["language"])
-                self.add_edge(from_id, to_id, i["added_by"])
 
-            for i in graph_data["commits"]:
-                self.add_commit(i["hex_sha"], Commit(i["hex_sha"], i["author_email"], i['author_name'],
-                                                     i['author_date'], i['committer_email'],
-                                                     i['committer_name'], i['commit_date'],
-                                                     i['message'], i['parent']))
+    @staticmethod
+    def deserialize_dict(graph_data: dict) -> "MemoryCallCommitGraph":
+        graph = MemoryCallCommitGraph()
+        for nd in graph_data["nodes"]:
+            node = deserialize_node(nd)
+            graph._add_node_direct(node)
+        for ed in graph_data["edges"]:
+            edge = deserialize_edge(ed)
+            graph._add_edge_direct(edge)
+        for cd in graph_data["commits"]:
+            commit = deserialize_commit(cd)
+            graph.update_commit(commit)
+        return graph
+
+    @staticmethod
+    def load_from(fp: TextIO) -> "MemoryCallCommitGraph":
+        d = json.load(fp)
+        return MemoryCallCommitGraph.deserialize_dict(d)
+
+    @staticmethod
+    def load(json_content: str) -> "MemoryCallCommitGraph":
+        d = json.loads(json_content)
+        return MemoryCallCommitGraph.deserialize_dict(d)
 
     def _ensure_node_exists(self, node_id: NodeId, commit_hexsha: str) -> None:
         if node_id not in self._nodes_dict:
@@ -117,8 +151,8 @@ class MemoryCallCommitGraph(ICallCommitGraph):
         for commit in self._commits.values():
             yield commit
 
-    def add_node(self, id: NodeId, node: Node) -> None:
-        self._nodes_dict[id] = node
+    def _add_node_direct(self, node: Node) -> None:
+        self._nodes_dict[node.id] = node
 
     def update_node_history(self, node_id: NodeId, commit_hexsha: str,
                             added_lines: int = 0, removed_lines: int = 0) -> None:
@@ -137,21 +171,18 @@ class MemoryCallCommitGraph(ICallCommitGraph):
         self._nodes_dict[node_id].files = files
 
     def add_edge(self, from_id: NodeId, to_id: NodeId, commit_hexsha: str) -> None:
-        edge = Edge(from_id, to_id, commit_hexsha)
-        self._edges_dict[(from_id, to_id)] = edge
-        self._from_edges[from_id].append(to_id)
-        self._to_edges[to_id].append(from_id)
+        self._add_edge_direct(Edge(from_id, to_id, commit_hexsha))
+
+    def _add_edge_direct(self, edge: Edge) -> None:
+        self._edges_dict[(edge.from_id, edge.to_id)] = edge
+        self._from_edges[edge.from_id].append(edge.to_id)
+        self._to_edges[edge.to_id].append(edge.from_id)
 
     def flush(self) -> None:
         pass
 
-    def add_commit(self, hex_sha: str, author_email: str, author_name: str, author_date: str,
-                   committer_email: str, committer_name: str, commit_date: str, message: str) -> None:
-        self._commits[hex_sha] = Commit(hex_sha, author_email, author_name,
-                                        author_date, committer_email, committer_name, commit_date, message)
-
     def get_commit(self, hex_sha: str) -> Commit:
-        return self._commits[hex_sha]
+        return self._commits.get(hex_sha, None)
 
     def update_commit(self, commit: Commit) -> None:
         self._commits[commit.hexsha] = commit
