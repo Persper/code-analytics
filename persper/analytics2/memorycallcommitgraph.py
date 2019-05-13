@@ -1,12 +1,18 @@
-from persper.analytics2.abstractions.callcommitgraph import *
-from persper.analytics2.abstractions.repository import *
-import sys
 import logging
+import sys
 from collections import defaultdict
 
+from persper.analytics2.abstractions.callcommitgraph import (Commit, Edge,
+                                                             ICallCommitGraph,
+                                                             Node,
+                                                             NodeHistoryItem,
+                                                             NodeId)
+from persper.analytics2.abstractions.repository import (
+    ICommitInfo, IRepositoryHistoryProvider)
+from typing import Iterable
 
 class MemoryCallCommitGraph(ICallCommitGraph):
-    def __init__(self, graph_data: dict=None):
+    def __init__(self, graph_data: dict = None):
         self._nodes_dict = {}
         self._edges_dict = {}
         self._commits = {}
@@ -16,21 +22,23 @@ class MemoryCallCommitGraph(ICallCommitGraph):
             for i in graph_data["nodes"]:
                 nodeid = NodeId(i["id"]['name'], i["id"]['language'])
                 for commit_id, history in i['history'].items:
-                    self.update_node_history(nodeid, commit_id, history['adds'], history['dels'])
+                    self.update_node_history(
+                        nodeid, commit_id, history['adds'], history['dels'])
                 files = []
                 for file in i["files"]:
                     files.append(file)
                 self.update_node_files(nodeid, files)
             for i in graph_data["edges"]:
-                from_id = NodeId(i['from_id']["name"], i['from_id']["language"])
+                from_id = NodeId(i['from_id']["name"],
+                                 i['from_id']["language"])
                 to_id = NodeId(i['to_id']["name"], i['to_id']["language"])
                 self.add_edge(from_id, to_id, i["added_by"])
 
             for i in graph_data["commits"]:
                 self.add_commit(i["hex_sha"], Commit(i["hex_sha"], i["author_email"], i['author_name'],
-                                                i['author_date'], i['committer_email'],
-                                                i['committer_name'], i['commit_date'],
-                                                i['message'], i['parent']) )
+                                                     i['author_date'], i['committer_email'],
+                                                     i['committer_name'], i['commit_date'],
+                                                     i['message'], i['parent']))
 
     def _ensure_node_exists(self, node_id: NodeId, commit_hexsha: str) -> None:
         if node_id not in self._nodes_dict:
@@ -118,13 +126,13 @@ class MemoryCallCommitGraph(ICallCommitGraph):
         for historyitem in self._nodes_dict[node_id].history:
             if historyitem.hexsha == commit_hexsha:
                 self._nodes_dict[node_id].history = [NodeHistoryItem(commit_hexsha,
-                                                    added_lines, removed_lines)]
+                                                                     added_lines, removed_lines)]
             return
         self._nodes_dict[node_id].history.append(NodeHistoryItem(commit_hexsha,
-                                                    added_lines, removed_lines))
+                                                                 added_lines, removed_lines))
 
     def update_node_files(self, node_id: NodeId, commit_hexsha: str,
-                        files: Iterable[str] = None) -> None:
+                          files: Iterable[str] = None) -> None:
         self._ensure_node_exists(node_id, commit_hexsha)
         self._nodes_dict[node_id].files = files
 
@@ -140,7 +148,7 @@ class MemoryCallCommitGraph(ICallCommitGraph):
     def add_commit(self, hex_sha: str, author_email: str, author_name: str, author_date: str,
                    committer_email: str, committer_name: str, commit_date: str, message: str) -> None:
         self._commits[hex_sha] = Commit(hex_sha, author_email, author_name,
-                                author_date, committer_email, committer_name, commit_date, message)
+                                        author_date, committer_email, committer_name, commit_date, message)
 
     def get_commit(self, hex_sha: str) -> Commit:
         return self._commits[hex_sha]
