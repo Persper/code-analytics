@@ -6,16 +6,18 @@ from typing import Union
 
 from git import Blob, Commit, Diff, DiffIndex, Repo
 
-from persper.analytics2.abstractions.repository import (
-    FileDiffOperation, ICommitInfo, IFileDiff, IFileInfo,
-    IRepositoryHistoryProvider, IWorkspaceFileFilter)
+from persper.analytics2.abstractions.repository import (FileDiffOperation,
+                                                        ICommitInfo,
+                                                        ICommitRepository,
+                                                        IFileDiff, IFileInfo,
+                                                        IWorkspaceFileFilter)
 
 _logger = logging.getLogger(__name__)
 
 EMPTY_TREE_SHA = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
-class GitRepository(IRepositoryHistoryProvider):
+class GitRepository(ICommitRepository):
     def __init__(self, repo_path: str, first_parent_only: bool = False):
         """
         params
