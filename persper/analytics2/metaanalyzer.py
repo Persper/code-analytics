@@ -17,14 +17,18 @@ _whitespace_re = re.compile(r"\s+")
 class MetaAnalyzer():
     """
     Coordinates `ICommitAnalyzer` and `IPostAnalyzer` implementation, doing analysis through the commit history.
-    params
-        origin_commit, terminal_commit: See `ICommitRepository.enum_commits` for details.
     """
 
     def __init__(self, repository: ICommitRepository,
                  commit_analyzers: Iterable[ICommitAnalyzer], post_analyzers: Iterable[IPostAnalyzer],
                  origin_commit: str = None, terminal_commit: str = "HEAD",
                  analyzed_commits: Iterable[str] = None):
+        """
+        params
+            commit_analyzers: a list of commit analyzers. They will be invoked sequentially in each commit.
+            post_analyzers: a list of post analyzers. They will be invoked sequentially after the analysis ends successfully or in fault.
+            origin_commit, terminal_commit: see `ICommitRepository.enum_commits` for details.
+        """
         if not isinstance(repository, ICommitRepository):
             raise ValueError("Expect ICommitRepository instance for repository.")
         # do necessary defensive copies
