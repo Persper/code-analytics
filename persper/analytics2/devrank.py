@@ -22,10 +22,12 @@ class CallCommitGraphAnalyzer(ICommitAnalyzer):
         self._call_commit_graph = call_commit_graph
 
     def analyze(self, commit: ICommitInfo):
+        assert commit
         for gs in self._graph_servers:
             t0 = monotonic()
             _logger.info("Analyzing %s with %s...", commit, gs)
             assert isinstance(gs, IGraphServer)
+            gs.update_graph(commit)
             _logger.info("%s finished in %.2fs.", gs, monotonic() - t0)
         t0 = monotonic()
         self._call_commit_graph.flush()
@@ -38,4 +40,5 @@ class DevRankAnalyzer(IPostAnalyzer):
         self._call_commit_graph = call_commit_graph
 
     def analyze(self, status: AnalysisStatus):
+        # TODO put analysis code here.
         pass
