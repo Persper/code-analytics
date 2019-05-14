@@ -2,7 +2,10 @@ import json
 import logging
 import sys
 from collections import defaultdict
+from datetime import datetime
 from typing import Iterable, TextIO
+
+import pytz
 
 from persper.analytics2.abstractions.callcommitgraph import (Commit, Edge,
                                                              ICallCommitGraph,
@@ -13,12 +16,34 @@ from persper.analytics2.abstractions.repository import (ICommitInfo,
                                                         ICommitRepository)
 
 
-def serialize_node_id(d: NodeId) -> dict:
-    return {"name": d.name, "language": d.language}
+def serialize_node_id(o: NodeId) -> tuple:
+    return (o.name, o.language)
 
 
-def deserialize_node_id(d: dict) -> NodeId:
-    return NodeId(d["name"], d["language"])
+def serialize_node_history_item(o: NodeHistoryItem) -> dict:
+    return {"hexsha": o.hexsha, "added_lines": o.added_lines, "removed_lines": o.removed_lines}
+
+
+def serialize_node(o: Node) -> dict:
+    return {"id": o.node_id, "added_by": o.added_by,
+            "history": [serialize_node_history_item(h) for h in o.history],
+            "files": list(o.files)}
+
+
+def serialize_edge(o: Edge) -> dict:
+    return {"from_id": serialize_node_id(o.from_id), "to_id": serialize_node_id(o.to_id),
+            "added_by": o.added_by}
+
+
+def serialize_commit(o: Commit) -> dict:
+    return {"hex_sha": o.hexsha,
+            "author_email": o.author_email, "author_name": o.author_name, "authored_time": str(o.authored_time),
+            "committer_email": o.committer_email, "committer_name": o.committer_name, "committed_time": str(o.committed_time),
+            "message": o.message, "parents": o.parents}
+
+
+def deserialize_node_id(t: tuple) -> NodeId:
+    return NodeId(t[0], t[1])
 
 
 def deserialize_node_history_item(d: dict) -> NodeHistoryItem:
@@ -32,13 +57,13 @@ def deserialize_node(d: dict) -> NodeId:
 
 
 def deserialize_edge(d: dict) -> Edge:
-    return Edge(from_id=deserialize_node_id(d["from_id"]), to_id=d["to_id"], added_by=d["added_by"])
+    return Edge(from_id=deserialize_node_id(d["from_id"]), to_id=deserialize_node_id(d["to_id"]), added_by=d["added_by"])
 
 
 def deserialize_commit(d: dict) -> Commit:
     return Commit(d["hex_sha"],
-                  d["author_email"], d['author_name'], d['author_date'],
-                  d['committer_email'], d['committer_name'], d['commit_date'],
+                  d["author_email"], d['author_name'], datetime.fromisoformat(d['authored_time']),
+                  d['committer_email'], d['committer_name'], datetime.fromisoformat(d['committed_time']),
                   d['message'], d['parents'])
 
 
@@ -70,9 +95,23 @@ class MemoryCallCommitGraph(ICallCommitGraph):
         return MemoryCallCommitGraph.deserialize_dict(d)
 
     @staticmethod
-    def load(json_content: str) -> "MemoryCallCommitGraph":
+    def deserialize(json_content: str) -> "MemoryCallCommitGraph":
         d = json.loads(json_content)
         return MemoryCallCommitGraph.deserialize_dict(d)
+
+    def serialize_dict(self) -> dict:
+        return {
+            "nodes": [serialize_node(n) for n in self._nodes_dict.values()],
+            "edges": [serialize_edge(n) for n in self._edges_dict.values()],
+            "commits": [serialize_commit(n) for n in self._commits.values()],
+        }
+
+    def save_to(self, fp: TextIO):
+        d = self.serialize_dict()
+        json.dump(d, fp)
+
+    def serialize(self) -> str:
+        return json.dumps(self.serialize_dict())
 
     def _ensure_node_exists(self, node_id: NodeId, commit_hexsha: str) -> None:
         if node_id not in self._nodes_dict:
@@ -152,7 +191,7 @@ class MemoryCallCommitGraph(ICallCommitGraph):
             yield commit
 
     def _add_node_direct(self, node: Node) -> None:
-        self._nodes_dict[node.id] = node
+        self._nodes_dict[node.node_id] = node
 
     def update_node_history(self, node_id: NodeId, commit_hexsha: str,
                             added_lines: int = 0, removed_lines: int = 0) -> None:
@@ -174,6 +213,7 @@ class MemoryCallCommitGraph(ICallCommitGraph):
         self._add_edge_direct(Edge(from_id, to_id, commit_hexsha))
 
     def _add_edge_direct(self, edge: Edge) -> None:
+
         self._edges_dict[(edge.from_id, edge.to_id)] = edge
         self._from_edges[edge.from_id].append(edge.to_id)
         self._to_edges[edge.to_id].append(edge.from_id)

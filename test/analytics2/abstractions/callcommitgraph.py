@@ -5,6 +5,7 @@ from typing import Iterable
 
 from persper.analytics2.abstractions.callcommitgraph import (Commit, Edge,
                                                              ICallCommitGraph,
+                                                             IReadOnlyCallCommitGraph,
                                                              Node, NodeId)
 
 
@@ -114,3 +115,19 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     assertNode(csnode2, added_by=commit2.hexsha, files=csFiles)
     assertNode(csnode3, added_by=commit2.hexsha, files=csFiles)
     assertNode(javanode1, added_by=commit3.hexsha, files=javaFiles)
+
+
+def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallCommitGraph, compare_hexsha: bool = True):
+    for n1 in expected.enum_nodes():
+        n2 = actual.get_node(n1.node_id)
+        assert n2, "Node missing: {0}".format(n1.node_id)
+        assert n1.node_id == n2.node_id
+        if compare_hexsha:
+            assert n1.added_by == n2.added_by
+        else:
+            c1 = expected.get_commit(n1.added_by)
+            c2 = actual.get_commit(n2.added_by)
+            assert c1
+            assert c2
+            assert c1.message == c2.message
+        # TODO add more assertions
