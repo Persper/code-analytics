@@ -1,6 +1,6 @@
 import logging
 from itertools import islice
-from test.analytics2.repository import prepare_repository
+from test.analytics2.utilities import prepare_repository
 
 from persper.analytics2.abstractions.analyzers import (
     AnalysisStatus, CommitAnalysisStopReason, ICommitAnalyzer, IPostAnalyzer)

@@ -1,6 +1,6 @@
 import os.path
 import subprocess
-import test.analytics2.abstractions.repository as repositoryhelper
+import test.analytics2.helpers.repository as repositoryhelper
 
 from persper.analytics2.repository import GitRepository
 from persper.util.path import root_path
