@@ -134,6 +134,12 @@ def commit_assertion_by_comment(expectedGraph, actualGraph, expectedHexsha, actu
 
 def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallCommitGraph,
                       commit_assertion=commit_assertion_by_hexsha):
+    """
+    Asserts two `IReadOnlyCallCommitGraph` instances contain the equivalent content.
+    params
+        commit_assertion:   Specifies how to treat two commits as equivalent. You need to choose between
+                            `commit_assertion_skip`, `commit_assertion_by_hexsha`, and `commit_assertion_by_comment`.
+    """
     def assertCommitEqual(expectedHexsha, actualHexsha):
         return commit_assertion(expected, actual, expectedHexsha, actualHexsha)
     for n1 in expected.enum_nodes():
