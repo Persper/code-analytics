@@ -28,6 +28,10 @@ class MetaAnalyzer():
             commit_analyzers: a list of commit analyzers. They will be invoked sequentially in each commit.
             post_analyzers: a list of post analyzers. They will be invoked sequentially after the analysis ends successfully or in fault.
             origin_commit, terminal_commit: see `ICommitRepository.enum_commits` for details.
+        remarks
+            You may use `load_state_dict` to load `origin_commit`, `terminal_commit`, and `analyzed_commits` from
+            dict after instantiating this class. Still you need to inject required services (indicated by required
+            parameters) so that you can instantiate this class.
         """
         if not isinstance(repository, ICommitRepository):
             raise ValueError("Expect ICommitRepository instance for repository.")
@@ -38,6 +42,22 @@ class MetaAnalyzer():
         self._origin_commit = origin_commit
         self._terminal_commit = terminal_commit
         self._analyzed_commits = set(analyzed_commits) if analyzed_commits else set()
+
+    def save_state_dict(self) -> dict:
+        """
+        Save the current state into a dict with simple values.
+        """
+        return {"origin_commit": self._origin_commit,
+                "terminal_commit": self._terminal_commit,
+                "analyzed_commits": list(self._analyzed_commits)}
+
+    def load_state_dict(self, d: dict):
+        """
+        Load the current state from a dict with simple values.
+        """
+        self.origin_commit = d["origin_commit"]
+        self.terminal_commit = d["terminal_commit"]
+        self.analyzed_commits = set(d["analyzed_commits"])
 
     @property
     def origin_commit(self):
@@ -125,8 +145,8 @@ class MetaAnalyzer():
                      len(analyzedCommits), monotonic() - t0, analyzerEllapsedTime)
         # Post analysis
         status = AnalysisStatus(stop_reason=stopReason, exception=failedAnalyzerException,
-                        origin_commit_ref=self._origin_commit, terminal_commit_ref=self._terminal_commit,
-                        analyzed_commits_ref=analyzedCommits, last_commit_ref=lastCommitRef)
+                                origin_commit_ref=self._origin_commit, terminal_commit_ref=self._terminal_commit,
+                                analyzed_commits_ref=analyzedCommits, last_commit_ref=lastCommitRef)
         t0 = monotonic()
         _logger.info("Start post-analyzing: %s..%s .", self._origin_commit, self._terminal_commit)
         analyzer = None
@@ -140,7 +160,7 @@ class MetaAnalyzer():
             _logger.info("Finished post-analyzing in %.2fs.", monotonic() - t0)
         except Exception as ex:
             _logger.error("Failed during post-analysis with analyzer [%d][%s].\n%s",
-                            analyzerIndex, analyzer, traceback.format_exc())
+                          analyzerIndex, analyzer, traceback.format_exc())
             # We can do nothing about it. Crash the caller.
             raise
         return status
