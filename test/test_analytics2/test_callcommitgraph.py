@@ -1,6 +1,6 @@
 import subprocess
 import pytest
-import test.analytics2.helpers.callcommitgraph as ccghelper
+import test.test_analytics2.helpers.callcommitgraph as ccghelper
 
 #   TODO import your call commit graph implementation(s)
 from persper.analytics2.memorycallcommitgraph import MemoryCallCommitGraph
