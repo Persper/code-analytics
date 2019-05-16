@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 from random import randint
 from typing import Iterable
 
-from persper.analytics2.abstractions.callcommitgraph import (Commit, Edge,
-                                                             ICallCommitGraph,
-                                                             Node, NodeId)
+from persper.analytics2.abstractions.callcommitgraph import (
+    Commit, Edge, ICallCommitGraph, IReadOnlyCallCommitGraph, Node,
+    NodeHistoryItem, NodeId)
 
 
 def commit_equals(x: Commit, y: Commit):
@@ -114,3 +114,76 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     assertNode(csnode2, added_by=commit2.hexsha, files=csFiles)
     assertNode(csnode3, added_by=commit2.hexsha, files=csFiles)
     assertNode(javanode1, added_by=commit3.hexsha, files=javaFiles)
+
+
+def commit_assertion_skip(expectedGraph, actualGraph, expectedHexsha, actualHexsha):
+    pass
+
+
+def commit_assertion_by_hexsha(expectedGraph, actualGraph, expectedHexsha, actualHexsha):
+    assert expectedHexsha == actualHexsha, "Commits are not the same by hexsha."
+
+
+def commit_assertion_by_comment(expectedGraph, actualGraph, expectedHexsha, actualHexsha):
+    c1 = expectedGraph.get_commit(expectedHexsha)
+    c2 = actualGraph.get_commit(actualHexsha)
+    assert c1, "Expected-side of commit is missing."
+    assert c2, "Actual-side of commit is missing."
+    assert c1.message == c2.message, "Commits are not the same by commit message."
+
+
+def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallCommitGraph,
+                      commit_assertion=commit_assertion_by_hexsha):
+    """
+    Asserts two `IReadOnlyCallCommitGraph` instances contain the equivalent content.
+    params
+        commit_assertion:   Specifies how to treat two commits as equivalent. You need to choose between
+                            `commit_assertion_skip`, `commit_assertion_by_hexsha`, and `commit_assertion_by_comment`.
+    """
+    def assertCommitEqual(expectedHexsha, actualHexsha):
+        return commit_assertion(expected, actual, expectedHexsha, actualHexsha)
+    for n1 in expected.enum_nodes():
+        n2 = actual.get_node(n1.node_id)
+        assert n2, "Node missing: {0}".format(n1.node_id)
+        assert n1.node_id == n2.node_id
+        assertCommitEqual(n1.added_by, n2.added_by)
+        keyExtractor = None
+        if commit_assertion == commit_assertion_by_hexsha:
+            # Make autopep8 happy.
+            def f(h):
+                return h.hexsha
+            keyExtractor = f
+        elif commit_assertion == commit_assertion_by_comment:
+            def f(h):
+                return h.message
+            keyExtractor = f
+        if keyExtractor:
+            d1 = dict((keyExtractor, h) for h in n1.history)
+            d2 = dict((keyExtractor, h) for h in n2.history)
+            for k, h1 in d1:
+                h2 = d2.get(k, None)
+                assert isinstance(h1, NodeHistoryItem)
+                assert h2, "Commit history {0} missing for node {1}.".format(h1, n1.node_id)
+                assert isinstance(h2, NodeHistoryItem)
+                assert h1.added_lines == h2.added_lines, "In commit: {0}".format(h1)
+                assert h1.removed_lines == h2.removed_lines, "In commit: {0}".format(h1)
+            if len(d1) < len(d2):
+                # there are extra node history
+                for k, h2 in d2:
+                    h1 = d1.get(k, None)
+                    assert h2, "Extra commit history {0} for node {1}.".format(h1, n1.node_id)
+        assert set(n1.files) == set(n2.files)
+    if expected.get_nodes_count() < actual.get_nodes_count():
+        # there are extra nodes
+        for n2 in actual.enum_nodes():
+            n1 = expected.get_node(n2.node_id)
+            assert n1, "Extra node: {0}".format(n2.node_id)
+    for b1 in expected.enum_edges():
+        b2 = actual.get_edge(b1.from_id, b1.to_id)
+        assert b2, "Edge missing: {0} -> {1}".format(b1.from_id, b1.to_id)
+        assertCommitEqual(b1.added_by, b2.added_by)
+    if expected.get_edges_count() < actual.get_edges_count():
+        # there are extra edges
+        for n2 in actual.enum_edges():
+            n1 = expected.get_edge(n2.from_id, n2.to_id)
+            assert n1, "Extra edge: {0} -> {1}".format(b2.from_id, b2.to_id)
