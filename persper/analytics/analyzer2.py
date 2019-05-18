@@ -128,6 +128,15 @@ class Analyzer:
                                      top_one=top_one,
                                      additive=additive)
 
+    def compute_project_complexity(self, r_n: int, r_e: int):
+        """
+        Evaluates project complexity.
+        params
+            r_n: The conversion factor from node count to logic units.
+            r_e: The conversion factor from edge count to logic units.
+        """
+        return self.graph.eval_project_complexity(r_n, r_e)
+
     async def analyze(self, maxAnalyzedCommits=None, suppressStdOutLogs=False):
         commitSpec = self._terminalCommit
         if self._originCommit:
