@@ -211,7 +211,7 @@ class Analyzer:
 
         t1 = time.monotonic() - t1
         diff_index = None
-        if self._skip_rewind_diff:
+        if self._skip_rewind_diff and seekingMode == CommitSeekingMode.Rewind:
             _logger.info("Skipped diff for rewinding commit.")
         else:
             diff_index = diff_with_commit(self._repo, commit, parentCommit)
