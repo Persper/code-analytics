@@ -4,7 +4,7 @@ import logging
 import re
 import time
 from abc import ABC
-from typing import List, Optional, Set, Union
+from typing import List, Optional, Set, Union, Dict
 
 from git import Commit, Diff, DiffIndex, Repo
 
@@ -20,7 +20,9 @@ class Analyzer:
     def __init__(self, repositoryRoot: str, graphServer: GraphServer,
                  terminalCommit: str = 'HEAD',
                  firstParentOnly: bool = False,
-                 commit_classifier: Optional[CommitClassifier] = None):
+                 commit_classifier: Optional[CommitClassifier] = None,
+                 skip_rewind_diff: bool = False):
+        # skip_rewind_diff will skip diff, but rewind commit start/end will still be notified to the GraphServer.
         self._repositoryRoot = repositoryRoot
         self._graphServer = graphServer
         self._repo = Repo(repositoryRoot)
@@ -32,6 +34,7 @@ class Analyzer:
         self._observer: AnalyzerObserver = emptyAnalyzerObserver
         self._commit_classifier = commit_classifier
         self._clf_results: Dict[str, List[float]] = {}
+        self._skip_rewind_diff = skip_rewind_diff
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -207,7 +210,11 @@ class Analyzer:
             await result
 
         t1 = time.monotonic() - t1
-        diff_index = diff_with_commit(self._repo, commit, parentCommit)
+        diff_index = None
+        if self._skip_rewind_diff and seekingMode == CommitSeekingMode.Rewind:
+            _logger.info("Skipped diff for rewinding commit.")
+        else:
+            diff_index = diff_with_commit(self._repo, commit, parentCommit)
 
         # commit classification
         if self._commit_classifier and commit.hexsha not in self._clf_results:
@@ -216,33 +223,34 @@ class Analyzer:
 
         # t2: update_graph time
         t2 = time.monotonic()
-        for diff in diff_index:
-            old_fname, new_fname = _get_fnames(diff)
-            # apply filter
-            # if a file comes into/goes from our view, we will set corresponding old_fname/new_fname to None,
-            # as if the file is introduced/removed in this commit.
-            # However, the diff will keep its original, no matter if the file has been filtered in/out.
-            if old_fname and not self._graphServer.filter_file(old_fname):
-                old_fname = None
-            if new_fname and not self._graphServer.filter_file(new_fname):
-                new_fname = None
-            if not old_fname and not new_fname:
-                # no modification
-                continue
+        if diff_index:
+            for diff in diff_index:
+                old_fname, new_fname = _get_fnames(diff)
+                # apply filter
+                # if a file comes into/goes from our view, we will set corresponding old_fname/new_fname to None,
+                # as if the file is introduced/removed in this commit.
+                # However, the diff will keep its original, no matter if the file has been filtered in/out.
+                if old_fname and not self._graphServer.filter_file(old_fname):
+                    old_fname = None
+                if new_fname and not self._graphServer.filter_file(new_fname):
+                    new_fname = None
+                if not old_fname and not new_fname:
+                    # no modification
+                    continue
 
-            old_src = new_src = None
+                old_src = new_src = None
 
-            if old_fname:
-                old_src = get_contents(self._repo, parentCommit, old_fname)
+                if old_fname:
+                    old_src = get_contents(self._repo, parentCommit, old_fname)
 
-            if new_fname:
-                new_src = get_contents(self._repo, commit, new_fname)
+                if new_fname:
+                    new_src = get_contents(self._repo, commit, new_fname)
 
-            if old_src or new_src:
-                result = self._graphServer.update_graph(
-                    old_fname, old_src, new_fname, new_src, diff.diff)
-                if asyncio.iscoroutine(result):
-                    await result
+                if old_src or new_src:
+                    result = self._graphServer.update_graph(
+                        old_fname, old_src, new_fname, new_src, diff.diff)
+                    if asyncio.iscoroutine(result):
+                        await result
         t2 = time.monotonic() - t2
 
         # t3: end_commit time
