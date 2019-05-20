@@ -179,7 +179,8 @@ def update_graph(ccgraph, ast_list, change_stats, new_fname_to_old_fname):
         if func not in ccgraph:
             print("%s in change_stats but not in ccgraph" % func)
             continue
-        ccgraph.update_node_history(func, fstat['adds'], fstat['dels'])
+        ccgraph.update_node_history(func, fstat)
+        # ccgraph.update_node_history(func, fstat['adds'], fstat['dels'])
 
 
 def get_func_ranges_c(root):
