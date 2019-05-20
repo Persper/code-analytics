@@ -21,7 +21,8 @@ class Analyzer:
                  terminalCommit: str = 'HEAD',
                  firstParentOnly: bool = False,
                  commit_classifier: Optional[CommitClassifier] = None,
-                 skip_rewind_diff: bool = False):
+                 skip_rewind_diff: bool = False,
+                 monolithic_commit_lines_threshold: int = 5000):
         # skip_rewind_diff will skip diff, but rewind commit start/end will still be notified to the GraphServer.
         self._repositoryRoot = repositoryRoot
         self._graphServer = graphServer
@@ -35,6 +36,7 @@ class Analyzer:
         self._commit_classifier = commit_classifier
         self._clf_results: Dict[str, List[float]] = {}
         self._skip_rewind_diff = skip_rewind_diff
+        self._monolithic_commit_lines_threshold = monolithic_commit_lines_threshold
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -198,6 +200,9 @@ class Analyzer:
         if type(commit) != Commit:
             commit = self._repo.commit(commit)
 
+        # filter monolithic commit
+        seekingMode = self._filter_monolithic_commit(commit, seekingMode)
+
         # t0: Total time usage
         t0 = time.monotonic()
         self._observer.onBeforeCommit(self, commit, seekingMode)
@@ -265,6 +270,19 @@ class Analyzer:
                      t0, t1, t2, t3)
         assert self._graphServer.get_workspace_commit_hexsha() == commit.hexsha, \
             "GraphServer.get_workspace_commit_hexsha should be return the hexsha seen in last start_commit."
+
+    def _filter_monolithic_commit(self, commit: Commit, seeking_mode: CommitSeekingMode) -> CommitSeekingMode:
+        # filter monolithic commit
+        if seeking_mode == CommitSeekingMode.NormalForward and len(commit.parents) == 1:
+            changed_lines = 0
+            files = commit.stats.files
+            for fname in files:
+                if self._graphServer.filter_file(fname):
+                    changed_lines += files[fname]['lines']
+            if changed_lines > self._monolithic_commit_lines_threshold:
+                # enforce using CommitSeekingMode.MergeCommit to update graph without updating node history
+                return CommitSeekingMode.MergeCommit
+        return seeking_mode
 
 
 def _get_fnames(diff: Diff):
