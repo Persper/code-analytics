@@ -119,7 +119,7 @@ class CallCommitGraph:
         else:
             node_history[self._current_commit_id] = {'adds': num_adds, 'dels': num_dels}
 
-    def update_node_history(self, node, fstat):
+    def update_node_history_accurate(self, node, fstat):
         node_history = self._get_node_history(node)
         # A commit might update a node's history more than once when
         # a single FunctionNode corresponds to more than one actual functions
