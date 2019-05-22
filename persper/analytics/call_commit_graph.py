@@ -119,6 +119,19 @@ class CallCommitGraph:
         else:
             node_history[self._current_commit_id] = {'adds': num_adds, 'dels': num_dels}
 
+    def update_node_history_accurate(self, node, fstat):
+        node_history = self._get_node_history(node)
+        # A commit might update a node's history more than once when
+        # a single FunctionNode corresponds to more than one actual functions
+        if self._current_commit_id in node_history:
+            node_history[self._current_commit_id]['adds'] += fstat['adds']
+            node_history[self._current_commit_id]['dels'] += fstat['dels']
+            node_history[self._current_commit_id]['added_units'] += fstat['added_units']
+            node_history[self._current_commit_id]['removed_units'] += fstat['removed_units']
+        else:
+            node_history[self._current_commit_id] = {'adds': fstat['adds'], 'dels': fstat['dels'],
+                                                     'added_units': fstat['added_units'], 'removed_units': fstat['removed_units']}
+
     # read/write access to node history are thourgh this function
     def _get_node_history(self, node: str) -> Dict[str, Dict[str, int]]:
         return self._digraph.nodes[node]['history']
