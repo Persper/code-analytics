@@ -41,13 +41,14 @@ def get_add_line_number(additions, deletions):
         add_line_number.append(tmp_line_number)
         add_num += add_range[1]
     return add_line_number
-#need test
+
 def get_units(src_list, line_number_range):
     """
     Get the sum of units for each line in line_number_range
     """
     units_sum = 0
-    p = re.compile(r'\w+')
+    # p = re.compile(r'\w+')
+    p = re.compile(r'[\w_][\w\d_]*')
     for i in range(line_number_range[0]-1, line_number_range[1]):
         if i >= len(src_list):
             break
@@ -65,6 +66,8 @@ def get_changed_functions(func_names, func_ranges, additions, deletions,
             in the same order of func_names.
         additions: A list of pair of integers,
         deletions: A list of pair of integers,
+        old_src: Old source files,
+        new_src: New source files,
         separate: A boolean flag, if set to True, additions and deletions are
             reported separately.
 
@@ -75,22 +78,25 @@ def get_changed_functions(func_names, func_ranges, additions, deletions,
     info = {}
 
     if (func_names is None or func_ranges is None or
-       additions is None or deletions is None or
-       old_src is None or new_src is None):
+       additions is None or deletions is None):
         return info
 
-    def update_info(fn, num_lines, num_units, key1, key2):
+    def update_info(fn, num_lines, num_units, key_lines, key_units):
         """key should be one of 'adds' or 'dels'."""
         if fn in info:
-            info[fn][key1] += num_lines
-            info[fn][key2] += num_units
+            info[fn][key_lines] += num_lines
+            info[fn][key_units] += num_units
         else:
             info[fn] = {'adds': 0, 'dels': 0, 'added_units': 0, 'removed_units': 0}
-            info[fn][key1] = num_lines
-            info[fn][key2] = num_units
+            info[fn][key_lines] = num_lines
+            info[fn][key_units] = num_units
 
-    old_src_list = old_src.split('\n')
-    new_src_list = new_src.split('\n')
+    old_src_list = []
+    new_src_list = []
+    if not old_src is None:
+        old_src_list = old_src.split('\n')
+    if not new_src is None:
+        new_src_list = new_src.split('\n')
 
     add_line_number = get_add_line_number(additions, deletions)
     add_ptr, del_ptr = 0, 0
