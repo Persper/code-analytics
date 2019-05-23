@@ -28,6 +28,8 @@ def az():
 def test_analyzer_filter_monolithic_commit(az):
     threshold = az._monolithic_commit_lines_threshold
 
+    # case 1: changes above threshold, but the commit is the first commit
+    # expected result: normal forward
     case_1_files = {
         'main.c': {'lines': threshold + 1},
     }
@@ -35,6 +37,8 @@ def test_analyzer_filter_monolithic_commit(az):
     case_1_seeking_mode = az._filter_monolithic_commit(case_1_commit, CommitSeekingMode.NormalForward)
     assert case_1_seeking_mode == CommitSeekingMode.NormalForward
 
+    # case 2: changes equal to threshold, the commit has one parent commit
+    # expected result: normal forward
     case_2_files = {
         'a.c': {'lines': threshold},
     }
@@ -42,6 +46,8 @@ def test_analyzer_filter_monolithic_commit(az):
     case_2_seeking_mode = az._filter_monolithic_commit(case_2_commit, CommitSeekingMode.NormalForward)
     assert case_2_seeking_mode == CommitSeekingMode.NormalForward
 
+    # case 3: changes above threshold, the commit has one parent commit
+    # expected result: merge commit
     case_3_files = {
         'a.c': {'lines': threshold},
         'b.c': {'lines': 1},
@@ -50,6 +56,8 @@ def test_analyzer_filter_monolithic_commit(az):
     case_3_seeking_mode = az._filter_monolithic_commit(case_3_commit, CommitSeekingMode.NormalForward)
     assert case_3_seeking_mode == CommitSeekingMode.MergeCommit
 
+    # case 4: changes equal to threshold, the commit is a merge commit
+    # expected result: merge commit
     case_4_files = {
         'a.c': {'lines': threshold},
     }
