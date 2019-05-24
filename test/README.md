@@ -2,12 +2,14 @@
 
 Our recommended way to run tests is through [pytest](https://docs.pytest.org/en/latest/).
 
-Installation with your favorite package manager:
+It should have been installed if you have run `pipenv install`. Otherwise, install pytest with your favorite package manager:
 
-```
-pip install -U pytest # pip
+```bash
+// pip
+$ pip install -U pytest
 
-conda install pytest # conda
+// or conda
+$ conda install pytest
 ```
 
 ## Run Tests
@@ -15,14 +17,26 @@ conda install pytest # conda
 To run the entire test suite, simply:
 
 ```
-cd test
-pytest 
+cd ${root}
+pipenv run pytest -s test/
 ```
 
 To test a specific module:
 
 ```
-pytest <test_module>.py
+pipenv run pytest -s <test_module>.py
 ```
 
 To learn more about how pytest detects tests, follow this [link](https://docs.pytest.org/en/latest/goodpractices.html#goodpractices).
+
+## Tests that are ignored
+
+You can ignore certain tests by customizing test collection using `conftest.py`. For details, please see [here](https://docs.pytest.org/en/latest/example/pythoncollection.html#customizing-test-collection).
+
+Here is a list of tests that are currently ignored:
+
+1. `test/test_analytics/test_analyzer_cpp.py`
+2. `test/test_analytics/test_analyzer_lsp_ccls.py`
+
+
+
