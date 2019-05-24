@@ -23,7 +23,7 @@ test_ci:
     - export LANG=C.UTF-8
   script:
     - apt-get update
-    - git config --global user.email "merico@meir.co"
+    - git config --global user.email "merico@meri.co"
     - git config --global user.name "merico"
     - pip3 install pipenv
 
@@ -32,14 +32,6 @@ test_ci:
     #&& git checkout ${CI_COMMIT_REF_NAME}
     - export PYTHONPATH=$PYTHONPATH:/root/code-analytics
     - pipenv install --python 3.7
-    - pipenv run pytest -s test/test_analytics/test_analyzer_c.py
-    - pipenv run pytest -s test/test_analytics/test_inverse_diff.py 
-    - pipenv run pytest -s test/test_analytics/test_analyzer.py
-    - pipenv run pytest -s test/test_analytics/test_call_commit_graph.py 
-    - pipenv run pytest -s test/test_analytics/test_detect_change.py
-    - pipenv run pytest -s test/test_analytics/test_devrank.py 
-    - pipenv run pytest -s test/test_analytics/test_diff.py 
-    - pipenv run pytest -s test/test_analytics/test_score.py 
-    - pipenv run pytest -s test/test_analytics/test_srcml.py 
+    - pipenv run pytest -s test/test_analytics
     - pipenv run pytest -s test/test_analytics2
     - echo "Done"
