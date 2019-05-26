@@ -3,13 +3,15 @@ from datetime import datetime, timezone
 from itertools import islice
 from random import randint
 
-from persper.analytics2.abstractions.repository import (
-    FileDiffOperation, ICommitInfo, IFileDiff, IRepositoryHistoryProvider)
+from persper.analytics2.abstractions.repository import (FileDiffOperation,
+                                                        ICommitInfo,
+                                                        ICommitRepository,
+                                                        IFileDiff)
 
 _logger = logging.getLogger(__file__)
 
 
-def test_repository_history_provider(rhp: IRepositoryHistoryProvider):
+def test_repository_history_provider(rhp: ICommitRepository):
     assert rhp
     # We enumerate from the beginning
     commits = list(islice(rhp.enum_commits(None, "HEAD"), 1000))
@@ -22,6 +24,7 @@ def test_repository_history_provider(rhp: IRepositoryHistoryProvider):
     seenCommits = set()
     for c in commits:
         assert isinstance(c, ICommitInfo)
+        assert isinstance(c.hexsha, str)
         # We should see every commit only once
         assert c.hexsha not in seenCommits
         seenCommits.add(c.hexsha)

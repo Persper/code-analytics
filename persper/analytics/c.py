@@ -8,7 +8,7 @@ from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.call_commit_graph import CallCommitGraph
 
 
-def function_change_stats(old_ast, new_ast, patch, patch_parser, ranges_func):
+def function_change_stats(old_ast, old_src, new_ast, new_src, patch, patch_parser, ranges_func):
     """
     Parse old/new source files and extract the change info for all functions
     """
@@ -19,19 +19,21 @@ def function_change_stats(old_ast, new_ast, patch, patch_parser, ranges_func):
 
     if old_ast is not None:
         forward_stats = get_changed_functions(
-            *ranges_func(old_ast), adds, dels, separate=True)
+            *ranges_func(old_ast), adds, dels, old_src, new_src, separate=True)
 
     if new_ast is not None:
         inv_adds, inv_dels = inverse_diff(adds, dels)
         bckward_stats = get_changed_functions(
-            *ranges_func(new_ast), inv_adds, inv_dels, separate=True)
+            *ranges_func(new_ast), inv_adds, inv_dels, new_src, old_src, separate=True)
 
     # merge forward and backward stats
     for func, fstat in bckward_stats.items():
         if func not in forward_stats:
             forward_stats[func] = {
                 'adds': fstat['dels'],
-                'dels': fstat['adds']
+                'dels': fstat['adds'],
+                'added_units': fstat['removed_units'],
+                'removed_units': fstat['added_units']
             }
 
     return forward_stats
@@ -85,7 +87,7 @@ class CGraphServer(GraphServer):
         # Compatible with both the old and the new Analyzer
         change_stats = {}
         if self._seeking_mode != CommitSeekingMode.MergeCommit:
-            change_stats = function_change_stats(old_ast, new_ast, patch,
+            change_stats = function_change_stats(old_ast, old_src, new_ast, new_src, patch,
                                                  self._parse_patch,
                                                  get_func_ranges_c)
 

@@ -8,7 +8,7 @@ from networkx.readwrite import json_graph
 from persper.analytics.devrank import devrank
 from persper.analytics.score import normalize
 from typing import Union, Set, List, Dict, Optional
-
+from persper.analytics.complexity import eval_project_complexity
 
 class CommitIdGenerators:
     @staticmethod
@@ -119,6 +119,19 @@ class CallCommitGraph:
         else:
             node_history[self._current_commit_id] = {'adds': num_adds, 'dels': num_dels}
 
+    def update_node_history_accurate(self, node, fstat):
+        node_history = self._get_node_history(node)
+        # A commit might update a node's history more than once when
+        # a single FunctionNode corresponds to more than one actual functions
+        if self._current_commit_id in node_history:
+            node_history[self._current_commit_id]['adds'] += fstat['adds']
+            node_history[self._current_commit_id]['dels'] += fstat['dels']
+            node_history[self._current_commit_id]['added_units'] += fstat['added_units']
+            node_history[self._current_commit_id]['removed_units'] += fstat['removed_units']
+        else:
+            node_history[self._current_commit_id] = {'adds': fstat['adds'], 'dels': fstat['dels'],
+                                                     'added_units': fstat['added_units'], 'removed_units': fstat['removed_units']}
+
     # read/write access to node history are thourgh this function
     def _get_node_history(self, node: str) -> Dict[str, Dict[str, int]]:
         return self._digraph.nodes[node]['history']
@@ -157,6 +170,15 @@ class CallCommitGraph:
         for node in self.nodes():
             for nbr, datadict in self._digraph.pred[node].items():
                 datadict['weight'] = self._digraph.nodes[node]['size']
+
+    def eval_project_complexity(self, r_n: float, r_e: float):
+        """
+        Evaluates project complexity.
+        params
+            r_n: The conversion factor from node count to logic units.
+            r_e: The conversion factor from edge count to logic units.
+        """
+        return eval_project_complexity(self._digraph, r_n, r_e)
 
     def function_devranks(self, alpha, black_set=None):
         """

@@ -1,0 +1,37 @@
+stages:
+  - build
+  - test
+
+
+test_ci:
+  stage: test
+  image: ubuntu:18.04
+#  only:
+#    - setup-ci
+  before_script:
+    - apt update && apt install -y openssh-client wget libarchive-dev libcurl4-openssl-dev git python3.7 python3-pip
+    - wget http://131.123.42.38/lmcrs/beta/srcML-Ubuntu18.04.deb
+    - dpkg -i srcML-Ubuntu18.04.deb
+    - mkdir -p ~/.ssh
+    - echo "${DEPLOY_KEY}" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-keyscan -H  "gitlab.com" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - set LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+    - export LC_ALL=C.UTF-8
+    - export LANG=C.UTF-8
+  script:
+    - apt-get update
+    - git config --global user.email "merico@meri.co"
+    - git config --global user.name "merico"
+    - pip3 install pipenv
+
+    - echo -e "machine gitlab.com\nlogin ${GITLAB_USER}\npassword ${GITLAB_PASSWD}" > ~/.netrc
+    - git clone https://gitlab.com/persper/code-analytics.git && cd code-analytics 
+    #&& git checkout ${CI_COMMIT_REF_NAME}
+    - export PYTHONPATH=$PYTHONPATH:/root/code-analytics
+    - pipenv install --python 3.7
+    - pipenv run pytest -s test/test_analytics
+    - pipenv run pytest -s test/test_analytics2
+    - echo "Done"

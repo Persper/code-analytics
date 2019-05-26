@@ -12,6 +12,10 @@ class NodeId(NamedTuple):
     name: str
     language: str
 
+    def __eq__(self, other):
+        return self.name == other.name and self.language == other.language
+        
+
 
 class NodeHistoryItem:
     """
@@ -247,7 +251,7 @@ class IWriteOnlyCallCommitGraph(ABC):
         pass
 
     @abstractmethod
-    def update_node_files(self, node_id: NodeId, files: Iterable[str] = None) -> None:
+    def update_node_files(self, node_id: NodeId, commit_hexsha: str, files: Iterable[str] = None) -> None:
         """
         Sets or replaces the list of files that contains this node in the latest commit.
         Note that this method will replace the whole file list of the specified node.
@@ -293,8 +297,31 @@ class ICallCommitGraph(IReadOnlyCallCommitGraph, IWriteOnlyCallCommitGraph):
 
 class IGraphServer(ABC):
     """
-    Provides basic functionality to trigger the commit analysis on graph server. 
+    Provides basic functionality to trigger the commit analysis on graph server.
+    remarks
+        The call sequence:
+        * start
+        * update_graph
+        * update_graph
+        * ...
+        * update_graph
+        * stop
     """
+    @abstractmethod
+    def start(self) -> None:
+        """
+        When implemented, starts the graph server and get ready for commit analysis, if applicable.
+        This includes starting the graph server process, preparing workspace folder, etc.
+        """
+        pass
+
+    @abstractmethod
+    def stop(self) -> None:
+        """
+        When implemented, stops the graph server and do necessary cleanup, if applicable.
+        """
+        pass
+
     @abstractmethod
     def update_graph(self, commit: ICommitInfo) -> None:
         """
