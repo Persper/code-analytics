@@ -137,6 +137,16 @@ class Analyzer:
         """
         return self.graph.eval_project_complexity(r_n, r_e)
 
+    def compute_modularity(self):
+        """Compute modularity score based on function graph.
+
+        Returns
+        -------
+            modularity : float
+                The modularity score of this graph.
+        """
+        return self.graph.compute_modularity()
+
     async def analyze(self, maxAnalyzedCommits=None, suppressStdOutLogs=False):
         commitSpec = self._terminalCommit
         if self._originCommit:

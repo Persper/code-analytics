@@ -9,6 +9,7 @@ from persper.analytics.devrank import devrank
 from persper.analytics.score import normalize
 from typing import Union, Set, List, Dict, Optional
 from persper.analytics.complexity import eval_project_complexity
+import community
 
 class CommitIdGenerators:
     @staticmethod
@@ -241,3 +242,26 @@ class CallCommitGraph:
             else:
                 developer_devranks[email] = commit_devranks[sha]
         return developer_devranks
+
+    def compute_modularity(self):
+        """Compute modularity score based on function graph.
+
+        Returns
+        -------
+            modularity : float
+                The modularity score of this graph.
+        """
+        # Construct non directed graph
+        graph = nx.Graph()
+        for node in self.nodes():
+            graph.add_node(node)
+        for (source, target) in self.edges():
+            graph.add_edge(source, target)
+        # Compute the partition of the graph nodes
+        partition = community.best_partition(graph)
+        # Compute modularity
+        modularity = community.modularity(partition, graph)
+        # Normalize [0, 1] to [0, 100]
+        modularity = modularity * 100
+
+        return modularity
