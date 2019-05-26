@@ -45,7 +45,7 @@ def test_detect_change():
         assert func_ranges_result == func_ranges_truth
 
     assert changed_result == get_changed_functions(
-        *func_ranges_result, *parsing_result)
+        *func_ranges_result, *parsing_result, None, None)
 
 
 def test_get_changed_functions():
@@ -64,23 +64,35 @@ def test_get_changed_functions():
         example_patch = f.read()
         parsing_result = parser.parse(example_patch)
 
+    old_src, new_src = '', ''
+    with open(os.path.join(dir_path, 'patch_test_files/example7_old.c'), 'r') as f:
+        old_src = f.read()
+    with open(os.path.join(dir_path, 'patch_test_files/example7_new.c'), 'r') as f:
+        new_src = f.read()
+
     changed_truth = {
         'append': {
             'adds': 26,
-            'dels': 9
+            'dels': 9,
+            'added_units': 40,
+            'removed_units': 33
         },
         'add': {
             'adds': 0,
-            'dels': 5
+            'dels': 5,
+            'added_units': 0,
+            'removed_units': 6
         },
         'insert': {
             'adds': 0,
-            'dels': 25
+            'dels': 25,
+            'added_units': 0,
+            'removed_units': 44
         }
 
     }
     assert changed_truth == get_changed_functions(
-        *func_ranges_truth, *parsing_result, separate=True)
+        *func_ranges_truth, *parsing_result, old_src, new_src, separate=True)
 
 
 def test_patch_parser():
