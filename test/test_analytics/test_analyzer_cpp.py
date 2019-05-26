@@ -41,13 +41,13 @@ async def test_analyzer_files(az):
 
     history_truth = {
         'C': {
-            'printmessage': {'adds': 4, 'dels': 0},
-            'main': {'adds': 4, 'dels': 0}
+            'printmessage': {'adds': 4, 'dels': 0, 'added_units': 7, 'removed_units': 0},
+            'main': {'adds': 4, 'dels': 0, 'added_units': 3, 'removed_units': 0}
         },
         'B': {},
         'A': {
-            'addition': {'adds': 6, 'dels': 0},
-            'main': {'adds': 6, 'dels': 0}
+            'addition': {'adds': 6, 'dels': 0, 'added_units': 13, 'removed_units': 0},
+            'main': {'adds': 6, 'dels': 0, 'added_units': 13, 'removed_units': 0}
         },
     }
 
