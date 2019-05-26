@@ -95,6 +95,33 @@ def test_call_commit_graph():
     assert isclose(dev_drs3[second_commit['authorEmail']], 0.201, rel_tol=1e-2)
 
 
+def test_devrank_with_accurate_history():
+    ccgraph = CallCommitGraph()
+    first_commit = {
+        'hexsha': '0x01',
+        'authorName': 'koala',
+        'authorEmail': 'koala@persper.org',
+        'message': 'first commit'
+    }
+    ccgraph.add_commit(first_commit['hexsha'],
+                       first_commit['authorName'],
+                       first_commit['authorEmail'],
+                       first_commit['message'])
+    ccgraph.add_node('f1')
+    ccgraph.update_node_history_accurate('f1', {'adds': 10, 'dels': 0, 'added_units': 20, 'removed_units': 0})
+    ccgraph.add_node('f2')
+    ccgraph.update_node_history_accurate('f2', {'adds': 10, 'dels': 0, 'added_units': 40, 'removed_units': 0})
+    ccgraph.add_edge('f1', 'f2')
+
+    func_drs = ccgraph.function_devranks(0.85)
+    commit_drs = ccgraph.commit_devranks(0.85)
+    dev_drs = ccgraph.developer_devranks(0.85)
+    assert isclose(func_drs['f1'], 0.26, rel_tol=1e-2)
+    assert isclose(func_drs['f2'], 0.74, rel_tol=1e-2)
+    assert isclose(commit_drs[first_commit['hexsha']], 1)
+    assert isclose(dev_drs[first_commit['authorEmail']], 1)
+
+
 @pytest.mark.asyncio
 async def test_black_set():
     """

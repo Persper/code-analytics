@@ -148,15 +148,15 @@ class CallCommitGraph:
         """
         for node in self.nodes():
             node_history = self._get_node_history(node)
-            if black_set is not None:
-                size = 0
-                for cid, chist in node_history.items():
-                    sha = self.commits()[cid]['hexsha']
-                    if sha not in black_set:
-                        size += (chist['adds'] + chist['dels'])
-            else:
-                size = sum([chist['adds'] + chist['dels'] for chist in node_history.values()])
-
+            size = 0
+            for cid, chist in node_history.items():
+                sha = self.commits()[cid]['hexsha']
+                if black_set is not None and sha in black_set:
+                    continue
+                if 'added_units' in chist.keys() and 'removed_units' in chist.keys():
+                    size += (chist['added_units'] + chist['removed_units'])
+                else:
+                    size += (chist['adds'] + chist['dels'])
             # set default size to 1 to avoid zero division error
             if size == 0:
                 size = 1
@@ -206,7 +206,10 @@ class CallCommitGraph:
                 continue
 
             for cid, chist in history.items():
-                csize = chist['adds'] + chist['dels']
+                if 'added_units' in chist.keys() and 'removed_units' in chist.keys():
+                    csize = (chist['added_units'] + chist['removed_units'])
+                else:
+                    csize = (chist['adds'] + chist['dels'])
                 sha = self.commits()[cid]['hexsha']
                 if black_set is None or sha not in black_set:
                     dr = (csize / size) * func_devranks[func]
