@@ -251,6 +251,10 @@ class CallCommitGraph:
             modularity : float
                 The modularity score of this graph.
         """
+        # Check the number of edges
+        if len(self.edges()) == 0:
+            return 0.
+
         # Construct non directed graph
         graph = nx.Graph()
         for node in self.nodes():
