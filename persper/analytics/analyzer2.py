@@ -298,8 +298,10 @@ class Analyzer:
             for fname in files:
                 if self._graphServer.filter_file(fname):
                     changed_lines += files[fname]['lines']
+            print('_filter_monolithic_commit commit:', commit.hexsha, 'changed_lines:', changed_lines)
             if changed_lines > self._monolithic_commit_lines_threshold:
                 # enforce using CommitSeekingMode.MergeCommit to update graph without updating node history
+                print('_filter_monolithic_commit set CommitSeekingMode to MergeCommit')
                 return CommitSeekingMode.MergeCommit
         return seeking_mode
 

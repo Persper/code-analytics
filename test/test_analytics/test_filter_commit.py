@@ -68,6 +68,7 @@ def test_analyzer_filter_monolithic_commit(az):
 
 class MockCommit:
     def __init__(self, files: dict, parent_number: int = 1):
+        self.hexsha = 'test'
         self.stats = MockCommitStats(files)
         self.parents = [{}] * parent_number
 
