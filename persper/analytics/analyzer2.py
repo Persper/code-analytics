@@ -292,7 +292,8 @@ class Analyzer:
 
     def _filter_monolithic_commit(self, commit: Commit, seeking_mode: CommitSeekingMode) -> CommitSeekingMode:
         # filter monolithic commit
-        if seeking_mode == CommitSeekingMode.NormalForward and len(commit.parents) == 1:
+        # hot fix: enable filter_monolithic_commit on first commit
+        if seeking_mode == CommitSeekingMode.NormalForward and len(commit.parents) <= 1:
             changed_lines = 0
             files = commit.stats.files
             for fname in files:
