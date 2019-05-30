@@ -183,7 +183,7 @@ class Analyzer:
                 else:
                     expectedParentCommit = None
                     message = None
-                    if not commit.parents:
+                    if len(commit.parents) == 0:
                         message = "Going forward (initial commit)."
                         expectedParentCommit = None
                     else:
