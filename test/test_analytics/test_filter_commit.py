@@ -29,13 +29,13 @@ def test_analyzer_filter_monolithic_commit(az):
     threshold = az._monolithic_commit_lines_threshold
 
     # case 1: changes above threshold, but the commit is the first commit
-    # expected result: normal forward
+    # expected result: merge commit
     case_1_files = {
         'main.c': {'lines': threshold + 1},
     }
     case_1_commit = MockCommit(case_1_files, 0)
     case_1_seeking_mode = az._filter_monolithic_commit(case_1_commit, CommitSeekingMode.NormalForward)
-    assert case_1_seeking_mode == CommitSeekingMode.NormalForward
+    assert case_1_seeking_mode == CommitSeekingMode.MergeCommit
 
     # case 2: changes equal to threshold, the commit has one parent commit
     # expected result: normal forward
