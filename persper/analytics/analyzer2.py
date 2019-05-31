@@ -24,7 +24,7 @@ class Analyzer:
                  commit_classifier: Optional[CommitClassifier] = None,
                  skip_rewind_diff: bool = False,
                  monolithic_commit_lines_threshold: int = 5000,
-                 monolithic_file_bytes_threshold: int = 100000):
+                 monolithic_file_bytes_threshold: int = 200000):
         # skip_rewind_diff will skip diff, but rewind commit start/end will still be notified to the GraphServer.
         self._repositoryRoot = repositoryRoot
         self._graphServer = graphServer
