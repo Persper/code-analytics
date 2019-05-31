@@ -40,6 +40,13 @@ class MultiAnalyzer:
                     self._linguist[lang] = value
 
             print(self._linguist)
+            if "Vue" in self._linguist:
+                print("Merging Vue to Javascript...")
+                if "Javascript" not in self._linguist:
+                    self._linguist["Javascript"] = 0
+                self._linguist["Javascript"] += self._linguist["Vue"]
+                del self._linguist["Vue"]
+                print(self._linguist)
 
         else:
             print('Analyzing Language Error from Linguist')
@@ -52,7 +59,7 @@ class MultiAnalyzer:
         print(self._analyzers)
 
     async def analyzing(self, saved_path=None):
-        for language, analyzer in self._analyzers.items():    
+        for language, analyzer in self._analyzers.items(): 
             print('Start Analyzing Language, ', language)
             analyzer.terminalCommit = analyzer._repo.head.commit
             await analyzer.analyze()
