@@ -12,7 +12,8 @@ JS_FILENAME_REGEXES = [
     r'^(?!spec/).+',
     r'^(?!build/).+',
     r'^(?!bin/).+',
-    r'^(?!doc(s)?/).+'
+    r'^(?!doc(s)?/).+',
+    r'.*(?<!.min.js)$'
 ]
 
 # todo(hezheng) consider moving these regexes to their corresponding language file
