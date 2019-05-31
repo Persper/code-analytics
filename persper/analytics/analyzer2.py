@@ -2,6 +2,7 @@ import asyncio
 import collections.abc
 import logging
 import re
+import sys
 import time
 from abc import ABC
 from typing import List, Optional, Set, Union, Dict
@@ -22,7 +23,8 @@ class Analyzer:
                  firstParentOnly: bool = False,
                  commit_classifier: Optional[CommitClassifier] = None,
                  skip_rewind_diff: bool = False,
-                 monolithic_commit_lines_threshold: int = 5000):
+                 monolithic_commit_lines_threshold: int = 5000,
+                 monolithic_file_bytes_threshold: int = 100000):
         # skip_rewind_diff will skip diff, but rewind commit start/end will still be notified to the GraphServer.
         self._repositoryRoot = repositoryRoot
         self._graphServer = graphServer
@@ -37,6 +39,7 @@ class Analyzer:
         self._clf_results: Dict[str, List[float]] = {}
         self._skip_rewind_diff = skip_rewind_diff
         self._monolithic_commit_lines_threshold = monolithic_commit_lines_threshold
+        self._monolithic_file_bytes_threshold = monolithic_file_bytes_threshold
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -250,10 +253,10 @@ class Analyzer:
         if diff_index:
             for diff in diff_index:
                 old_fname, new_fname = _get_fnames(diff)
-                # apply filter
+                # apply file-level filter
                 # if a file comes into/goes from our view, we will set corresponding old_fname/new_fname to None,
                 # as if the file is introduced/removed in this commit.
-                # However, the diff will keep its original, no matter if the file has been filtered in/out.
+                # However, the diff will not change, regardless of whether the file has been filtered out or not.
                 if old_fname and not self._graphServer.filter_file(old_fname):
                     old_fname = None
                 if new_fname and not self._graphServer.filter_file(new_fname):
@@ -266,9 +269,13 @@ class Analyzer:
 
                 if old_fname:
                     old_src = get_contents(self._repo, parentCommit, old_fname)
+                    if self._file_is_too_large(old_fname, old_src):
+                        continue
 
                 if new_fname:
                     new_src = get_contents(self._repo, commit, new_fname)
+                    if self._file_is_too_large(new_fname, new_src):
+                        continue
 
                 if old_src or new_src:
                     result = self._graphServer.update_graph(
@@ -305,6 +312,18 @@ class Analyzer:
                 print('_filter_monolithic_commit set CommitSeekingMode to MergeCommit')
                 return CommitSeekingMode.MergeCommit
         return seeking_mode
+
+    def _file_is_too_large(self, fname, file_content):
+        # Filter monolithic file by its byte size
+        # Returns True if under the threshold
+        file_size = sys.getsizeof(file_content)
+        too_large = file_size > self._monolithic_file_bytes_threshold
+        if too_large:
+            message = 'WARNING: file too large;'
+        else:
+            message = 'OK: file normal size;'
+        print(message, fname, str(file_size / 1000) + 'kB')
+        return too_large
 
 
 def _get_fnames(diff: Diff):
