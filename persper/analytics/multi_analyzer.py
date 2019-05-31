@@ -42,9 +42,9 @@ class MultiAnalyzer:
             print(self._linguist)
             if "Vue" in self._linguist:
                 print("Merging Vue to Javascript...")
-                if "Javascript" not in self._linguist:
-                    self._linguist["Javascript"] = 0
-                self._linguist["Javascript"] += self._linguist["Vue"]
+                if "JavaScript" not in self._linguist:
+                    self._linguist["JavaScript"] = 0
+                self._linguist["JavaScript"] += self._linguist["Vue"]
                 del self._linguist["Vue"]
                 print(self._linguist)
 
