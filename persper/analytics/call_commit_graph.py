@@ -279,9 +279,11 @@ class CallCommitGraph:
         # Construct non directed graph
         graph = nx.Graph()
         for node in self.nodes():
-            graph.add_node(node)
+            if node is not None:
+                graph.add_node(node)
         for (source, target) in self.edges():
-            graph.add_edge(source, target)
+            if source is not None and target is not None:
+                graph.add_edge(source, target)
         # Compute the partition of the graph nodes
         partition = community.best_partition(graph)
         # Compute modularity
