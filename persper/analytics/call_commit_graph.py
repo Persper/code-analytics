@@ -3,13 +3,18 @@ call_commit_graph.py
 ====================================
 CallCommitGraph stores all relevant analysis results
 """
+import logging
+import community
 import networkx as nx
 from networkx.readwrite import json_graph
+from typing import Union, Set, List, Dict, Optional
+
 from persper.analytics.devrank import devrank
 from persper.analytics.score import normalize
-from typing import Union, Set, List, Dict, Optional
 from persper.analytics.complexity import eval_project_complexity
-import community
+
+_logger = logging.getLogger(__name__)
+
 
 class CommitIdGenerators:
     @staticmethod
@@ -100,12 +105,14 @@ class CallCommitGraph:
     # TODO: remove the default value of files
     def add_node(self, node: str, files: Union[Set[str], List[str]] = []):
         if node is None:
+            _logger.error("Argument node is None in add_node.")
             return
         self._digraph.add_node(node, size=None, history={}, files=set(files))
 
     # add_node must be called on source and target first
     def add_edge(self, source, target):
         if source is None or target is None:
+            _logger.error("Argument source or target is None in add_edge.")
             return
         if source not in self._digraph:
             raise ValueError("Error: caller %s does not exist in call-commit graph." % source)
@@ -141,11 +148,13 @@ class CallCommitGraph:
     # read/write access to node history are thourgh this function
     def _get_node_history(self, node: str) -> Dict[str, Dict[str, int]]:
         if node is None:
+            _logger.error("Argument node is None in _get_node_history.")
             return {}
         return self._digraph.nodes[node]['history']
 
     def update_node_files(self, node: str, new_files: Union[Set[str], List[str]]):
         if node is None:
+            _logger.error("Argument node is None in update_node_files")
             return
         self._digraph.nodes[node]['files'] = set(new_files)
 
@@ -174,6 +183,7 @@ class CallCommitGraph:
 
     def _set_node_size(self, node, size):
         if node is None:
+            _logger.error("Argument node is None in _set_node_size.")
             return
         self._digraph.nodes[node]['size'] = size
 
