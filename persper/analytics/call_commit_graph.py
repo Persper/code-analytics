@@ -51,6 +51,7 @@ class CallCommitGraph:
     def reset(self):
         """Reset all internal states"""
         self._digraph = self._new_graph()
+        self._digraph.degree()
 
     def _new_graph(self):
         """Create a new nx.DiGraph for underlying storage
@@ -98,10 +99,14 @@ class CallCommitGraph:
 
     # TODO: remove the default value of files
     def add_node(self, node: str, files: Union[Set[str], List[str]] = []):
+        if node is None:
+            return
         self._digraph.add_node(node, size=None, history={}, files=set(files))
 
     # add_node must be called on source and target first
     def add_edge(self, source, target):
+        if source is None or target is None:
+            return
         if source not in self._digraph:
             raise ValueError("Error: caller %s does not exist in call-commit graph." % source)
         if target not in self._digraph:
@@ -135,9 +140,13 @@ class CallCommitGraph:
 
     # read/write access to node history are thourgh this function
     def _get_node_history(self, node: str) -> Dict[str, Dict[str, int]]:
+        if node is None:
+            return {}
         return self._digraph.nodes[node]['history']
 
     def update_node_files(self, node: str, new_files: Union[Set[str], List[str]]):
+        if node is None:
+            return
         self._digraph.nodes[node]['files'] = set(new_files)
 
     # TODO: provide other options for computing a node's size
@@ -164,6 +173,8 @@ class CallCommitGraph:
             self._set_node_size(node, size)
 
     def _set_node_size(self, node, size):
+        if node is None:
+            return
         self._digraph.nodes[node]['size'] = size
 
     def _set_all_edges_weight(self):
