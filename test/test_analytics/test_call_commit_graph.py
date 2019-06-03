@@ -148,3 +148,13 @@ async def test_black_set():
     assert len(devdict2) == 2
     assert parent_sha in devdict
     assert parent_sha not in devdict2
+
+
+def test_remove_invalid_nodes():
+    ccgraph = CallCommitGraph()
+    ccgraph.add_node('f1')
+    ccgraph.add_node(None)
+    ccgraph.add_edge('f1', None)
+
+    func_drs = ccgraph.function_devranks(0.85)
+    assert isclose(func_drs['f1'], 1, rel_tol=1e-2)

@@ -184,7 +184,7 @@ class CallCommitGraph:
     def _set_node_size(self, node, size):
         if node is None:
             _logger.error("Argument node is None in _set_node_size.")
-            return
+        # set node size even if it is None since we'd like to suppress the error
         self._digraph.nodes[node]['size'] = size
 
     def _set_all_edges_weight(self):
@@ -202,12 +202,17 @@ class CallCommitGraph:
         """
         return eval_project_complexity(self._digraph, r_n, r_e)
 
+    def _remove_invalid_nodes(self):
+        if None in self.nodes():
+            self._digraph.remove_node(None)
+
     def function_devranks(self, alpha, black_set=None):
         """
         Args:
                 alpha - A float between 0 and 1, commonly set to 0.85
             black_set - A set of commit hexshas to be blacklisted
         """
+        self._remove_invalid_nodes()
         self._set_all_nodes_size(black_set=black_set)
         return devrank(self._digraph, 'size', alpha=alpha)
 
