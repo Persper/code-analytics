@@ -248,8 +248,12 @@ class Analyzer:
             prob = self._commit_classifier.predict(commit, diff_index)
             self._clf_results[commit.hexsha] = prob
 
-        # t2: update_graph time
+        # t2: update_graph + git diff traversing time
         t2 = time.monotonic()
+        # t2a: get_contents time
+        t2a = 0
+        # t2a: update_graph time
+        t2b = 0
         if diff_index:
             for diff in diff_index:
                 old_fname, new_fname = _get_fnames(diff)
@@ -267,6 +271,7 @@ class Analyzer:
 
                 old_src = new_src = None
 
+                t2a0 = time.monotonic()
                 if old_fname:
                     old_src = get_contents(self._repo, parentCommit, old_fname)
                     if self._file_is_too_large(old_fname, old_src):
@@ -276,12 +281,15 @@ class Analyzer:
                     new_src = get_contents(self._repo, commit, new_fname)
                     if self._file_is_too_large(new_fname, new_src):
                         continue
+                t2a += time.monotonic() - t2a0
 
+                t2b0 = time.monotonic()
                 if old_src or new_src:
                     result = self._graphServer.update_graph(
                         old_fname, old_src, new_fname, new_src, diff.diff)
                     if asyncio.iscoroutine(result):
                         await result
+                t2b += time.monotonic() - t2b0
         t2 = time.monotonic() - t2
 
         # t3: end_commit time
@@ -292,8 +300,8 @@ class Analyzer:
         t3 = time.monotonic() - t3
         self._observer.onAfterCommit(self, commit, seekingMode)
         t0 = time.monotonic() - t0
-        _logger.info("t0 = %.2f, t1 = %.2f, t2 = %.2f, t3 = %.2f",
-                     t0, t1, t2, t3)
+        _logger.info("t0 = %.2f, t1 = %.2f, t2 = %.2f, t2a = %.2f, t2b = %.2f, t3 = %.2f",
+                     t0, t1, t2, t2a, t2b, t3)
         assert self._graphServer.get_workspace_commit_hexsha() == commit.hexsha, \
             "GraphServer.get_workspace_commit_hexsha should be return the hexsha seen in last start_commit."
 
