@@ -245,7 +245,7 @@ class Analyzer:
 
         # commit classification
         if self._commit_classifier and commit.hexsha not in self._clf_results:
-            prob = self._commit_classifier.predict(commit, diff_index)
+            prob = self._commit_classifier.predict(commit, diff_index, self._repo)
             self._clf_results[commit.hexsha] = prob
 
         # t2: update_graph + git diff traversing time

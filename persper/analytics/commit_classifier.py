@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from git import Commit, DiffIndex
+from git import Commit, DiffIndex, Repo
 
 
 class CommitClassifier(ABC):
@@ -8,13 +8,14 @@ class CommitClassifier(ABC):
     """
 
     @abstractmethod
-    def predict(self, commit: Commit, diff_index: DiffIndex):
+    def predict(self, commit: Commit, diff_index: DiffIndex, repo: Repo):
         """
         Args:
             commit: A gitpython's Commit object.
             diff_index: A gitpython's DiffIndex object.
                 It is a list of Diff object, each containing the
                 diff information between a pair of old/new source files.
+            repo: A gitpython's Repo object.
 
 
         Returns:
