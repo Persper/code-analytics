@@ -30,8 +30,8 @@ GO_FILENAME_REGEXES = [
     r'.+\.go$',
     r'^(?!(.+/)*vendor/).+',
     r'^(?!examples/).+',
-    r'^(?!thrift/gen-go/).+',
-    r'^(?!thrift/thrift-gen/).+',
+    r'^(?!(.+/)*thrift/gen-go/).+',
+    r'^(?!(.+/)*thrift/thrift-gen/).+',
 ]
 
 JAVA_FILENAME_REGEXES = [
