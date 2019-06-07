@@ -13,6 +13,8 @@ from persper.analytics.commit_classifier import CommitClassifier
 from persper.analytics.git_tools import diff_with_commit, get_contents
 from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.score import commit_overall_scores
+from git.compat import defenc
+from merico.techtag.conf.token2package import init_config as init_token2package
 
 _logger = logging.getLogger(__name__)
 
@@ -41,6 +43,8 @@ class Analyzer:
         self._monolithic_commit_lines_threshold = monolithic_commit_lines_threshold
         self._monolithic_file_bytes_threshold = monolithic_file_bytes_threshold
         self._call_commit_graph = None
+        self._author_packages = {}
+        self._token_2_package = init_token2package()
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -165,6 +169,13 @@ class Analyzer:
         """
         return self.graph.compute_modularity()
 
+    def get_author_packages(self):
+        """
+        Get the info about author and packages.
+        :return: {author1: {package1, package2, ...}}
+        """
+        return self._author_packages
+
     async def analyze(self, maxAnalyzedCommits=None, suppressStdOutLogs=False):
         self._call_commit_graph = None
         commitSpec = self._terminalCommit
@@ -258,6 +269,27 @@ class Analyzer:
             _logger.info("Skipped diff for rewinding commit.")
         else:
             diff_index = diff_with_commit(self._repo, commit, parentCommit)
+
+            package_set = self._author_packages.get(str(commit.author), set())
+
+            for d in diff_index:
+                try:
+                    # Get the patch message
+                    msg = d.diff.decode(defenc)
+                    # Traverse all lines
+                    for line in msg.splitlines():
+                        # Only consider new additions
+                        if line.startswith("+"):
+                            keywords = re.findall("\w+", line)
+                            for keyword in keywords:
+                                package = self._token_2_package[keyword]
+                                if package is not None:
+                                    package_set.add(package)
+
+                except UnicodeDecodeError:
+                    continue
+
+            self._author_packages[str(commit.author)] = package_set
 
         # commit classification
         if self._commit_classifier and commit.hexsha not in self._clf_results:
