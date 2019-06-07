@@ -29,7 +29,8 @@ CPP_FILENAME_REGEXES = {
 GO_FILENAME_REGEXES = [
     r'.+\.go$',
     r'^(?!(.+/)*vendor/).+',
-    r'^(?!examples/).+',
+    r'^(?!Godeps/).+',
+    r'^(?!(.+/)*example(s)?/).+',
     r'^(?!(.+/)*thrift/gen-go/).+',
     r'^(?!(.+/)*thrift/thrift-gen/).+',
 ]
