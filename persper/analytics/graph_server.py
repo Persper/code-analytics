@@ -30,7 +30,7 @@ GO_FILENAME_REGEXES = [
     r'.+\.go$',
     r'^(?!(.+/)*vendor/).+',
     r'^(?!Godeps/).+',
-    r'^(?!examples/).+',
+    r'^(?!(.+/)*example(s)?/).+',
     r'^(?!(.+/)*thrift/gen-go/).+',
     r'^(?!(.+/)*thrift/thrift-gen/).+',
 ]
