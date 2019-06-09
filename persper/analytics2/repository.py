@@ -2,7 +2,8 @@ import logging
 import os.path
 from io import TextIOWrapper
 from time import monotonic
-from typing import Union
+from typing import Union, Iterable
+import re
 
 from git import Blob, Commit, Diff, DiffIndex, Repo
 
@@ -287,3 +288,13 @@ class GitFileDiff(IFileDiff):
             raise NotImplementedError(
                 "patch is not supported for partial diff view. (a or b side is hidden by filter.)")
         return self._diff.diff
+
+class FileNameRegexWorkspaceFileFilter(IWorkspaceFileFilter):
+    def __init__(self, file_name_pattern: str):
+        self.matcher = re.compile(file_name_pattern)
+
+    def filter_file(self, file_name: str, file_path: str) -> bool:
+        return self.matcher.match(file_name)
+
+    def filter_folder(self, folder_name: str, folder_path) -> bool:
+        return True

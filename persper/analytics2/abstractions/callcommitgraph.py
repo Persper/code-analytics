@@ -247,7 +247,20 @@ class IWriteOnlyCallCommitGraph(ABC):
     @abstractmethod
     def update_node_history(self, node_id: NodeId, commit_hexsha: str, added_lines: int = 0, removed_lines: int = 0) -> None:
         """
-        Sets or replaces the modification information of the specified node ID and commit hexsha.
+        Sets or replaces the modification information (by lines of code) of the specified node ID and commit hexsha.
+        remarks
+            If the node does not exist, it will be created.
+            If commit_hexsha doesn't exist in history, add the entry to history.
+            If commit_hexsha exists in history, the entry will be *replaced*.
+                Note the entire node history entry of this hexsha will be replaced rather than merged.
+            To accumulate multiple modifications to a node in the same commit, use `NodeHistoryAccumulator` helper class.
+        """
+        pass
+
+    @abstractmethod
+    def update_node_history_lu(self, node_id: NodeId, commit_hexsha: str, added_units: int = 0, removed_units: int = 0) -> None:
+        """
+        Sets or replaces the modification information (by count of logical units) of the specified node ID and commit hexsha.
         remarks
             If the node does not exist, it will be created.
             If commit_hexsha doesn't exist in history, add the entry to history.

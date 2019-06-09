@@ -1,4 +1,8 @@
+from typing import Iterable, Union
+
 from persper.analytics2.abstractions.callcommitgraph import IWriteOnlyCallCommitGraph, NodeId
+
+__all__ = ["NodeHistoryAccumulator", "NodeFilesAccumulator"]
 
 
 class NodeHistoryAccumulator():
@@ -7,8 +11,9 @@ class NodeHistoryAccumulator():
     (i.e. the added/removed lines to the same node in a single commit)
     """
 
-    def __init__(self):
+    def __init__(self, logical_units: bool = False):
         # [NodeId]: [added_lines, removed_lines]
+        self._logical_units = logical_units
         self._nodes = {}
 
     def clear(self):
@@ -58,5 +63,47 @@ class NodeHistoryAccumulator():
         remarks
             You may want to call `clear` to reset the change history after calling this method. 
         """
-        for id, (added, removed) in self._nodes:
-            graph.update_node_history(id, commit_hexsha, added, removed)
+        if self._logical_units:
+            for id, (added, removed) in self._nodes:
+                graph.update_node_history_lu(id, commit_hexsha, added, removed)
+        else:
+            for id, (added, removed) in self._nodes:
+                graph.update_node_history(id, commit_hexsha, added, removed)
+
+
+class NodeFilesAccumulator():
+    def __init__(self):
+        self._nodes = {}
+
+    def clear(self):
+        self._nodes.clear()
+
+    def put(self, node_id: NodeId, added_files: Union[str, Iterable[str]] = None, removed_files: Union[str, Iterable[str]] = None):
+        if not added_files and not removed_files:
+            return
+        files = self._nodes.get(node_id, None)
+        if files == None:
+            files = set()
+            self._nodes[node_id] = files
+        if added_files:
+            if isinstance(added_files, str):
+                files.add(added_files)
+            else:
+                files.update(added_files)
+        if removed_files:
+            if isinstance(removed_files, str):
+                files.remove(removed_files)
+            else:
+                files.difference_update(removed_files)
+
+    def get(self, node_id: NodeId):
+        """
+        Gets the files where the specified node is defined.
+        returns
+            a collection of file names. Do not modify the returned collection, or there will be undefined behavior.
+        """
+        return self._nodes.get(node_id, ())
+
+    def apply(self, graph: IWriteOnlyCallCommitGraph, commit_hexsha: str):
+        for id, files in self._nodes:
+            graph.update_node_files(id, commit_hexsha, files)
