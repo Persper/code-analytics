@@ -33,6 +33,7 @@ GO_FILENAME_REGEXES = [
     r'^(?!(.+/)*example(s)?/).+',
     r'^(?!(.+/)*thrift/gen-go/).+',
     r'^(?!(.+/)*thrift/thrift-gen/).+',
+    r'^(?!\.gen/go/).+',
 ]
 
 JAVA_FILENAME_REGEXES = [
