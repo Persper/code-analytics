@@ -88,7 +88,7 @@ class CGraphServer(IGraphServer):
             if d.new_file:
                 new_ast = src_to_tree(d.new_file.name, new_src)
                 if new_ast is None:
-                    _logger.warning("Failed to parse new_file: %s. Skipped.", d.old_file.name)
+                    _logger.warning("Failed to parse new_file: %s. Skipped.", d.new_file.name)
                     continue
             # Update node history
             if len(commit.parents) <= 1:
@@ -106,7 +106,7 @@ class CGraphServer(IGraphServer):
                     self._ccgraph.update_node_history_lu(node_id, hexsha, v['added_units'], v['removed_units'])
             # Update edges & node files
             old_file_path = d.old_file.path if d.old_file else None
-            new_file_path = d.old_file.path if d.new_file else None
+            new_file_path = d.new_file.path if d.new_file else None
             update_graph_a2(self._ccgraph, self._files, commit.hexsha,
                             self._language, new_ast, old_file_path, new_file_path)
 

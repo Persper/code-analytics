@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import datetime, timedelta
 from random import randint
@@ -6,6 +7,7 @@ from typing import Iterable
 from persper.analytics2.abstractions.callcommitgraph import (
     Commit, Edge, ICallCommitGraph, IReadOnlyCallCommitGraph, Node,
     NodeHistoryItem, NodeId)
+from persper.analytics2.memorycallcommitgraph import MemoryCallCommitGraph
 
 
 def commit_equals(x: Commit, y: Commit):
@@ -197,6 +199,7 @@ def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallC
             def f(h):
                 return h.message
             keyExtractor = f
+        # TODO Add history_lu assertion
         if keyExtractor:
             d1 = dict((keyExtractor, h) for h in n1.history)
             d2 = dict((keyExtractor, h) for h in n2.history)
@@ -227,3 +230,27 @@ def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallC
         for n2 in actual.enum_edges():
             n1 = expected.get_edge(n2.from_id, n2.to_id)
             assert n1, "Extra edge: {0} -> {1}".format(b2.from_id, b2.to_id)
+
+
+_CONFIG_IS_GENERATING_BASELINE = False
+
+
+def set_is_generating_baseline(value: bool = True):
+    global _CONFIG_IS_GENERATING_BASELINE
+    _CONFIG_IS_GENERATING_BASELINE = value
+
+
+def check_graph_baseline(baseline_file_name: str, actual_graph: MemoryCallCommitGraph,
+                         commit_assertion=commit_assertion_by_hexsha):
+    file_path = os.path.realpath(os.path.join(__file__, "..", "..", "baseline", baseline_file_name + ".json"))
+    print(_CONFIG_IS_GENERATING_BASELINE)
+    if _CONFIG_IS_GENERATING_BASELINE:
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        serialized = actual_graph.serialize_dict()
+        with open(file_path, "wt") as f:
+            json.dump(serialized, f, indent=True, sort_keys=True)
+    else:
+        expected_graph = None
+        with open(file_path, "rt") as f:
+            expected_graph = MemoryCallCommitGraph.load_from(f)
+        assert_graph_same(expected_graph, actual_graph, commit_assertion)

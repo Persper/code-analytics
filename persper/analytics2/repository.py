@@ -202,14 +202,15 @@ class GitFileInfo(IFileInfo):
         self._ensure_blob()
         if self.is_missing:
             return None
-        with TextIOWrapper(self._blob.data_stream, encoding, "replace") as t:
-            return t.read()
+        content: bytes = self._blob.data_stream.read()
+        return content.decode(encoding, "replace")
 
     @property
     def raw_content_stream(self):
         self._ensure_blob()
         if self.is_missing:
             return None
+        # XXX data_stream is gitdb.base.OStream. It's not a stream.
         return self._blob.data_stream
 
     @property
@@ -288,6 +289,7 @@ class GitFileDiff(IFileDiff):
             raise NotImplementedError(
                 "patch is not supported for partial diff view. (a or b side is hidden by filter.)")
         return self._diff.diff
+
 
 class FileNameRegexWorkspaceFileFilter(IWorkspaceFileFilter):
     def __init__(self, file_name_pattern: str):
