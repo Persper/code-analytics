@@ -76,6 +76,9 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     ccg.update_node_history(cppnode3, commit1.hexsha, 10, 0)
     ccg.update_node_history(csnode2, commit2.hexsha, 5, 0)
     ccg.update_node_history(csnode3, commit2.hexsha, 4, 0)
+    ccg.update_node_history_lu(cppnode1, commit1.hexsha, 20, -10)
+    ccg.update_node_history_lu(cppnode2, commit1.hexsha, 15, 0)
+    ccg.update_node_history_lu(cppnode3, commit1.hexsha, 10, 0)
 
     ccg.add_edge(cppnode2, cppnode1, commit1.hexsha)
     ccg.add_edge(cppnode3, cppnode1, commit1.hexsha)
