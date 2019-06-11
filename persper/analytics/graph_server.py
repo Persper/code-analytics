@@ -6,7 +6,7 @@ from aenum import Enum
 from persper.analytics.call_commit_graph import CallCommitGraph
 
 JS_FILENAME_REGEXES = [
-    r'.+\.(js|vue)$',
+    r'.+\.(js|vue|ts|tsx)$',
     r'^(?!dist/).+',
     r'^(?!test(s)?/).+',
     r'^(?!spec/).+',
