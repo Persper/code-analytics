@@ -1,6 +1,7 @@
 import os
 import json
 import pickle
+import logging
 from git import Repo
 from enum import Enum
 from Naked.toolshed.shell import muterun_rb
@@ -11,6 +12,9 @@ from persper.util.normalize_score import normalize_with_coef
 from persper.analytics.graph_server import C_FILENAME_REGEXES
 from persper.analytics.graph_server import CPP_FILENAME_REGEXES
 from persper.analytics.analyzer2 import Analyzer, AnalyzerObserver, emptyAnalyzerObserver
+
+
+_logger = logging.getLogger(__name__)
 
 
 class Linguist(Enum):
@@ -54,32 +58,32 @@ class MultiAnalyzer:
             ts = Linguist.TYPESCRIPT.value
             vue = Linguist.VUE.value
 
-            print(lang_dict)
+            _logger.info(lang_dict)
             if vue in lang_dict:
-                print("Merging Vue to Javascript...")
+                _logger.info("Merging Vue to Javascript...")
                 if js not in lang_dict:
                     lang_dict[js] = 0
                 lang_dict[js] += lang_dict[vue]
                 del lang_dict[vue]
-                print(lang_dict)
+                _logger.info(lang_dict)
 
             if ts in lang_dict:
-                print("Merging TypeScript to JavaScript...")
+                _logger.info("Merging TypeScript to JavaScript...")
                 if js not in lang_dict:
                     lang_dict[js] = 0
                 lang_dict[js] += lang_dict[ts]
                 del lang_dict[ts]
-                print(lang_dict)
+                _logger.info(lang_dict)
 
             # intersect with what languages we support
             for lang, value in lang_dict.items():
                 if lang in self._supported_analyzers().keys():
                     self._linguist[lang] = value
 
-            print(self._linguist)
+            _logger.info(self._linguist)
 
         else:
-            print('Analyzing Language Error from Linguist')
+            _logger.info('Analyzing Language Error from Linguist')
 
     def _set_analyzers(self):
         for language, value in self._linguist.items():
