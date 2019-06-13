@@ -115,8 +115,11 @@ class Analyzer:
         if self._call_commit_graph is None:
             # retry 10 times when get graph from graph server
             for i in range(10):
-                ccg = self._graphServer.get_graph()
-                break
+                try:
+                    ccg = self._graphServer.get_graph()
+                    break
+                except Exception:
+                    continue
             else:
                 raise Exception('get graph is failed')
             self._call_commit_graph = ccg
