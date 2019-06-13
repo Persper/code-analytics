@@ -111,8 +111,14 @@ class Analyzer:
 
     @property
     def graph(self):
+        # When starting the analysis,set self._call_commit_graph to None, we can ensure that the graph is the latest call commit graph version.
         if self._call_commit_graph is None:
-            ccg = self._graphServer.get_graph()
+            # retry 10 times when get graph from graph server
+            for i in range(10):
+                ccg = self._graphServer.get_graph()
+                break
+            else:
+                raise Exception('get graph is failed')
             self._call_commit_graph = ccg
         return self._call_commit_graph
     @property
