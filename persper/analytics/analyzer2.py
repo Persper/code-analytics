@@ -40,6 +40,7 @@ class Analyzer:
         self._skip_rewind_diff = skip_rewind_diff
         self._monolithic_commit_lines_threshold = monolithic_commit_lines_threshold
         self._monolithic_file_bytes_threshold = monolithic_file_bytes_threshold
+        self._call_commit_graph = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -110,8 +111,16 @@ class Analyzer:
 
     @property
     def graph(self):
-        return self._graphServer.get_graph()
-
+        # When starting the analysis,set self._call_commit_graph to None, we can ensure that the graph is the latest call commit graph version.
+        if self._call_commit_graph is None:
+            # retry 10 times when get graph from graph server
+            for i in range(10):
+                ccg = self._graphServer.get_graph()
+                break
+            else:
+                raise Exception('get graph is failed')
+            self._call_commit_graph = ccg
+        return self._call_commit_graph
     @property
     def visitedCommits(self) -> Set[str]:
         """
@@ -151,6 +160,7 @@ class Analyzer:
         return self.graph.compute_modularity()
 
     async def analyze(self, maxAnalyzedCommits=None, suppressStdOutLogs=False):
+        self._call_commit_graph = None
         commitSpec = self._terminalCommit
         if self._originCommit:
             commitSpec = self._originCommit.hexsha + ".." + self._terminalCommit.hexsha
