@@ -117,8 +117,11 @@ class Analyzer:
             for i in range(10):
                 try:
                     ccg = self._graphServer.get_graph()
-                    break
+                    if ccg is not None:
+                        break
                 except Exception:
+                    logging.info('get graph failed:{}'.format(i))
+                    time.sleep(1)
                     continue
             else:
                 raise Exception('get graph is failed')
