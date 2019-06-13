@@ -40,6 +40,7 @@ class Analyzer:
         self._skip_rewind_diff = skip_rewind_diff
         self._monolithic_commit_lines_threshold = monolithic_commit_lines_threshold
         self._monolithic_file_bytes_threshold = monolithic_file_bytes_threshold
+        self._call_commit_graph = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -110,8 +111,10 @@ class Analyzer:
 
     @property
     def graph(self):
-        return self._graphServer.get_graph()
-
+        if self._call_commit_graph is None:
+            ccg = self._graphServer.get_graph()
+            self._call_commit_graph = ccg
+        return self._call_commit_graph
     @property
     def visitedCommits(self) -> Set[str]:
         """
