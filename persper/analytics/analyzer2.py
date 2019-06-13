@@ -154,6 +154,7 @@ class Analyzer:
         return self.graph.compute_modularity()
 
     async def analyze(self, maxAnalyzedCommits=None, suppressStdOutLogs=False):
+        self._call_commit_graph = None
         commitSpec = self._terminalCommit
         if self._originCommit:
             commitSpec = self._originCommit.hexsha + ".." + self._terminalCommit.hexsha
