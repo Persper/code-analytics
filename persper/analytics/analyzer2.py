@@ -15,13 +15,6 @@ from persper.analytics.git_tools import diff_with_commit, get_contents
 from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.score import commit_overall_scores
 
-#import for tech tag{
-from merico.techtag.api.meta_tag import _ConfigSingleton
-from merico.techtag.util.query_file_techtag import query_techtag
-import merico.techtag.util.source_file as source_file
-import merico.techtag.util.function as util
-#import for tech tag}
-
 _logger = logging.getLogger(__name__)
 
 class Analyzer:
@@ -48,7 +41,7 @@ class Analyzer:
         self._monolithic_commit_lines_threshold = monolithic_commit_lines_threshold
         self._monolithic_file_bytes_threshold = monolithic_file_bytes_threshold
         self._call_commit_graph = None
-        self._commit_tag_package = {}
+        self._commit_analyzer_funs = []
            
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -173,12 +166,15 @@ class Analyzer:
         """
         return self.graph.compute_modularity()
 
-    def get_commit_tag_package(self):
+    def register_commit_analyzers(self, analyze_fun):
+        """Register commit analyzing fun, executed when analyzing commits
+        
+        analyze_fun:
+            input: Analyzer, Commit, Diffs
+            output: None
+        No returns
         """
-        Get the info about commits and packages.
-        :return: {commit_id: {tag1, tag1, ...}}
-        """
-        return self._commit_tag_package
+        self._commit_analyzer_funs.append(analyze_fun)
 
     async def analyze(self, maxAnalyzedCommits=None, suppressStdOutLogs=False):
         self._call_commit_graph = None
@@ -273,62 +269,8 @@ class Analyzer:
             _logger.info("Skipped diff for rewinding commit.")
         else:
             diff_index = diff_with_commit(self._repo, commit, parentCommit)
-            
-            #tech tag collecting{
-            commit_id = str(commit.hexsha)
-            if commit_id not in self._commit_tag_package:
-                config_singleton = _ConfigSingleton.instance()
-                package2tag = config_singleton.package2tag
-                token2package = config_singleton.token2package
-
-                
-                token_to_lang_file_line = {}
-                package_to_token_to_file_line = {}
-                package_to_tag_to_occur = {}
-                languages = set()
-                for d in diff_index:
-                    try:
-                        old_fname, new_fname = _get_fnames(d)
-                        lang = source_file.detect_lang(new_fname)
-                        if not lang:
-                            continue
-                        languages.add(lang)
-                        
-                        # Get the patch message
-                        msg = d.diff.decode(defenc)
-                        # Traverse all lines
-                        for line in msg.splitlines():
-                            if not line.startswith("+"):
-                                continue
-                            keywords = re.findall("\w+", line)
-                            for token in keywords:
-                                util.list_dict(token_to_lang_file_line, token, (lang, new_fname, line))
-                    except UnicodeDecodeError:
-                        continue
-                    
-                for token, usage_list in token_to_lang_file_line.items():
-                    for lang, new_fname, line in usage_list:
-                        token = token.lower()
-                        package_uri = token2package.get(token)
-                        if not package_uri:
-                            continue   
-                        package_lang, package = package_uri.split("\t", 1)
-                        if lang != package_lang:
-                            continue
-                        _, tag = query_techtag(package, package2tag, lang)
-                        if tag == "unknown":
-                            continue
-                        util.list_dict(package_to_token_to_file_line, package, token, (new_fname, line) )
-                        util.occur_dict(package_to_tag_to_occur, package, tag)
-                        
-                    
-                self._commit_tag_package[commit_id] = {
-                    "package_to_tag_to_occur": package_to_tag_to_occur,
-                    "package_to_token_to_file_line": package_to_token_to_file_line,
-                    "languages": list(languages),
-                }
-            #tech tag collecting}
-            
+            for analyze_fun in self._commit_analyzer_funs:
+                analyze_fun(self, commit, diff_index)
             
         # commit classification
         if self._commit_classifier and commit.hexsha not in self._clf_results:
