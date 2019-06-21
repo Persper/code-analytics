@@ -24,7 +24,7 @@ def diff_with_commit(repo: Repo, current_commit: Commit, base_commit_sha: str):
     else:
         base_commit = repo.commit(base_commit_sha)
     return base_commit.diff(current_commit, create_patch=True, indent_heuristic=True,
-                            ignore_blank_lines=True, ignore_space_change=True)
+                            ignore_blank_lines=True, ignore_space_change=True, ignore_all_space=True)
 
 
 def initialize_repo(repo_path):
