@@ -39,5 +39,5 @@ def test_diff_ignore_space(create_repo):
     diff_result = diff_with_commit(create_repo, commits[1], commits[0], ignore_space=False)
     diff = str(diff_result[0].diff, encoding="utf8") 
     diff = diff.replace("---", "")
-    assert 134 == (diff.count("\n-")+diff.count("\n+"))
+    assert 60 == (diff.count("\n-")+diff.count("\n+"))
 
