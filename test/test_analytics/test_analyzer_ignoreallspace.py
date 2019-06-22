@@ -40,7 +40,7 @@ def test_diff_ignore_space(create_repo):
 
     commits = []
     for c in create_repo.iter_commits():
-        commits.append(c)
+        commits.append(str(c))
     diff_result = diff_with_commit(commits[1], commits[0])
     diff = str(diff_result[0].diff) 
     diff = diff.replace("---", "")
