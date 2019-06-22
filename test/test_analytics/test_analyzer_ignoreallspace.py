@@ -11,9 +11,9 @@ from persper.analytics.git_tools import diff_with_first_parent, diff_with_commit
 @pytest.fixture(scope='module')
 def create_repo():
     # build the repo first if not exists yet
-    repo_path = os.path.join(root_path, 'repos/test_ignoreAllSpace')
+    repo_path = os.path.join(root_path, 'repos/git_test_ignore_all_space')
     script_path = os.path.join(root_path, 'tools/repo_creater/create_repo.py')
-    test_src_path = os.path.join(root_path, 'test/test_ignoreAllSpace')
+    test_src_path = os.path.join(root_path, 'test/git_test_ignore_all_space')
 
     # Always use latest source to create test repo
     if os.path.exists(repo_path):
@@ -41,7 +41,9 @@ def test_diff_ignore_space(create_repo):
     commits = []
     for c in create_repo.iter_commits():
         commits.append(c)
-    diff_result = diff_with_first_parent(commits[1], commits[0])
-    assert len(diff_result) == 48
-
+    diff_result = diff_with_commit(commits[1], commits[0])
+    diff = str(diff_result[0].diff) 
+    diff = diff.replace("---", "")
+    assert 48 == (diff.count("\n-")+diff.count("\n+"))
+    
 
