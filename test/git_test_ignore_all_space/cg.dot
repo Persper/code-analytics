@@ -1,0 +1,3 @@
+digraph c_test_files_repo {
+    A -> B ;
+}
