@@ -178,7 +178,8 @@ class CallCommitGraph:
 
         Returns:
             A dict with keys being commit hexshas and values being how much this commit
-                contributes to the node's overall dev eq
+                contributes to the node's overall dev eq. This dict can be an empty dict
+                for built-in functions that don't have edit history.
         """
         def _compute_node_commit_dev_eq(hist_entry):
             # use logical units if possible, otherwise fall back to LOC
@@ -194,6 +195,29 @@ class CallCommitGraph:
                 continue
             node_commits_dev_eq[hexsha] = _compute_node_commit_dev_eq(hist_entry)
         return node_commits_dev_eq
+
+    def get_commits_dev_eq(self, commit_black_list: Optional[Set] = None) -> Dict[str, int]:
+        """Return all commits' overall development equivalent
+        All commits are guaranteed to be present in the returned dict, even if their dev eq is 0.
+
+        Args:
+                         node - A str, the node's name
+            commit_black_list - A set of strs, each element is a commit's hexsha
+
+        Returns:
+            A dict with keys being commit hexshas and values being how much this commit
+                contributes to the node's overall dev eq. This dict can be an empty dict
+                for built-in functions that don't have edit history.
+        """
+        commits_dev_eq = {}
+        for hexsha in self.commits():
+            commits_dev_eq[hexsha] = 0
+
+        for node in self.nodes():
+            node_commits_dev_eq = self.get_node_commits_dev_eq(node, commit_black_list=commit_black_list)
+            for hexsha, node_commit_dev_eq in node_commits_dev_eq.items():
+                commits_dev_eq[hexsha] += node_commit_dev_eq
+        return commits_dev_eq
 
     def update_node_files(self, node: str, new_files: Union[Set[str], List[str]]):
         if node is None:
