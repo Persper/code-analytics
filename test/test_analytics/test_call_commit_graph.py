@@ -158,3 +158,28 @@ def test_remove_invalid_nodes():
 
     func_drs = ccgraph.function_devranks(0.85)
     assert isclose(func_drs['f1'], 1, rel_tol=1e-2)
+
+def test_get_commits_dev_eq():
+    ccgraph = CallCommitGraph()
+    # add first commit with hexsha 0x01
+    ccgraph.add_commit('0x01', None, None, None)
+    ccgraph.add_node('f1')
+    ccgraph.update_node_history_accurate('f1', {'adds': 10, 'dels': 0, 'added_units': 20, 'removed_units': 0})
+    ccgraph.add_node('f2')
+    ccgraph.update_node_history_accurate('f2', {'adds': 10, 'dels': 0, 'added_units': 40, 'removed_units': 0})
+    ccgraph.add_edge('f1', 'f2')
+
+    # add second commit with hexsha 0x02
+    # this commit doesn't change source code
+    ccgraph.add_commit('0x02', None, None, None)
+
+    # add third commit with hexsha 0x03
+    ccgraph.add_commit('0x03', None, None, None)
+    ccgraph.add_node('f3')
+    ccgraph.update_node_history_accurate('f3', {'adds': 5, 'dels': 0, 'added_units': 15, 'removed_units': 0})
+    ccgraph.update_node_history_accurate('f2', {'adds': 3, 'dels': 3, 'added_units': 12, 'removed_units': 13})
+    ccgraph.add_edge('f3', 'f2')
+
+    # note that '0x02' is present in the ground truth
+    assert {'0x01': 60, '0x02': 0, '0x03': 40} == ccgraph.get_commits_dev_eq()
+
