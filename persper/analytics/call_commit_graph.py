@@ -152,6 +152,73 @@ class CallCommitGraph:
             return {}
         return self._digraph.nodes[node]['history']
 
+    def get_node_dev_eq(self, node: str, commit_black_list: Optional[Set] = None) -> int:
+        """Return a function node's development equivalent (dev eq), computed from its node history
+        This serves as an interface function since the underlying dev eq algorithm might change.
+
+        Args:
+                         node - A str, the node's name
+            commit_black_list - A set of strs, each element is a commit's hexsha
+
+        Returns:
+            An int representing the node's dev eq
+        """
+        node_commits_dev_eq = self.get_node_commits_dev_eq(node, commit_black_list=commit_black_list)
+        dev_eq = sum(node_commits_dev_eq.values())
+
+        # take max between dev_eq and 1 to avoid zero division error
+        return max(dev_eq, 1)
+
+    def get_node_commits_dev_eq(self, node: str, commit_black_list: Optional[Set] = None) -> Dict[str, int]:
+        """Return a function node's development equivalent, broken down into each commit's contribution.
+
+        Args:
+                         node - A str, the node's name
+            commit_black_list - A set of strs, each element is a commit's hexsha
+
+        Returns:
+            A dict with keys being commit hexshas and values being how much this commit
+                contributes to the node's overall dev eq. This dict can be an empty dict
+                for built-in functions that don't have edit history.
+        """
+        def _compute_node_commit_dev_eq(hist_entry):
+            # use logical units if possible, otherwise fall back to LOC
+            if 'added_units' in hist_entry.keys() and 'removed_units' in hist_entry.keys():
+                return hist_entry['added_units'] + hist_entry['removed_units']
+            else:
+                return hist_entry['adds'] + hist_entry['dels']
+
+        node_commits_dev_eq = {}
+        node_history = self._get_node_history(node)
+        for hexsha, hist_entry in node_history.items():
+            if commit_black_list is not None and hexsha in commit_black_list:
+                continue
+            node_commits_dev_eq[hexsha] = _compute_node_commit_dev_eq(hist_entry)
+        return node_commits_dev_eq
+
+    def get_commits_dev_eq(self, commit_black_list: Optional[Set] = None) -> Dict[str, int]:
+        """Return all commits' overall development equivalent
+        All commits are guaranteed to be present in the returned dict, even if their dev eq is 0.
+
+        Args:
+                         node - A str, the node's name
+            commit_black_list - A set of strs, each element is a commit's hexsha
+
+        Returns:
+            A dict with keys being commit hexshas and values being how much this commit
+                contributes to the node's overall dev eq. This dict can be an empty dict
+                for built-in functions that don't have edit history.
+        """
+        commits_dev_eq = {}
+        for hexsha in self.commits():
+            commits_dev_eq[hexsha] = 0
+
+        for node in self.nodes():
+            node_commits_dev_eq = self.get_node_commits_dev_eq(node, commit_black_list=commit_black_list)
+            for hexsha, node_commit_dev_eq in node_commits_dev_eq.items():
+                commits_dev_eq[hexsha] += node_commit_dev_eq
+        return commits_dev_eq
+
     def update_node_files(self, node: str, new_files: Union[Set[str], List[str]]):
         if node is None:
             _logger.error("Argument node is None in update_node_files")
@@ -166,20 +233,7 @@ class CallCommitGraph:
         black_set - A set of commit hexshas to be blacklisted
         """
         for node in self.nodes():
-            node_history = self._get_node_history(node)
-            size = 0
-            for cid, chist in node_history.items():
-                sha = self.commits()[cid]['hexsha']
-                if black_set is not None and sha in black_set:
-                    continue
-                if 'added_units' in chist.keys() and 'removed_units' in chist.keys():
-                    size += (chist['added_units'] + chist['removed_units'])
-                else:
-                    size += (chist['adds'] + chist['dels'])
-            # set default size to 1 to avoid zero division error
-            if size == 0:
-                size = 1
-            self._set_node_size(node, size)
+            self._set_node_size(node, self.get_node_dev_eq(node))
 
     def _set_node_size(self, node, size):
         if node is None:
@@ -211,10 +265,14 @@ class CallCommitGraph:
         Args:
                 alpha - A float between 0 and 1, commonly set to 0.85
             black_set - A set of commit hexshas to be blacklisted
+
+        Returns:
+            A dict with keys being function IDs and values being devranks
         """
         self._remove_invalid_nodes()
         self._set_all_nodes_size(black_set=black_set)
         return devrank(self._digraph, 'size', alpha=alpha)
+
 
     def commit_devranks(self, alpha, black_set=None):
         """
@@ -268,6 +326,7 @@ class CallCommitGraph:
             else:
                 developer_devranks[email] = commit_devranks[sha]
         return developer_devranks
+
 
     def compute_modularity(self):
         """Compute modularity score based on function graph.
