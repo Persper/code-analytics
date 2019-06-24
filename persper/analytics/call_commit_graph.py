@@ -157,25 +157,43 @@ class CallCommitGraph:
         This serves as an interface function since the underlying dev eq algorithm might change.
 
         Args:
-            node - A str, the node's name
+                         node - A str, the node's name
+            commit_black_list - A set of strs, each element is a commit's hexsha
 
         Returns:
             An int representing the node's dev eq
         """
-        dev_eq = 0
-        node_history = self._get_node_history(node)
-        for hexsha, hist_entry in node_history.items():
-            if commit_black_list is not None and hexsha in commit_black_list:
-                continue
-            # use logical units if possible, otherwise fall back to LOC
-            if 'added_units' in hist_entry.keys() and 'removed_units' in hist_entry.keys():
-                dev_eq += (hist_entry['added_units'] + hist_entry['removed_units'])
-            else:
-                dev_eq += (hist_entry['adds'] + hist_entry['dels'])
+        node_commits_dev_eq = self.get_node_commits_dev_eq(node, commit_black_list=commit_black_list)
+        dev_eq = sum(node_commits_dev_eq.values())
 
         # take max between dev_eq and 1 to avoid zero division error
         return max(dev_eq, 1)
 
+    def get_node_commits_dev_eq(self, node: str, commit_black_list: Optional[Set] = None) -> Dict[str, int]:
+        """Return a function node's development equivalent, broken down into each commit's contribution.
+
+        Args:
+                         node - A str, the node's name
+            commit_black_list - A set of strs, each element is a commit's hexsha
+
+        Returns:
+            A dict with keys being commit hexshas and values being how much this commit
+                contributes to the node's overall dev eq
+        """
+        def _compute_node_commit_dev_eq(hist_entry):
+            # use logical units if possible, otherwise fall back to LOC
+            if 'added_units' in hist_entry.keys() and 'removed_units' in hist_entry.keys():
+                return hist_entry['added_units'] + hist_entry['removed_units']
+            else:
+                return hist_entry['adds'] + hist_entry['dels']
+
+        node_commits_dev_eq = {}
+        node_history = self._get_node_history(node)
+        for hexsha, hist_entry in node_history.items():
+            if commit_black_list is not None and hexsha in commit_black_list:
+                continue
+            node_commits_dev_eq[hexsha] = _compute_node_commit_dev_eq(hist_entry)
+        return node_commits_dev_eq
 
     def update_node_files(self, node: str, new_files: Union[Set[str], List[str]]):
         if node is None:
