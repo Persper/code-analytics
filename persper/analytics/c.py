@@ -7,6 +7,7 @@ from persper.analytics.detect_change import get_changed_functions
 from persper.analytics.patch_parser import PatchParser
 from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.call_commit_graph import CallCommitGraph
+from persper.analytics.exclude_patterns import EXCLUDE_PATTERNS
 
 
 def function_change_stats(old_ast, old_src, new_ast, new_src, patch, patch_parser, ranges_func):
@@ -45,7 +46,7 @@ class CGraphServer(GraphServer):
     # CGraphServer only analyzes files with the following suffixes
     _suffix_regex = re.compile(r'.+\.(h|c)$')
 
-    def __init__(self, exclude_patterns: List[str] = []):
+    def __init__(self, exclude_patterns: List[str] = EXCLUDE_PATTERNS):
         self._ccgraph = CallCommitGraph()
         self._exclude_regexes = [re.compile(pattern) for pattern in exclude_patterns]
         self._pparser = PatchParser()
