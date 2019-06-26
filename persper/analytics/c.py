@@ -1,4 +1,5 @@
 import re
+from typing import List
 from persper.analytics.inverse_diff import inverse_diff
 from persper.analytics.srcml import src_to_tree
 from persper.analytics.call_graph.c import update_graph, get_func_ranges_c
@@ -40,9 +41,13 @@ def function_change_stats(old_ast, old_src, new_ast, new_src, patch, patch_parse
 
 
 class CGraphServer(GraphServer):
-    def __init__(self, filename_regex_strs):
+
+    # CGraphServer only analyzes files with the following suffixes
+    _suffix_regex = re.compile(r'.+\.(h|c)$')
+
+    def __init__(self, exclude_patterns: List[str] = []):
         self._ccgraph = CallCommitGraph()
-        self._filename_regexes = [re.compile(regex_str) for regex_str in filename_regex_strs]
+        self._exclude_regexes = [re.compile(pattern) for pattern in exclude_patterns]
         self._pparser = PatchParser()
         self._seeking_mode = None
         self._workspace_commit_hexsha = None
@@ -106,8 +111,10 @@ class CGraphServer(GraphServer):
         self._ccgraph.reset()
 
     def filter_file(self, filename):
-        for regex in self._filename_regexes:
-            if not regex.match(filename):
+        if not self._suffix_regex.match(filename):
+            return False
+        for regex in self._exclude_regexes:
+            if regex.match(filename):
                 return False
         return True
 
