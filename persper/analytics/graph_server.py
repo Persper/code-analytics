@@ -17,10 +17,6 @@ JS_FILENAME_REGEXES = [
     r'^(?!(.+/)*example(s)?/).+',
 ]
 
-JAVA_FILENAME_REGEXES = [
-    r'.+\.java$'
-]
-
 
 class CommitInfo(NamedTuple):
     # Tuple not used for now.
