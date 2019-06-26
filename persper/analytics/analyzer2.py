@@ -2,6 +2,7 @@ import asyncio
 import collections.abc
 import logging
 import re
+import sys
 import time
 from abc import ABC
 from typing import List, Optional, Set, Union, Dict
@@ -22,7 +23,8 @@ class Analyzer:
                  firstParentOnly: bool = False,
                  commit_classifier: Optional[CommitClassifier] = None,
                  skip_rewind_diff: bool = False,
-                 monolithic_commit_lines_threshold: int = 5000):
+                 monolithic_commit_lines_threshold: int = 5000,
+                 monolithic_file_bytes_threshold: int = 200000):
         # skip_rewind_diff will skip diff, but rewind commit start/end will still be notified to the GraphServer.
         self._repositoryRoot = repositoryRoot
         self._graphServer = graphServer
@@ -37,6 +39,8 @@ class Analyzer:
         self._clf_results: Dict[str, List[float]] = {}
         self._skip_rewind_diff = skip_rewind_diff
         self._monolithic_commit_lines_threshold = monolithic_commit_lines_threshold
+        self._monolithic_file_bytes_threshold = monolithic_file_bytes_threshold
+        self._call_commit_graph = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -107,8 +111,22 @@ class Analyzer:
 
     @property
     def graph(self):
-        return self._graphServer.get_graph()
-
+        # When starting the analysis,set self._call_commit_graph to None, we can ensure that the graph is the latest call commit graph version.
+        if self._call_commit_graph is None:
+            # retry 10 times when get graph from graph server
+            for i in range(10):
+                try:
+                    ccg = self._graphServer.get_graph()
+                    if ccg is not None:
+                        break
+                except Exception:
+                    logging.info('get graph failed:{}'.format(i))
+                    time.sleep(1)
+                    continue
+            else:
+                raise Exception('get graph is failed')
+            self._call_commit_graph = ccg
+        return self._call_commit_graph
     @property
     def visitedCommits(self) -> Set[str]:
         """
@@ -137,7 +155,18 @@ class Analyzer:
         """
         return self.graph.eval_project_complexity(r_n, r_e)
 
+    def compute_modularity(self):
+        """Compute modularity score based on function graph.
+
+        Returns
+        -------
+            modularity : float
+                The modularity score of this graph.
+        """
+        return self.graph.compute_modularity()
+
     async def analyze(self, maxAnalyzedCommits=None, suppressStdOutLogs=False):
+        self._call_commit_graph = None
         commitSpec = self._terminalCommit
         if self._originCommit:
             commitSpec = self._originCommit.hexsha + ".." + self._terminalCommit.hexsha
@@ -173,7 +202,7 @@ class Analyzer:
                 else:
                     expectedParentCommit = None
                     message = None
-                    if not commit.parents:
+                    if len(commit.parents) == 0:
                         message = "Going forward (initial commit)."
                         expectedParentCommit = None
                     else:
@@ -232,18 +261,22 @@ class Analyzer:
 
         # commit classification
         if self._commit_classifier and commit.hexsha not in self._clf_results:
-            prob = self._commit_classifier.predict(commit, diff_index)
+            prob = self._commit_classifier.predict(commit, diff_index, self._repo)
             self._clf_results[commit.hexsha] = prob
 
-        # t2: update_graph time
+        # t2: update_graph + git diff traversing time
         t2 = time.monotonic()
+        # t2a: get_contents time
+        t2a = 0
+        # t2a: update_graph time
+        t2b = 0
         if diff_index:
             for diff in diff_index:
                 old_fname, new_fname = _get_fnames(diff)
-                # apply filter
+                # apply file-level filter
                 # if a file comes into/goes from our view, we will set corresponding old_fname/new_fname to None,
                 # as if the file is introduced/removed in this commit.
-                # However, the diff will keep its original, no matter if the file has been filtered in/out.
+                # However, the diff will not change, regardless of whether the file has been filtered out or not.
                 if old_fname and not self._graphServer.filter_file(old_fname):
                     old_fname = None
                 if new_fname and not self._graphServer.filter_file(new_fname):
@@ -254,17 +287,25 @@ class Analyzer:
 
                 old_src = new_src = None
 
+                t2a0 = time.monotonic()
                 if old_fname:
                     old_src = get_contents(self._repo, parentCommit, old_fname)
+                    if self._file_is_too_large(old_fname, old_src):
+                        continue
 
                 if new_fname:
                     new_src = get_contents(self._repo, commit, new_fname)
+                    if self._file_is_too_large(new_fname, new_src):
+                        continue
+                t2a += time.monotonic() - t2a0
 
+                t2b0 = time.monotonic()
                 if old_src or new_src:
                     result = self._graphServer.update_graph(
                         old_fname, old_src, new_fname, new_src, diff.diff)
                     if asyncio.iscoroutine(result):
                         await result
+                t2b += time.monotonic() - t2b0
         t2 = time.monotonic() - t2
 
         # t3: end_commit time
@@ -275,23 +316,38 @@ class Analyzer:
         t3 = time.monotonic() - t3
         self._observer.onAfterCommit(self, commit, seekingMode)
         t0 = time.monotonic() - t0
-        _logger.info("t0 = %.2f, t1 = %.2f, t2 = %.2f, t3 = %.2f",
-                     t0, t1, t2, t3)
+        _logger.info("t0 = %.2f, t1 = %.2f, t2 = %.2f, t2a = %.2f, t2b = %.2f, t3 = %.2f",
+                     t0, t1, t2, t2a, t2b, t3)
         assert self._graphServer.get_workspace_commit_hexsha() == commit.hexsha, \
             "GraphServer.get_workspace_commit_hexsha should be return the hexsha seen in last start_commit."
 
     def _filter_monolithic_commit(self, commit: Commit, seeking_mode: CommitSeekingMode) -> CommitSeekingMode:
         # filter monolithic commit
-        if seeking_mode == CommitSeekingMode.NormalForward and len(commit.parents) == 1:
+        # hot fix: enable filter_monolithic_commit on first commit
+        if seeking_mode == CommitSeekingMode.NormalForward and len(commit.parents) <= 1:
             changed_lines = 0
             files = commit.stats.files
             for fname in files:
                 if self._graphServer.filter_file(fname):
                     changed_lines += files[fname]['lines']
+            print('_filter_monolithic_commit commit:', commit.hexsha, 'changed_lines:', changed_lines)
             if changed_lines > self._monolithic_commit_lines_threshold:
                 # enforce using CommitSeekingMode.MergeCommit to update graph without updating node history
+                print('_filter_monolithic_commit set CommitSeekingMode to MergeCommit')
                 return CommitSeekingMode.MergeCommit
         return seeking_mode
+
+    def _file_is_too_large(self, fname, file_content):
+        # Filter monolithic file by its byte size
+        # Returns True if under the threshold
+        file_size = sys.getsizeof(file_content)
+        too_large = file_size > self._monolithic_file_bytes_threshold
+        if too_large:
+            message = 'WARNING: file too large;'
+        else:
+            message = 'OK: file normal size;'
+        print(message, fname, str(file_size / 1000) + 'kB')
+        return too_large
 
 
 def _get_fnames(diff: Diff):

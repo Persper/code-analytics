@@ -25,6 +25,7 @@ aenum = "*"
 pytest-cov = "*"
 gitpython = "*"
 sphinx = "*"
+python-louvain = "*"
 
 [dev-packages]
 

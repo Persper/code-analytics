@@ -18,6 +18,11 @@ class NotFunctionCallError(UnexpectedASTError):
     pass
 
 
+class UnexpectedCallNodeError(UnexpectedASTError):
+    """Raise when failed to parse a function call's callee name"""
+    pass
+
+
 def _handle_function(func_node):
     """Extract name and range from a <function> node
 
@@ -122,17 +127,39 @@ def _handle_call(call_node):
     Case 2: function call from struct variable
         Example: tty->write(tty)
 
+    Case 3: function call in a chain
+        Example: (*mi).second.empty()
+
     Raises:
         NotFunctionCallError
+        UnexpectedCallNodeError
     """
     name_node = call_node.find('srcml:name', ns)
     if name_node is None:
         # Case 1
         raise NotFunctionCallError()
+
+    def last_sub_name_node(node):
+        name_lst = node.findall('srcml:name', ns)
+        if len(name_lst) > 0:
+            return name_lst[-1]
+        else:
+            raise UnexpectedCallNodeError()
+
+    # Case 2 & 3
     callee_name = name_node.text
-    if callee_name is None:
-        # Case 2
-        callee_name = name_node[-1].text
+    # DEBUG
+    # print_flag = False
+    # if callee_name is None:
+    #     print_flag = True
+    #     from persper.analytics.call_graph.utils import transform_node_to_src
+    #     print(transform_node_to_src(name_node))
+    while callee_name is None:
+        name_node = last_sub_name_node(name_node)
+        callee_name = name_node.text
+    # DEBUG
+    # if print_flag:
+    #     print(callee_name)
     return callee_name
 
 
@@ -167,6 +194,9 @@ def update_graph(ccgraph, ast_list, change_stats, new_fname_to_old_fname):
                     callee_name = _handle_call(call)
                 except NotFunctionCallError as e:
                     # do not print error since we expect this to happen a lot
+                    continue
+                except UnexpectedCallNodeError as e:
+                    print(type(e).__name__, e.args)
                     continue
 
                 if callee_name not in ccgraph:

@@ -3,12 +3,18 @@ call_commit_graph.py
 ====================================
 CallCommitGraph stores all relevant analysis results
 """
+import logging
+import community
 import networkx as nx
 from networkx.readwrite import json_graph
+from typing import Union, Set, List, Dict, Optional
+
 from persper.analytics.devrank import devrank
 from persper.analytics.score import normalize
-from typing import Union, Set, List, Dict, Optional
 from persper.analytics.complexity import eval_project_complexity
+
+_logger = logging.getLogger(__name__)
+
 
 class CommitIdGenerators:
     @staticmethod
@@ -50,6 +56,7 @@ class CallCommitGraph:
     def reset(self):
         """Reset all internal states"""
         self._digraph = self._new_graph()
+        self._digraph.degree()
 
     def _new_graph(self):
         """Create a new nx.DiGraph for underlying storage
@@ -97,10 +104,16 @@ class CallCommitGraph:
 
     # TODO: remove the default value of files
     def add_node(self, node: str, files: Union[Set[str], List[str]] = []):
+        if node is None:
+            _logger.error("Argument node is None in add_node.")
+            return
         self._digraph.add_node(node, size=None, history={}, files=set(files))
 
     # add_node must be called on source and target first
     def add_edge(self, source, target):
+        if source is None or target is None:
+            _logger.error("Argument source or target is None in add_edge.")
+            return
         if source not in self._digraph:
             raise ValueError("Error: caller %s does not exist in call-commit graph." % source)
         if target not in self._digraph:
@@ -134,9 +147,15 @@ class CallCommitGraph:
 
     # read/write access to node history are thourgh this function
     def _get_node_history(self, node: str) -> Dict[str, Dict[str, int]]:
+        if node is None:
+            _logger.error("Argument node is None in _get_node_history.")
+            return {}
         return self._digraph.nodes[node]['history']
 
     def update_node_files(self, node: str, new_files: Union[Set[str], List[str]]):
+        if node is None:
+            _logger.error("Argument node is None in update_node_files")
+            return
         self._digraph.nodes[node]['files'] = set(new_files)
 
     # TODO: provide other options for computing a node's size
@@ -148,21 +167,24 @@ class CallCommitGraph:
         """
         for node in self.nodes():
             node_history = self._get_node_history(node)
-            if black_set is not None:
-                size = 0
-                for cid, chist in node_history.items():
-                    sha = self.commits()[cid]['hexsha']
-                    if sha not in black_set:
-                        size += (chist['adds'] + chist['dels'])
-            else:
-                size = sum([chist['adds'] + chist['dels'] for chist in node_history.values()])
-
+            size = 0
+            for cid, chist in node_history.items():
+                sha = self.commits()[cid]['hexsha']
+                if black_set is not None and sha in black_set:
+                    continue
+                if 'added_units' in chist.keys() and 'removed_units' in chist.keys():
+                    size += (chist['added_units'] + chist['removed_units'])
+                else:
+                    size += (chist['adds'] + chist['dels'])
             # set default size to 1 to avoid zero division error
             if size == 0:
                 size = 1
             self._set_node_size(node, size)
 
     def _set_node_size(self, node, size):
+        if node is None:
+            _logger.error("Argument node is None in _set_node_size.")
+        # set node size even if it is None since we'd like to suppress the error
         self._digraph.nodes[node]['size'] = size
 
     def _set_all_edges_weight(self):
@@ -180,12 +202,17 @@ class CallCommitGraph:
         """
         return eval_project_complexity(self._digraph, r_n, r_e)
 
+    def _remove_invalid_nodes(self):
+        if None in self.nodes():
+            self._digraph.remove_node(None)
+
     def function_devranks(self, alpha, black_set=None):
         """
         Args:
                 alpha - A float between 0 and 1, commonly set to 0.85
             black_set - A set of commit hexshas to be blacklisted
         """
+        self._remove_invalid_nodes()
         self._set_all_nodes_size(black_set=black_set)
         return devrank(self._digraph, 'size', alpha=alpha)
 
@@ -206,7 +233,10 @@ class CallCommitGraph:
                 continue
 
             for cid, chist in history.items():
-                csize = chist['adds'] + chist['dels']
+                if 'added_units' in chist.keys() and 'removed_units' in chist.keys():
+                    csize = (chist['added_units'] + chist['removed_units'])
+                else:
+                    csize = (chist['adds'] + chist['dels'])
                 sha = self.commits()[cid]['hexsha']
                 if black_set is None or sha not in black_set:
                     dr = (csize / size) * func_devranks[func]
@@ -238,3 +268,32 @@ class CallCommitGraph:
             else:
                 developer_devranks[email] = commit_devranks[sha]
         return developer_devranks
+
+    def compute_modularity(self):
+        """Compute modularity score based on function graph.
+
+        Returns
+        -------
+            modularity : float
+                The modularity score of this graph.
+        """
+        # Check the number of edges
+        if len(self.edges()) == 0:
+            return 0.
+
+        # Construct non directed graph
+        graph = nx.Graph()
+        for node in self.nodes():
+            if node is not None:
+                graph.add_node(node)
+        for (source, target) in self.edges():
+            if source is not None and target is not None:
+                graph.add_edge(source, target)
+        # Compute the partition of the graph nodes
+        partition = community.best_partition(graph)
+        # Compute modularity
+        modularity = community.modularity(partition, graph)
+        # Normalize [0, 1] to [0, 100]
+        modularity = modularity * 100
+
+        return modularity

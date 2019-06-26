@@ -15,13 +15,13 @@ The following procedure is tested on Ubuntu 16.04 LTS.
 Download and install Python 3.6+: <https://www.python.org/downloads/>.
 
 Also, create a symbolic link from `python3` to `python` since some scripts reply on it.
-```
+```sh
 sudo ln -s /usr/bin/python3 /usr/bin/python
 ```
 
 2. Install python dependencies (we recommend to use pipenv)
 
-```bash
+```sh
 pipenv install
 ```
 
@@ -29,7 +29,7 @@ pipenv install
 
 In order to uset the `--indent-heuristic` option of `git diff`, we require git version >= 2.11. Use the following commands to upgrade:
 
-```bash
+```sh
 sudo add-apt-repository ppa:git-core/ppa -y
 sudo apt-get update
 sudo apt-get install git -y
@@ -40,12 +40,12 @@ git --version
 
 Add the following line to your `~/.bashrc` file.
 
-```
+```sh
 export PYTHONPATH=$PYTHONPATH:/path/to/dir
 ```
 
 To update your path for the remainder of the session.
-```
+```sh
 source ~/.bashrc
 ```
 
@@ -55,14 +55,21 @@ Please download from [here](https://www.srcml.org/#download) and follow the [ins
 
 srcML also needs `libarchive-dev` and `libcurl4-openssl-dev`. Install them with the following commands:
 
-```bash
+```sh
 sudo apt install libarchive-dev
 sudo apt install libcurl4-openssl-dev
 ```
 
 6. Check setup correctness
 
-```bash
+As the test process will create Git repositories, set up your global Git user name and email before testing:
+```sh
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+```
+
+Run the test process:
+```sh
 pipenv run pytest test/test_analytics
 ```
 

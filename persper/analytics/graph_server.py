@@ -6,13 +6,15 @@ from aenum import Enum
 from persper.analytics.call_commit_graph import CallCommitGraph
 
 JS_FILENAME_REGEXES = [
-    r'.+\.js$',
+    r'.+\.(js|vue|ts|tsx)$',
     r'^(?!dist/).+',
     r'^(?!test(s)?/).+',
     r'^(?!spec/).+',
     r'^(?!build/).+',
     r'^(?!bin/).+',
-    r'^(?!doc(s)?/).+'
+    r'^(?!doc(s)?/).+',
+    r'.*(?<!.min.js)$',
+    r'^(?!(.+/)*example(s)?/).+',
 ]
 
 # todo(hezheng) consider moving these regexes to their corresponding language file
@@ -27,7 +29,12 @@ CPP_FILENAME_REGEXES = {
 
 GO_FILENAME_REGEXES = [
     r'.+\.go$',
-    r'^(?!(.+/)*vendor/).+'
+    r'^(?!(.+/)*vendor/).+',
+    r'^(?!Godeps/).+',
+    r'^(?!(.+/)*example(s)?/).+',
+    r'^(?!(.+/)*thrift/gen-go/).+',
+    r'^(?!(.+/)*thrift/thrift-gen/).+',
+    r'^(?!\.gen/go/).+',
 ]
 
 JAVA_FILENAME_REGEXES = [
