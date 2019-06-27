@@ -31,7 +31,7 @@ test_ci:
     - git clone https://gitlab.com/persper/code-analytics.git && cd code-analytics 
     #&& git checkout ${CI_COMMIT_REF_NAME}
     - export PYTHONPATH=$PYTHONPATH:/root/code-analytics
-    - pipenv install --python 3.7
+    - pipenv install --python 3.6
     - pipenv run pytest -s test/test_analytics
     - pipenv run pytest -s test/test_analytics2
     - echo "Done"
