@@ -143,10 +143,13 @@ async def test_black_set():
     ccgraph = az.get_graph()
     devdict = ccgraph.commit_devranks(0.85)
     devdict2 = ccgraph.commit_devranks(0.85, black_set=set([parent_sha]))
-    assert len(devdict) == 3
-    assert len(devdict2) == 2
-    assert parent_sha in devdict
-    assert parent_sha not in devdict2
+    print(devdict)
+    print(devdict2)
+    # CallCommitGraph.commit_devranks guarantee all commits to be present,
+    # even if their devrank is 0 or they're present in the `black_set`
+    assert devdict[parent_sha] > 0
+    # commits that are in the `black_set` should now have zero devrank
+    assert devdict2[parent_sha] == 0
 
 
 def test_remove_invalid_nodes():
