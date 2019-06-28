@@ -64,8 +64,8 @@ def deserialize_edge(d: dict) -> Edge:
 
 def deserialize_commit(d: dict) -> Commit:
     return Commit(d["hex_sha"],
-                  d["author_email"], d['author_name'], datetime.fromisoformat(d['authored_time']),
-                  d['committer_email'], d['committer_name'], datetime.fromisoformat(d['committed_time']),
+                  d["author_email"], d['author_name'], d['authored_time'],
+                  d['committer_email'], d['committer_name'], d['committed_time'],
                   d['message'], d['parents'])
 
 
