@@ -7,7 +7,6 @@ from git import Repo
 from persper.analytics.call_commit_graph import CallCommitGraph
 from persper.analytics.cpp import CPPGraphServer
 from persper.analytics.analyzer import Analyzer
-from persper.analytics.graph_server import CPP_FILENAME_REGEXES
 from persper.util.path import root_path
 
 
@@ -135,7 +134,7 @@ async def test_black_set():
     bitcoin_url = 'https://github.com/bitcoin/bitcoin'
     if not os.path.exists(repo_path):
         Repo.clone_from(bitcoin_url, repo_path)
-    az = Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES))
+    az = Analyzer(repo_path, CPPGraphServer())
     crlf_sha = '0a61b0df1224a5470bcddab302bc199ca5a9e356'
     parent_sha = '5b721607b1057df4dfe97f80d235ed372312f398'
     gggparent_sha = '401926283a200994ecd7df8eae8ced8e0b067c46'

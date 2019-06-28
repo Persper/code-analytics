@@ -5,42 +5,6 @@ from aenum import Enum
 
 from persper.analytics.call_commit_graph import CallCommitGraph
 
-JS_FILENAME_REGEXES = [
-    r'.+\.(js|vue|ts|tsx)$',
-    r'^(?!dist/).+',
-    r'^(?!test(s)?/).+',
-    r'^(?!spec/).+',
-    r'^(?!build/).+',
-    r'^(?!bin/).+',
-    r'^(?!doc(s)?/).+',
-    r'.*(?<!.min.js)$',
-    r'^(?!(.+/)*example(s)?/).+',
-]
-
-# todo(hezheng) consider moving these regexes to their corresponding language file
-C_FILENAME_REGEXES = [
-    r'.+\.(h|c)$'
-]
-
-# http://gcc.gnu.org/onlinedocs/gcc-4.4.1/gcc/Overall-Options.html#index-file-name-suffix-71
-CPP_FILENAME_REGEXES = {
-    r'.+\.(c|cc|cxx|cpp|CPP|c\+\+|C|hh|hpp|Hpp|h\+\+|H)$'
-}
-
-GO_FILENAME_REGEXES = [
-    r'.+\.go$',
-    r'^(?!(.+/)*vendor/).+',
-    r'^(?!Godeps/).+',
-    r'^(?!(.+/)*example(s)?/).+',
-    r'^(?!(.+/)*thrift/gen-go/).+',
-    r'^(?!(.+/)*thrift/thrift-gen/).+',
-    r'^(?!\.gen/go/).+',
-]
-
-JAVA_FILENAME_REGEXES = [
-    r'.+\.java$'
-]
-
 
 class CommitInfo(NamedTuple):
     # Tuple not used for now.

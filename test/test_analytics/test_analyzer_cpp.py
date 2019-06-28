@@ -4,7 +4,6 @@ import subprocess
 import shutil
 from persper.analytics.cpp import CPPGraphServer
 from persper.analytics.analyzer2 import Analyzer
-from persper.analytics.graph_server import CPP_FILENAME_REGEXES
 from persper.util.path import root_path
 
 @pytest.fixture(scope='module')
@@ -21,7 +20,7 @@ def az():
     cmd = '{} {}'.format(script_path, test_src_path)
     subprocess.call(cmd, shell=True)
 
-    return Analyzer(repo_path, CPPGraphServer(CPP_FILENAME_REGEXES))
+    return Analyzer(repo_path, CPPGraphServer())
 
 
 @pytest.mark.asyncio

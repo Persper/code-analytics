@@ -4,7 +4,7 @@ import subprocess
 import shutil
 from persper.analytics.c import CGraphServer
 from persper.analytics.analyzer2 import Analyzer
-from persper.analytics.graph_server import C_FILENAME_REGEXES, CommitSeekingMode
+from persper.analytics.graph_server import CommitSeekingMode
 from persper.util.path import root_path
 
 
@@ -22,7 +22,7 @@ def az():
     cmd = '{} {}'.format(script_path, test_src_path)
     subprocess.call(cmd, shell=True)
 
-    return Analyzer(repo_path, CGraphServer(C_FILENAME_REGEXES))
+    return Analyzer(repo_path, CGraphServer())
 
 
 def test_analyzer_filter_monolithic_commit(az):
