@@ -47,8 +47,8 @@ class CGraphServer(GraphServer):
     _suffix_regex = re.compile(r'.+\.(h|c)$')
 
     def __init__(self, exclude_patterns: List[str] = EXCLUDE_PATTERNS):
+        super(CGraphServer, self).__init__(exclude_patterns=exclude_patterns)
         self._ccgraph = CallCommitGraph()
-        self._exclude_regexes = [re.compile(pattern) for pattern in exclude_patterns]
         self._pparser = PatchParser()
         self._seeking_mode = None
         self._workspace_commit_hexsha = None
@@ -110,14 +110,6 @@ class CGraphServer(GraphServer):
 
     def reset_graph(self):
         self._ccgraph.reset()
-
-    def filter_file(self, filename):
-        if not self._suffix_regex.match(filename):
-            return False
-        for regex in self._exclude_regexes:
-            if regex.match(filename):
-                return False
-        return True
 
     def config(self, param):
         pass
