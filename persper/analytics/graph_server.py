@@ -1,9 +1,11 @@
+import re
 from abc import ABC, abstractmethod
-from typing import NamedTuple
+from typing import NamedTuple, List
 
 from aenum import Enum
 
 from persper.analytics.call_commit_graph import CallCommitGraph
+from persper.analytics.exclude_patterns import EXCLUDE_PATTERNS
 
 
 class CommitInfo(NamedTuple):
@@ -16,7 +18,7 @@ class CommitInfo(NamedTuple):
 
 class CommitSeekingMode(Enum):
     """
-    Describes how `Analyzer` has reached the current commit. 
+    Describes how `Analyzer` has reached the current commit.
     """
     _init_ = "value __doc__"
     NormalForward = 0, """
@@ -99,6 +101,22 @@ class GraphServer(ABC):
     synchronous or asynchronous (with `asyncio`, or `async def`). You will find the
     note on the methods respectively.
     """
+
+    # Whoever inherits GraphServerWithFileFilter should override this class variable
+    _suffix_regex = re.compile(r'.*')
+
+    def __init__(self, exclude_patterns: List[str] = EXCLUDE_PATTERNS):
+        self._exclude_patterns = exclude_patterns
+        self._exclude_regexes = [re.compile(pattern) for pattern in exclude_patterns]
+
+    @property
+    def exclude_patterns(self) -> List[str]:
+        return self._exclude_patterns
+
+    @exclude_patterns.setter
+    def exclude_patterns(self, value: List[str]) -> None:
+        self._exclude_patterns = value
+        self._exclude_regexes = [re.compile(pattern) for pattern in value]
 
     def start_project(self, project_info):
         """Signals the start of a new analysis"""
@@ -218,14 +236,23 @@ class GraphServer(ABC):
         """Reset the graph discarding all data"""
         pass
 
-    @abstractmethod
     def filter_file(self, filename):
-        """
-        Check if the file should be filtered out
+        """Check if the file should be filtered out
+            When given a `filename`, the `filter_file` function first check whether
+            it has the right suffix against `self._suffix_regex`.
+            If pass, then it goes on to check whether `filename` matches with any of the
+            regexes in `self._exclude_regexes`. If no match, then it return `true` to
+            signify that this file should be analyzed.
+
         :param filename: the path of the file to check
         :return: True if the file should be selected; False otherwise.
         """
-        pass
+        if not self._suffix_regex.match(filename):
+            return False
+        for regex in self._exclude_regexes:
+            if regex.match(filename):
+                return False
+        return True
 
     @abstractmethod
     def config(self, param: dict):
