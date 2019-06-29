@@ -178,8 +178,11 @@ class CallCommitGraph:
 
         Returns:
             A dict with keys being commit hexshas and values being how much this commit
-                contributes to the node's overall dev eq. This dict can be an empty dict
-                for built-in functions that don't have edit history.
+                contributes to the node's overall dev eq.
+
+                Note: this dict can be an empty dict for built-in functions that don't have edit history.
+                Also Note: only commits that have non-zero dev eq for this node and aren't present
+                    in the `commit_black_list` will be present in the returned dict
         """
         def _compute_node_commit_dev_eq(hist_entry):
             # use logical units if possible, otherwise fall back to LOC
@@ -198,7 +201,6 @@ class CallCommitGraph:
 
     def get_commits_dev_eq(self, commit_black_list: Optional[Set] = None) -> Dict[str, int]:
         """Return all commits' overall development equivalent
-        All commits are guaranteed to be present in the returned dict, even if their dev eq is 0.
 
         Args:
                          node - A str, the node's name
@@ -206,10 +208,13 @@ class CallCommitGraph:
 
         Returns:
             A dict with keys being commit hexshas and values being how much this commit
-                contributes to the node's overall dev eq. This dict can be an empty dict
-                for built-in functions that don't have edit history.
+                contributes to the node's overall dev eq.
+
+                Note: all commits are guaranteed to be present in the returned dict,
+                even if their dev eq is 0 or they're present in the `commit_black_list`
         """
         commits_dev_eq = {}
+        # guarantee to return all commits
         for hexsha in self.commits():
             commits_dev_eq[hexsha] = 0
 
@@ -273,35 +278,42 @@ class CallCommitGraph:
         self._set_all_nodes_size(black_set=black_set)
         return devrank(self._digraph, 'size', alpha=alpha)
 
+    def commit_devranks(self, alpha, black_set: Optional[Set] = None):
+        """Computes all commits' devranks from function-level devranks
+            Here is the formula:
 
-    def commit_devranks(self, alpha, black_set=None):
-        """
+                dr(c) = sum(dr(f) * dev_eq(f, c) / dev_eq(f) for f in C_f)
+
+            where dr(*) is the devrank function, dev_eq(*, *) is the development equivalent function,
+            and C_f is the set of functions that commit c changed.
+
         Args:
                 alpha - A float between 0 and 1, commonly set to 0.85
             black_set - A set of commit hexshas to be blacklisted
+
+        Returns:
+            A dict with keys being commit hexshas and values being commit devranks
+
+                Note: all commits are guaranteed to be present in the returned dict,
+                even if their devrank is 0 or they're present in the `black_set`
         """
         commit_devranks = {}
+        # guarantee to return all commits
+        for hexsha in self.commits():
+            commit_devranks[hexsha] = 0
+
         func_devranks = self.function_devranks(alpha, black_set=black_set)
 
-        for func, data in self.nodes(data=True):
-            size = data['size']
-            history = data['history']
-
-            if len(history) == 0:
+        for func in self.nodes():
+            func_commits_dev_eq = self.get_node_commits_dev_eq(func, commit_black_list=black_set)
+            # skip this node if empty (it's probably a built-in function or third-party dep)
+            if len(func_commits_dev_eq) == 0:
                 continue
 
-            for cid, chist in history.items():
-                if 'added_units' in chist.keys() and 'removed_units' in chist.keys():
-                    csize = (chist['added_units'] + chist['removed_units'])
-                else:
-                    csize = (chist['adds'] + chist['dels'])
-                sha = self.commits()[cid]['hexsha']
-                if black_set is None or sha not in black_set:
-                    dr = (csize / size) * func_devranks[func]
-                    if sha in commit_devranks:
-                        commit_devranks[sha] += dr
-                    else:
-                        commit_devranks[sha] = dr
+            func_dev_eq = self.get_node_dev_eq(func, commit_black_list=black_set)
+            for hexsha, func_commit_dev_eq in func_commits_dev_eq.items():
+                func_commit_dr = (func_commit_dev_eq / func_dev_eq) * func_devranks[func]
+                commit_devranks[hexsha] += func_commit_dr
 
         return commit_devranks
 
@@ -326,7 +338,6 @@ class CallCommitGraph:
             else:
                 developer_devranks[email] = commit_devranks[sha]
         return developer_devranks
-
 
     def compute_modularity(self):
         """Compute modularity score based on function graph.
