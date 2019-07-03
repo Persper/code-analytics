@@ -7,7 +7,7 @@ from persper.analytics2.abstractions.analyzers import (AnalysisStatus,
                                                        IPostAnalyzer)
 from persper.analytics2.abstractions.callcommitgraph import (
     IGraphServer, IReadOnlyCallCommitGraph, IWriteOnlyCallCommitGraph)
-from persper.analytics2.abstractions.repository import ICommitInfo
+from persper.analytics2.abstractions.repository import ICommitInfo, repr_hexsha
 
 _logger = logging.getLogger(__file__)
 
@@ -25,7 +25,7 @@ class CallCommitGraphAnalyzer(ICommitAnalyzer):
         assert commit
         for gs in self._graph_servers:
             t0 = monotonic()
-            _logger.info("Analyzing %s with %s...", commit, gs)
+            _logger.info("Analyzing %s with %s.", repr_hexsha(commit.hexsha), gs)
             assert isinstance(gs, IGraphServer)
             gs.update_graph(commit)
             _logger.info("%s finished in %.2fs.", gs, monotonic() - t0)

@@ -62,6 +62,9 @@ class CGraphServer(IGraphServer):
         self._pparser = PatchParser()
         self._files = NodeFilesAccumulator()
 
+    def __repr__(self):
+        return "CGraphServer({0})".format(self._language)
+
     def start(self):
         pass
 
