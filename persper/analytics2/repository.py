@@ -140,11 +140,12 @@ class GitCommitInfo(ICommitInfo):
         _logger.debug("diff_between %s and %s used %.2fs.",
                       base_commit_hexsha, self._commit.hexsha, monotonic() - t0)
         for diff in diff_index:
+            diff: Diff
             hide_base_file = base_commit_filter and diff.a_blob and not base_commit_filter.filter_file(
                 diff.a_blob.name, diff.a_blob.path)
             hide_current_file = current_commit_filter and diff.b_blob and not current_commit_filter.filter_file(
                 diff.b_blob.name, diff.b_blob.path)
-            if not hide_base_file or not hide_current_file:
+            if diff.a_blob and not hide_base_file or diff.b_blob and not hide_current_file:
                 yield GitFileDiff(self._commit.repo, diff, base_commit_ref, self._commit, hide_base_file, hide_current_file)
 
 

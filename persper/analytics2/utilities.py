@@ -72,6 +72,11 @@ class NodeHistoryAccumulator():
 
 
 class NodeFilesAccumulator():
+    """
+    Provides convenient methods for tracking file operations through the commits,
+    keep record of all the files containing a specific node.
+    """
+
     def __init__(self):
         self._nodes = {}
 
@@ -79,6 +84,9 @@ class NodeFilesAccumulator():
         self._nodes.clear()
 
     def put(self, node_id: NodeId, added_files: Union[str, Iterable[str]] = None, removed_files: Union[str, Iterable[str]] = None):
+        """
+        Declares the specific files containing the specific node has been added and/or removed.
+        """
         if not added_files and not removed_files:
             return
         files = self._nodes.get(node_id, None)
@@ -92,7 +100,11 @@ class NodeFilesAccumulator():
                 files.update(added_files)
         if removed_files:
             if isinstance(removed_files, str):
-                files.remove(removed_files)
+                try:
+                    files.remove(removed_files)
+                except KeyError:
+                    # e.g. Removing function while renaming file.
+                    pass
             else:
                 files.difference_update(removed_files)
 
@@ -105,5 +117,8 @@ class NodeFilesAccumulator():
         return self._nodes.get(node_id, ())
 
     def apply(self, graph: IWriteOnlyCallCommitGraph, commit_hexsha: str):
+        """
+        Applies the nodes and their containing file information into the specific call commit graph.
+        """
         for id, files in self._nodes:
             graph.update_node_files(id, commit_hexsha, files)
