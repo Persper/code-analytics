@@ -232,7 +232,8 @@ def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallC
             assert n1, "Extra edge: {0} -> {1}".format(b2.from_id, b2.to_id)
 
 
-_CONFIG_IS_GENERATING_BASELINE = False
+_CONFIG_IS_GENERATING_BASELINE = os.environ.get(
+    "PERSPER_TEST_GENERATING_BASELINE", "").strip().lower() in {"1", "true", "on"}
 
 
 def set_is_generating_baseline(value: bool = True):
@@ -240,17 +241,42 @@ def set_is_generating_baseline(value: bool = True):
     _CONFIG_IS_GENERATING_BASELINE = value
 
 
+def _redact_serialized_commits(serialized_graph: dict):
+    commits = serialized_graph.get("commits", None)
+    if not commits:
+        return
+    for commit in commits:
+        commit: dict
+        for k in commit:
+            if k not in ("hex_sha", "message", "parents"):
+                commit[k] = None
+
+
 def check_graph_baseline(baseline_file_name: str, actual_graph: MemoryCallCommitGraph,
                          commit_assertion=commit_assertion_by_hexsha):
-    file_path = os.path.realpath(os.path.join(__file__, "..", "..", "baseline", baseline_file_name + ".json"))
+    """
+    Checks or generates call commit graph baseline, depending on how `set_is_generating_baseline` is called
+    before executing the tests.
+    """
+    baseline_folder = os.path.join(__file__, "..", "..", "baseline")
+    os.makedirs(baseline_folder, exist_ok=True)
+    file_path = os.path.realpath(os.path.join(baseline_folder, baseline_file_name + ".json"))
     print(_CONFIG_IS_GENERATING_BASELINE)
     if _CONFIG_IS_GENERATING_BASELINE:
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
         serialized = actual_graph.serialize_dict()
+        _redact_serialized_commits(serialized)
         with open(file_path, "wt") as f:
             json.dump(serialized, f, indent=True, sort_keys=True)
     else:
         expected_graph = None
         with open(file_path, "rt") as f:
             expected_graph = MemoryCallCommitGraph.load_from(f)
-        assert_graph_same(expected_graph, actual_graph, commit_assertion)
+        try:
+            assert_graph_same(expected_graph, actual_graph, commit_assertion)
+        except Exception:
+            # dump actual graph if there is assertion failure or error
+            file_path = os.path.realpath(os.path.join(baseline_folder, baseline_file_name + ".actual.json"))
+            serialized = actual_graph.serialize_dict()
+            with open(file_path, "wt") as f:
+                json.dump(serialized, f, indent=True, sort_keys=True)
+            raise

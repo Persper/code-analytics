@@ -113,5 +113,7 @@ class CGraphServer(IGraphServer):
             update_graph_a2(self._ccgraph, self._files, commit.hexsha,
                             self._language, new_ast, old_file_path, new_file_path)
 
+        self._files.apply(self._ccgraph, commit.hexsha)
+
     def stop(self):
         pass

@@ -8,8 +8,7 @@ import pytest
 from persper.analytics2.graphservers.c import CGraphServer
 from persper.analytics2.memorycallcommitgraph import MemoryCallCommitGraph
 from persper.analytics2.repository import GitRepository
-
-set_is_generating_baseline()
+from persper.analytics2.abstractions.callcommitgraph import Commit
 
 
 def test_c_graph_server():
@@ -18,6 +17,7 @@ def test_c_graph_server():
     graph_server = CGraphServer(graph)
     graph_server.start()
     for commit in repo.enum_commits(None, "HEAD"):
+        graph.update_commit(Commit.from_commit_info(commit))
         graph_server.update_graph(commit)
     graph_server.stop()
     check_graph_baseline("c_test_feature_branch", graph, commit_assertion_by_comment)

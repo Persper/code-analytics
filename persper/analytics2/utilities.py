@@ -120,5 +120,5 @@ class NodeFilesAccumulator():
         """
         Applies the nodes and their containing file information into the specific call commit graph.
         """
-        for id, files in self._nodes:
+        for id, files in self._nodes.items():
             graph.update_node_files(id, commit_hexsha, files)
