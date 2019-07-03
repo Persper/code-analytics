@@ -237,8 +237,8 @@ def update_graph_a2(ccg: IWriteOnlyCallCommitGraph, files: NodeFilesAccumulator,
             except NotFunctionCallError as e:
                 # do not print error since we expect this to happen a lot
                 continue
-        callee_id = NodeId(callee_name, language)
-        ccg.add_edge(caller_id, callee_id, hexsha)
+            callee_id = NodeId(callee_name, language)
+            ccg.add_edge(caller_id, callee_id, hexsha)
 
 
 def get_func_ranges_c(root):
