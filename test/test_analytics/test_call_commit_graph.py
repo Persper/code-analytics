@@ -161,7 +161,9 @@ def test_remove_invalid_nodes():
     func_drs = ccgraph.function_devranks(0.85)
     assert isclose(func_drs['f1'], 1, rel_tol=1e-2)
 
-def test_get_commits_dev_eq():
+
+@pytest.fixture(scope='module')
+def simple_ccg():
     ccgraph = CallCommitGraph()
     # add first commit with hexsha 0x01
     ccgraph.add_commit('0x01', None, None, None)
@@ -181,7 +183,20 @@ def test_get_commits_dev_eq():
     ccgraph.update_node_history_accurate('f3', {'adds': 5, 'dels': 0, 'added_units': 15, 'removed_units': 0})
     ccgraph.update_node_history_accurate('f2', {'adds': 3, 'dels': 3, 'added_units': 12, 'removed_units': 13})
     ccgraph.add_edge('f3', 'f2')
+    return ccgraph
 
+
+def test_get_commits_dev_eq(simple_ccg):
     # note that '0x02' is present in the ground truth
-    assert {'0x01': 60, '0x02': 0, '0x03': 40} == ccgraph.get_commits_dev_eq()
+    assert {'0x01': 60, '0x02': 0, '0x03': 40} == simple_ccg.get_commits_dev_eq()
 
+
+def test_commit_function_devranks(simple_ccg):
+    commit_function_devranks_truth = {
+        '0x01': {'f1': 0.15414381366361263, 'f2': 0.4493835852853403},
+        '0x02': {},
+        '0x03': {'f2': 0.2808647408033377, 'f3': 0.11560786024770947}
+    }
+    # verify the devranks in ground truth sum up to 1
+    assert sum([sum(d.values()) for d in commit_function_devranks_truth.values()]) == 1.0
+    assert commit_function_devranks_truth == simple_ccg.commit_function_devranks(0.85)

@@ -278,11 +278,48 @@ class CallCommitGraph:
         self._set_all_nodes_size(black_set=black_set)
         return devrank(self._digraph, 'size', alpha=alpha)
 
+    def commit_function_devranks(self, alpha, commit_black_list: Optional[Set] = None) -> Dict[str, Dict[str, float]]:
+        """Show how a commit's devrank can be broken down into the partial devranks of the functions it changed
+            Here is the formula for how much devrank commit c receives by changing function f:
+
+                dr(c, f) = dr(f) * dev_eq(f, c) / dev_eq(f)
+
+        Args:
+                alpha - A float between 0 and 1, commonly set to 0.85
+            black_set - A set of commit hexshas to be blacklisted
+
+        Returns:
+            A dict with keys being commit hexshas and values being dicts,
+                whose values are function IDs and values are devranks
+
+            Note: all commits are guaranteed to be present in the returned dict,
+            even if they didn't touch any function (thus have an empty dict)
+        """
+        commit_function_devranks = {}
+        # guarantee to return all commits
+        for hexsha in self.commits():
+            commit_function_devranks[hexsha] = {}
+
+        func_devranks = self.function_devranks(alpha, black_set=commit_black_list)
+
+        for func in self.nodes():
+            func_commits_dev_eq = self.get_node_commits_dev_eq(func, commit_black_list=commit_black_list)
+            # skip this node if empty (it's probably a built-in function or third-party dep)
+            if len(func_commits_dev_eq) == 0:
+                continue
+
+            func_dev_eq = self.get_node_dev_eq(func, commit_black_list=commit_black_list)
+            for hexsha, func_commit_dev_eq in func_commits_dev_eq.items():
+                func_commit_dr = (func_commit_dev_eq / func_dev_eq) * func_devranks[func]
+                commit_function_devranks[hexsha][func] = func_commit_dr
+
+        return commit_function_devranks
+
     def commit_devranks(self, alpha, black_set: Optional[Set] = None):
         """Computes all commits' devranks from function-level devranks
             Here is the formula:
 
-                dr(c) = sum(dr(f) * dev_eq(f, c) / dev_eq(f) for f in C_f)
+                dr(c) = sum(dr(c, f) for f in C_f)
 
             where dr(*) is the devrank function, dev_eq(*, *) is the development equivalent function,
             and C_f is the set of functions that commit c changed.
@@ -298,23 +335,9 @@ class CallCommitGraph:
                 even if their devrank is 0 or they're present in the `black_set`
         """
         commit_devranks = {}
-        # guarantee to return all commits
-        for hexsha in self.commits():
-            commit_devranks[hexsha] = 0
-
-        func_devranks = self.function_devranks(alpha, black_set=black_set)
-
-        for func in self.nodes():
-            func_commits_dev_eq = self.get_node_commits_dev_eq(func, commit_black_list=black_set)
-            # skip this node if empty (it's probably a built-in function or third-party dep)
-            if len(func_commits_dev_eq) == 0:
-                continue
-
-            func_dev_eq = self.get_node_dev_eq(func, commit_black_list=black_set)
-            for hexsha, func_commit_dev_eq in func_commits_dev_eq.items():
-                func_commit_dr = (func_commit_dev_eq / func_dev_eq) * func_devranks[func]
-                commit_devranks[hexsha] += func_commit_dr
-
+        commit_function_devranks = self.commit_function_devranks(alpha, commit_black_list=black_set)
+        for hexsha, commit_dict in commit_function_devranks.items():
+            commit_devranks[hexsha] = sum(commit_dict.values())
         return commit_devranks
 
     def developer_devranks(self, alpha, black_set=None):
