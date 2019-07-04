@@ -258,9 +258,9 @@ def check_graph_baseline(baseline_file_name: str, actual_graph: MemoryCallCommit
     Checks or generates call commit graph baseline, depending on how `set_is_generating_baseline` is called
     before executing the tests.
     """
-    baseline_folder = os.path.join(__file__, "..", "..", "baseline")
+    baseline_folder = os.path.realpath(os.path.join(__file__, "..", "..", "baseline"))
     os.makedirs(baseline_folder, exist_ok=True)
-    file_path = os.path.realpath(os.path.join(baseline_folder, baseline_file_name + ".json"))
+    file_path = os.path.join(baseline_folder, baseline_file_name + ".json")
     print(_CONFIG_IS_GENERATING_BASELINE)
     if _CONFIG_IS_GENERATING_BASELINE:
         serialized = actual_graph.serialize_dict()
@@ -275,7 +275,7 @@ def check_graph_baseline(baseline_file_name: str, actual_graph: MemoryCallCommit
             assert_graph_same(expected_graph, actual_graph, commit_assertion)
         except Exception:
             # dump actual graph if there is assertion failure or error
-            file_path = os.path.realpath(os.path.join(baseline_folder, baseline_file_name + ".actual.json"))
+            file_path = os.path.join(baseline_folder, baseline_file_name + ".actual.json")
             serialized = actual_graph.serialize_dict()
             with open(file_path, "wt") as f:
                 json.dump(serialized, f, indent=True, sort_keys=True)
