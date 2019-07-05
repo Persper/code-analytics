@@ -1,10 +1,13 @@
 import json
+import pickle
 import rocksdb
 
-class Cache():
-    def __init__(self, path='', serializer='json'):
+
+class Cache:
+    def __init__(self, rocksdb_path, serializer='pickle'):
         self._serializer = serializer
 
+        """ options to create a rocksdb instance """
         opts = rocksdb.Options()
         opts.create_if_missing = True
         opts.max_open_files = 300000
@@ -17,11 +20,12 @@ class Cache():
                 block_cache=rocksdb.LRUCache(2 * (1024 ** 3)),
                 block_cache_compressed=rocksdb.LRUCache(500 * (1024 ** 2)))
 
-        self._db = rocksdb.DB(path, opts)
+        self._db = rocksdb.DB(rocksdb_path, opts)
 
     def put(self, key, val):
-        if self._serializer == 'json':
-            val = self.json_encode(val)
+        val = self._encode(val)
+
+        """prevent storing a key or value as a string"""
         if type(key) is str:
             key = self.str2bytes(key)
         if type(val) is str:
@@ -32,14 +36,27 @@ class Cache():
         if type(key) is str:
             key = self.str2bytes(key)
         val = self._db.get(key)
-        if self._serializer == 'json':
-            val = self.json_decode(val)
+        val = self._decode(val)
         return val
 
     def delete(self, key):
         if type(key) is str:
             key = self.str2bytes(key)
         self._db.delete(key)
+
+    def _encode(self, val):
+        if self._serializer == 'json':
+            val = self.json_encode(val)
+        elif self._serializer == 'pickle':
+            val = pickle.dumps(val)
+        return val
+
+    def _decode(self, val):
+        if self._serializer == 'json':
+            val = self.json_decode(val)
+        elif self._serializer == 'pickle':
+            val = pickle.loads(val)
+        return val
 
     @staticmethod
     def str2bytes(val):
@@ -59,9 +76,10 @@ class Cache():
         except:
             return None
 
+
 if __name__ == "__main__":
     cache = Cache('./test_rock')
-    obj = { "a": 1, "b": "hello" }
+    obj = {"a": 1, "b": "hello"}
     key = 'test_obj1'
     cache.put(key, obj)
 
