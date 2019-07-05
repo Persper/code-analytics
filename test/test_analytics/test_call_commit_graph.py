@@ -93,6 +93,9 @@ def test_call_commit_graph():
     assert isclose(dev_drs3[first_commit['authorEmail']], 0.798, rel_tol=1e-2)
     assert isclose(dev_drs3[second_commit['authorEmail']], 0.201, rel_tol=1e-2)
 
+    assert ccgraph.eval_project_complexity() == 190
+    assert ccgraph.eval_project_complexity(commit_black_list=set(['0x01'])) == 170
+
 
 def test_devrank_with_accurate_history():
     ccgraph = CallCommitGraph()

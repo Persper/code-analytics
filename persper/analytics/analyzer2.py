@@ -148,14 +148,14 @@ class Analyzer:
                                      top_one=top_one,
                                      additive=additive)
 
-    def compute_project_complexity(self, r_n: int, r_e: int,commit_black_list: Optional[Set] = None):
+    def compute_project_complexity(self, r_n: int, r_e: int, commit_black_list: Optional[Set] = None):
         """
         Evaluates project complexity.
         params
             r_n: The conversion factor from node count to logic units.
             r_e: The conversion factor from edge count to logic units.
         """
-        return self.graph.eval_project_complexity(r_n, r_e,commit_black_list)
+        return self.graph.eval_project_complexity(r_n, r_e, commit_black_list=commit_black_list)
 
     def compute_modularity(self):
         """Compute modularity score based on function graph.
