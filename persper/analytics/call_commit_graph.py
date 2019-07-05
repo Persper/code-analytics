@@ -252,14 +252,14 @@ class CallCommitGraph:
             for nbr, datadict in self._digraph.pred[node].items():
                 datadict['weight'] = self._digraph.nodes[node]['size']
 
-    def eval_project_complexity(self, r_n: float, r_e: float):
+    def eval_project_complexity(self, r_n: float, r_e: float,commit_black_list: Optional[Set] = None):
         """
         Evaluates project complexity.
         params
             r_n: The conversion factor from node count to logic units.
             r_e: The conversion factor from edge count to logic units.
         """
-        return eval_project_complexity(self._digraph, r_n, r_e)
+        return eval_project_complexity(self._digraph, r_n, r_e,commit_black_list)
 
     def _remove_invalid_nodes(self):
         if None in self.nodes():

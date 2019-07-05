@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List
+from typing import Dict, List ,Optional,Set
 
 import numpy as np
 from networkx import DiGraph
@@ -7,7 +7,7 @@ from networkx import DiGraph
 _logger = logging.getLogger(__file__)
 
 
-def eval_project_complexity(G: DiGraph, r_n: float, r_e: float):
+def eval_project_complexity(G: DiGraph, r_n: float, r_e: float,commit_black_list: Optional[Set] = None):
     """
     Evaluates project complexity from the specified bare call commit graph.
     remarks
@@ -16,10 +16,14 @@ def eval_project_complexity(G: DiGraph, r_n: float, r_e: float):
     """
     logical_units = 0
     useFallback = None
+    
     for _, data in G.nodes(data=True):
         added = 0
         removed = 0
-        for _, v in data["history"].items():
+        for hexsha, v in data["history"].items():
+            if commit_black_list is not None and hexsha in commit_black_list:
+                continue
+
             if useFallback == None:
                 useFallback = not "added_units" in v
                 if useFallback:
