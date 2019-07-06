@@ -67,13 +67,14 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     ccg.update_node_files(csnode3, commit2.hexsha, files=csFiles)
     ccg.update_node_files(javanode1, commit3.hexsha, files=javaFiles)
     ccg.update_node_history(cppnode1, commit1.hexsha, 10, 0)
-    # 10 will be overwritten
+    # (10, 0) will be overwritten
     ccg.update_node_history(cppnode1, commit1.hexsha, 20, -10)
     ccg.update_node_history(cppnode2, commit1.hexsha, 15, 0)
     ccg.update_node_history(cppnode3, commit1.hexsha, 10, 0)
     ccg.update_node_history(csnode2, commit2.hexsha, 5, 0)
     ccg.update_node_history(csnode3, commit2.hexsha, 4, 0)
     ccg.update_node_history(csnode1, commit2.hexsha, 4, 0)
+
     ccg.add_edge(cppnode2, cppnode1, commit1.hexsha)
     ccg.add_edge(cppnode3, cppnode1, commit1.hexsha)
     # csnode1 is implicitly added
@@ -81,7 +82,10 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     ccg.add_edge(csnode2, csnode1, commit1.hexsha)
     ccg.add_edge(csnode3, csnode2, commit1.hexsha)
     ccg.flush()
-    assert ccg.get_nodes_count() == 7
+
+    EXPECTED_NODE_IDS = {cppnode1, cppnode2, cppnode3, csnode1, csnode2, csnode3, javanode1}
+    assert ccg.get_nodes_count() == len(EXPECTED_NODE_IDS)
+    assert set((n.node_id for n in ccg.enum_nodes())) == EXPECTED_NODE_IDS
     assert ccg.get_nodes_count(name=csnode2.name) == 2
     assert ccg.get_nodes_count(name=csnode2.name, language=csnode2.language) == 1
     assert ccg.get_nodes_count(name="non_existent") == 0
@@ -90,11 +94,29 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     assert ccg.get_nodes_count(language="java") == 1
     assert ccg.get_nodes_count(language="java") == 1
     assert ccg.get_nodes_count(language="non_existent") == 0
-    assert ccg.get_edges_count() == 5
+
+    EXPECTED_EDGES = {
+        (cppnode2, cppnode1),
+        (cppnode3, cppnode1),
+        (csnode1, cppnode1),
+        (csnode2, csnode1),
+        (csnode3, csnode2)
+    }
+
+    def assert_edges_same(actual_edges, expected_ids):
+        assert set(((e.from_id, e.to_id) for e in actual_edges)) == set(expected_ids)
+    assert ccg.get_edges_count() == len(EXPECTED_EDGES)
+    assert_edges_same(ccg.enum_edges(), EXPECTED_EDGES)
     assert ccg.get_edges_count(from_language="cs") == 3
+    assert_edges_same(ccg.enum_edges(from_language="cs"), (e for e in EXPECTED_EDGES if e[0].language == "cs"))
     assert ccg.get_edges_count(to_language="cpp") == 3
+    assert_edges_same(ccg.enum_edges(to_language="cpp"), (e for e in EXPECTED_EDGES if e[1].language == "cpp"))
     assert ccg.get_edges_count(from_language="cs", to_language="cpp") == 1
+    assert_edges_same(ccg.enum_edges(from_language="cs", to_language="cpp"),
+                      (e for e in EXPECTED_EDGES if e[0].language == "cs" and e[1].language == "cpp"))
     assert ccg.get_edges_count(to_name=cppnode1.name) == 3
+    assert_edges_same(ccg.enum_edges(to_name=cppnode1.name),
+                      (e for e in EXPECTED_EDGES if e[1].name == cppnode1.name))
 
     def assertNode(node_id, added_by, files):
         node = ccg.get_node(node_id)
@@ -160,7 +182,7 @@ def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallC
         if keyExtractor:
             d1 = dict((keyExtractor, h) for h in n1.history)
             d2 = dict((keyExtractor, h) for h in n2.history)
-            for k, h1 in d1:
+            for k, h1 in d1.items():
                 h2 = d2.get(k, None)
                 assert isinstance(h1, NodeHistoryItem)
                 assert h2, "Commit history {0} missing for node {1}.".format(h1, n1.node_id)
