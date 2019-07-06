@@ -101,7 +101,7 @@ def create_history_weight_func(commits_black_list: Collection[str] = None):
             if node.history_lu:
                 falled_back = False
             elif node.history:
-                _logger.warning("Falled back to line-based commit history.")
+                _logger.warning("func_weight: Fell back to line-based commit history.")
                 falled_back = True
             else:
                 # history is empty
@@ -110,12 +110,12 @@ def create_history_weight_func(commits_black_list: Collection[str] = None):
         if not falled_back:
             for h in node.history_lu:
                 h: NodeHistoryLogicUnitItem
-                if black_list_present and h.hexsha not in commits_black_list:
+                if not black_list_present or h.hexsha not in commits_black_list:
                     weight += h.added_units + h.removed_units
         else:
             for h in node.history:
                 h: NodeHistoryItem
-                if black_list_present and h.hexsha not in commits_black_list:
+                if not black_list_present or h.hexsha not in commits_black_list:
                     weight += h.added_lines + h.removed_lines
         return weight
 
@@ -134,7 +134,7 @@ def create_history_weight_func_by_commit(commits_black_list: Collection[str] = N
             if node.history_lu:
                 falled_back = False
             elif node.history:
-                _logger.warning("Falled back to line-based commit history.")
+                _logger.warning("func_weight_by_commit: Fell back to line-based commit history.")
                 falled_back = True
             else:
                 # history is empty
@@ -143,13 +143,13 @@ def create_history_weight_func_by_commit(commits_black_list: Collection[str] = N
         if not falled_back:
             for h in node.history_lu:
                 h: NodeHistoryLogicUnitItem
-                if black_list_present and h.hexsha not in commits_black_list:
-                    result[h.hexsha] = h.added_units + h.removed_units
+                if not black_list_present or h.hexsha not in commits_black_list:
+                    result[h.hexsha] = result.get(h.hexsha, 0) + h.added_units + h.removed_units
         else:
             for h in node.history:
                 h: NodeHistoryItem
-                if black_list_present and h.hexsha not in commits_black_list:
-                    result[h.hexsha] += h.added_lines + h.removed_lines
+                if not black_list_present or h.hexsha not in commits_black_list:
+                    result[h.hexsha] = result.get(h.hexsha, 0) + h.added_lines + h.removed_lines
         return result
 
     return weight_func
@@ -203,7 +203,7 @@ def commit_function_devranks(ccg: IReadOnlyCallCommitGraph, alpha, commits_black
 
         func_dev_eq = result.weight
         for hexsha, func_commit_dev_eq in func_commits_dev_eq.items():
-            func_commit_dr = (func_commit_dev_eq / func_dev_eq) * func_devranks[node_id]
+            func_commit_dr = (func_commit_dev_eq / func_dev_eq) * result.dev_rank
             commit_function_devranks[hexsha][node_id] = func_commit_dr
 
     return commit_function_devranks
