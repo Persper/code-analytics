@@ -260,6 +260,8 @@ class MemoryCallCommitGraph(ICallCommitGraph):
         self._nodes_dict[node_id].files = files
 
     def add_edge(self, from_id: NodeId, to_id: NodeId, commit_hexsha: str) -> None:
+        self._ensure_node_exists(from_id, commit_hexsha)
+        self._ensure_node_exists(to_id, commit_hexsha)
         self._add_edge_direct(Edge(from_id, to_id, commit_hexsha))
 
     def _add_edge_direct(self, edge: Edge) -> None:
