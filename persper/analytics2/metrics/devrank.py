@@ -39,8 +39,6 @@ def devrank(ccg: IReadOnlyCallCommitGraph, weight_func, alpha=0.85, epsilon=1e-5
     node_info = {}
     # node ids
     ordered_nodes = []
-    #num_nodes = ccg.get_nodes_count()
-    #real_num_nodes = 0
     universe_size = 0
     row, col, data = [], [], []
     for i, node in enumerate(ccg.enum_nodes()):
@@ -51,21 +49,22 @@ def devrank(ccg: IReadOnlyCallCommitGraph, weight_func, alpha=0.85, epsilon=1e-5
         universe_size += weight
     num_nodes = len(ordered_nodes)
 
-    # assert num_nodes == real_num_nodes, "Detected inconsistent node count in call commit graph. Make sure the graph doesn't change during analysis."
-
     p = np.empty(num_nodes)
-    for node_id in ordered_nodes:
+    for node_index, node_id in enumerate(ordered_nodes):
         size_sum = 0
-        from_ids = []
-        for e in ccg.enum_edges(to_name=node_id.name, to_language=node_id.language):
+        to_ids = []
+        # from callsite to defintion
+        for e in ccg.enum_edges(from_name=node_id.name, from_language=node_id.language):
             e: Edge
-            size_sum += node_info[e.from_id][1]
-            row.append(node_info[e.from_id][0])
-            col.append(node_info[e.to_id][0])
-            from_ids.append(e.from_id)
-        for from_id in from_ids:
-            data.append(node_info[from_id][1] / size_sum)
-        p[node_info[node_id][0]] = len(from_ids) / universe_size
+            assert ccg.get_node(e.to_id)
+            to_index, to_weight = node_info[e.to_id]
+            size_sum += to_weight
+            row.append(to_index)
+            col.append(node_index)
+            to_ids.append(e.to_id)
+        for to_id in to_ids:
+            data.append(node_info[to_id].weight / size_sum)
+        p[node_info[node_id][0]] = len(to_ids) / universe_size
 
     P = coo_matrix((data, (row, col)), shape=(num_nodes, num_nodes)).tocsr()
 
@@ -105,7 +104,7 @@ def create_history_weight_func(commits_black_list: Collection[str] = None):
                 falled_back = True
             else:
                 # history is empty
-                return 0
+                return 1    # avoid DIV/0
         weight = 0
         if not falled_back:
             for h in node.history_lu:
@@ -117,7 +116,8 @@ def create_history_weight_func(commits_black_list: Collection[str] = None):
                 h: NodeHistoryItem
                 if not black_list_present or h.hexsha not in commits_black_list:
                     weight += h.added_lines + h.removed_lines
-        return weight
+        # we need to take max between dev_eq and 1 to avoid zero division error
+        return max(weight, 1)
 
     return weight_func
 
