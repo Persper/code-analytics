@@ -10,7 +10,7 @@ from persper.analytics2.abstractions.repository import (ICommitInfo,
                                                         ICommitRepository,
                                                         repr_hexsha)
 
-_logger = logging.getLogger(__file__)
+_logger = logging.getLogger(__name__)
 _whitespace_re = re.compile(r"\s+")
 
 

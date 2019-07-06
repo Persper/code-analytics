@@ -4,12 +4,12 @@ from typing import Iterable
 
 from persper.analytics2.abstractions.analyzers import (AnalysisStatus,
                                                        ICommitAnalyzer,
-                                                       IPostAnalyzer)
+                                                       IPostAnalyzer, CommitAnalysisStopReason)
 from persper.analytics2.abstractions.callcommitgraph import (
     IGraphServer, IReadOnlyCallCommitGraph, IWriteOnlyCallCommitGraph)
 from persper.analytics2.abstractions.repository import ICommitInfo, repr_hexsha
 
-_logger = logging.getLogger(__file__)
+_logger = logging.getLogger(__name__)
 
 
 class CallCommitGraphAnalyzer(ICommitAnalyzer):
@@ -33,12 +33,3 @@ class CallCommitGraphAnalyzer(ICommitAnalyzer):
         self._call_commit_graph.flush()
         _logger.info("Call commit graph flush used %.2fs.", monotonic() - t0)
 
-
-class DevRankAnalyzer(IPostAnalyzer):
-    def __init__(self, call_commit_graph: IReadOnlyCallCommitGraph):
-        assert call_commit_graph
-        self._call_commit_graph = call_commit_graph
-
-    def analyze(self, status: AnalysisStatus):
-        # TODO put analysis code here.
-        pass

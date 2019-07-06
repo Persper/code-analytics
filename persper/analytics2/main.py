@@ -11,7 +11,7 @@ def analytics_main(repo_path):
     container = RootContainer(repo)
     analyzer = MetaAnalyzer(repo,
                             commit_analyzers=[container.CallCommitGraphAnalyzer],
-                            post_analyzers=[container.DevRankAnalyzer],
+                            post_analyzers=[container.DevRankAnalyzer, container.ModularityAnalyzer],
                             origin_commit=None,
                             terminal_commit="HEAD",
                             analyzed_commits=None)
