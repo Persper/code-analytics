@@ -1,13 +1,13 @@
-from typing import Collection, Iterable, Tuple, NamedTuple, Dict
+import logging
+from typing import Callable, Collection, Dict, Iterable, NamedTuple, Tuple
 
 import numpy as np
 from numpy import linalg as LA
 from scipy.sparse import coo_matrix
 
 from persper.analytics2.abstractions.callcommitgraph import (
-    Edge, IReadOnlyCallCommitGraph, Node, NodeId, NodeHistoryItem, NodeHistoryLogicUnitItem, Commit)
-
-import logging
+    Commit, Edge, IReadOnlyCallCommitGraph, Node, NodeHistoryItem,
+    NodeHistoryLogicUnitItem, NodeId)
 
 _logger = logging.getLogger(__name__)
 
@@ -19,16 +19,15 @@ class _NodeEntry(NamedTuple):
 
 class DevRankNodeResult(NamedTuple):
     weight: float
-    dev_rank: float
+    devrank: float
 
 
-def devrank(ccg: IReadOnlyCallCommitGraph, weight_func, alpha=0.85, epsilon=1e-5, max_iters=300) -> Dict[NodeId, DevRankNodeResult]:
+def devrank(ccg: IReadOnlyCallCommitGraph, weight_func: Callable[[Node], float], alpha=0.85, epsilon=1e-5, max_iters=300) -> Dict[NodeId, DevRankNodeResult]:
     """Memory efficient DevRank using scipy.sparse
 
     Args:
                nodes - A sequence of nodes.
-        weight_label - A string, each node in graph should have this attribute.
-                     - It will be used as the weight of each node.
+        weight_func  - A function that provides weight of the specified `Node`.
                alpha - A float between 0 and 1, DevRank's damping factor.
              epsilon - A float.
            max_iters - An integer, specify max number of iterations to run.
@@ -203,7 +202,7 @@ def commit_function_devranks(ccg: IReadOnlyCallCommitGraph, alpha, commits_black
 
         func_dev_eq = result.weight
         for hexsha, func_commit_dev_eq in func_commits_dev_eq.items():
-            func_commit_dr = (func_commit_dev_eq / func_dev_eq) * result.dev_rank
+            func_commit_dr = (func_commit_dev_eq / func_dev_eq) * result.devrank
             commit_function_devranks[hexsha][node_id] = func_commit_dr
 
     return commit_function_devranks

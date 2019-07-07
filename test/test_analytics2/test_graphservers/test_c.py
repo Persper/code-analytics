@@ -5,10 +5,10 @@ from test.test_analytics2.utilities import prepare_repository
 
 import pytest
 
+from persper.analytics2.abstractions.callcommitgraph import Commit
 from persper.analytics2.graphservers.c import CGraphServer
 from persper.analytics2.memorycallcommitgraph import MemoryCallCommitGraph
 from persper.analytics2.repository import GitRepository
-from persper.analytics2.abstractions.callcommitgraph import Commit
 
 
 def test_c_graph_server():
