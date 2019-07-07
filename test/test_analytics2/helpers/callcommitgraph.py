@@ -188,6 +188,7 @@ def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallC
         n2 = actual.get_node(n1.node_id)
         assert n2, "Node missing: {0}".format(n1.node_id)
         assert n1.node_id == n2.node_id
+        print("Comparing node: {0} -- {1}", n1, n2)
         assertCommitEqual(n1.added_by, n2.added_by)
         keyExtractor = None
         if commit_assertion == commit_assertion_by_hexsha:
@@ -224,6 +225,7 @@ def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallC
     for b1 in expected.enum_edges():
         b2 = actual.get_edge(b1.from_id, b1.to_id)
         assert b2, "Edge missing: {0} -> {1}".format(b1.from_id, b1.to_id)
+        print("Comparing edge: {0} -- {1}", b1, b2)
         assertCommitEqual(b1.added_by, b2.added_by)
     if expected.get_edges_count() < actual.get_edges_count():
         # there are extra edges
