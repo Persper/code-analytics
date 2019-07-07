@@ -177,36 +177,70 @@ class MemoryCallCommitGraph(ICallCommitGraph):
     def get_edge(self, from_id: NodeId, to_id: NodeId) -> Edge:
         return self._edges_dict[(from_id, to_id)]
 
-    def get_edges_count(self, from_name: str = None, from_language: str = None, to_name: str = None,
-                        to_language: str = None) -> int:
-        base_set = self._edges_dict.values()
+    def get_edges_count(self, from_name: str = None, from_language: str = None, to_name: str = None, to_language: str = None) -> int:
+        # case: all edges
         if from_name == None and from_language == None and to_name == None and to_language == None:
-            return len(base_set)
+            return len(self._edges_dict)
+        base_set = self._edges_dict.keys()
+        # case: edges from one node
+        if from_name != None and from_language != None:
+            from_id = NodeId(from_name, from_language)
+            # case: edges from one node and to another
+            if to_name != None and to_language != None:
+                to_id = NodeId(to_name, to_language)
+                return 1 if (from_id, to_id) in self._edges_dict else 0
+            base_set = ((from_id, id) for id in self._to_edges.get(from_id, ()))
+        # case: edges to one node
+        if to_name != None and to_language != None:
+            to_id = NodeId(to_name, to_language)
+            base_set = ((id, to_id) for id in self._from_edges.get(to_id, ()))
         count = 0
-        for edge in base_set:
-            if from_name != None and edge.from_id.name != from_name:
+        for from_id, to_id in base_set:
+            if from_name != None and from_id.name != from_name:
                 continue
-            if to_name != None and edge.to_id.name != to_name:
+            if to_name != None and to_id.name != to_name:
                 continue
-            if from_language != None and edge.from_id.language != from_language:
+            if from_language != None and from_id.language != from_language:
                 continue
-            if to_language != None and edge.to_id.language != to_language:
+            if to_language != None and to_id.language != to_language:
                 continue
             count += 1
         return count
 
     def enum_edges(self, from_name: str = None, from_language: str = None, to_name: str = None, to_language: str = None) -> Iterable[Edge]:
-        base_set = self._edges_dict.values()
-        for edge in base_set:
-            if from_name != None and edge.from_id.name != from_name:
-                continue
-            if to_name != None and edge.to_id.name != to_name:
-                continue
-            if from_language != None and edge.from_id.language != from_language:
-                continue
-            if to_language != None and edge.to_id.language != to_language:
-                continue
-            yield edge
+        # case: all edges
+        if from_name == None and from_language == None and to_name == None and to_language == None:
+            return self._edges_dict.values()
+        base_set = self._edges_dict.keys()
+        # case: edges from one node
+        if from_name != None and from_language != None:
+            from_id = NodeId(from_name, from_language)
+            # case: edges from one node and to another
+            if to_name != None and to_language != None:
+                to_id = NodeId(to_name, to_language)
+                edge = self._edges_dict.get((from_id, to_id), None)
+                return edge or ()
+            base_set = ((from_id, id) for id in self._to_edges.get(from_id, ()))
+        # case: edges to one node
+        if to_name != None and to_language != None:
+            to_id = NodeId(to_name, to_language)
+            base_set = ((id, to_id) for id in self._from_edges.get(to_id, ()))
+
+        def naive_iterator():
+            nonlocal from_name, from_language, to_name, to_language
+            for edge in base_set:
+                from_id, to_id = edge
+                if from_name != None and from_id.name != from_name:
+                    continue
+                if to_name != None and to_id.name != to_name:
+                    continue
+                if from_language != None and from_id.language != from_language:
+                    continue
+                if to_language != None and to_id.language != to_language:
+                    continue
+                yield self._edges_dict[edge]
+
+        return naive_iterator()
 
     def enum_nodes(self, name: str = None, language: str = None, from_id: NodeId = None, to_id: NodeId = None) -> Iterable[Node]:
         if name == None and language == None and from_id == None and to_id == None:

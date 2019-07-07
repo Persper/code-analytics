@@ -102,7 +102,11 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     }
 
     def assert_edges_same(actual_edges, expected_ids):
-        assert set(((e.from_id, e.to_id) for e in actual_edges)) == set(expected_ids)
+        actual_edges = set(((e.from_id, e.to_id) for e in actual_edges))
+        if not isinstance(expected_ids, set):
+            expected_ids = set(expected_ids)
+        assert actual_edges == expected_ids
+
     assert ccg.get_edges_count() == len(EXPECTED_EDGES)
     assert_edges_same(ccg.enum_edges(), EXPECTED_EDGES)
     assert ccg.get_edges_count(from_language="cs") == 3
