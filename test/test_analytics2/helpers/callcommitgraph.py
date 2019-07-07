@@ -109,6 +109,8 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
 
     assert ccg.get_edges_count() == len(EXPECTED_EDGES)
     assert_edges_same(ccg.enum_edges(), EXPECTED_EDGES)
+    assert ccg.get_edges_count(from_name=cppnode2.name, from_language=cppnode2.language) == 1
+    assert_edges_same(ccg.enum_edges(from_name=cppnode2.name, from_language=cppnode2.language), {(cppnode2, cppnode1)})
     assert ccg.get_edges_count(from_language="cs") == 3
     assert_edges_same(ccg.enum_edges(from_language="cs"), (e for e in EXPECTED_EDGES if e[0].language == "cs"))
     assert ccg.get_edges_count(to_language="cpp") == 3

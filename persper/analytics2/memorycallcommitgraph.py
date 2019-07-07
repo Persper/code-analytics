@@ -189,11 +189,11 @@ class MemoryCallCommitGraph(ICallCommitGraph):
             if to_name != None and to_language != None:
                 to_id = NodeId(to_name, to_language)
                 return 1 if (from_id, to_id) in self._edges_dict else 0
-            base_set = ((from_id, id) for id in self._to_edges.get(from_id, ()))
+            base_set = ((from_id, id) for id in self._from_edges.get(from_id, ()))
         # case: edges to one node
         if to_name != None and to_language != None:
             to_id = NodeId(to_name, to_language)
-            base_set = ((id, to_id) for id in self._from_edges.get(to_id, ()))
+            base_set = ((id, to_id) for id in self._to_edges.get(to_id, ()))
         count = 0
         for from_id, to_id in base_set:
             if from_name != None and from_id.name != from_name:
@@ -220,11 +220,11 @@ class MemoryCallCommitGraph(ICallCommitGraph):
                 to_id = NodeId(to_name, to_language)
                 edge = self._edges_dict.get((from_id, to_id), None)
                 return edge or ()
-            base_set = ((from_id, id) for id in self._to_edges.get(from_id, ()))
+            base_set = ((from_id, id) for id in self._from_edges.get(from_id, ()))
         # case: edges to one node
         if to_name != None and to_language != None:
             to_id = NodeId(to_name, to_language)
-            base_set = ((id, to_id) for id in self._from_edges.get(to_id, ()))
+            base_set = ((id, to_id) for id in self._to_edges.get(to_id, ()))
 
         def naive_iterator():
             nonlocal from_name, from_language, to_name, to_language
