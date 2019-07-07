@@ -192,7 +192,7 @@ def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallC
         n2 = actual.get_node(n1.node_id)
         assert n2, "Node missing: {0}".format(n1.node_id)
         assert n1.node_id == n2.node_id
-        print("Comparing node: {0} -- {1}", n1, n2)
+        print("Comparing node: {0} -- {1}".format(n1, n2))
         assertCommitEqual(n1.added_by, n2.added_by)
         keyExtractor = None
         if commit_assertion == commit_assertion_by_hexsha:
@@ -229,7 +229,7 @@ def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallC
     for b1 in expected.enum_edges():
         b2 = actual.get_edge(b1.from_id, b1.to_id)
         assert b2, "Edge missing: {0} -> {1}".format(b1.from_id, b1.to_id)
-        print("Comparing edge: {0} -- {1}", b1, b2)
+        print("Comparing edge: {0} -- {1}".format(b1, b2))
         assertCommitEqual(b1.added_by, b2.added_by)
     if expected.get_edges_count() < actual.get_edges_count():
         # there are extra edges
@@ -267,7 +267,7 @@ def check_graph_baseline(baseline_file_name: str, actual_graph: MemoryCallCommit
     baseline_folder = os.path.realpath(os.path.join(__file__, "..", "..", "baseline"))
     os.makedirs(baseline_folder, exist_ok=True)
     file_path = os.path.join(baseline_folder, baseline_file_name + ".json")
-    print(_CONFIG_IS_GENERATING_BASELINE)
+    print("_CONFIG_IS_GENERATING_BASELINE=", _CONFIG_IS_GENERATING_BASELINE)
     if _CONFIG_IS_GENERATING_BASELINE:
         serialized = actual_graph.serialize_dict()
         _redact_serialized_commits(serialized)

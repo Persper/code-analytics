@@ -400,14 +400,15 @@
      "added_lines": 6,
      "hexsha": "1a1e7af6772d4364006b10ce4a185cdfc2099fe9",
      "removed_lines": 0
-    },
-    {
-     "added_lines": 13,
-     "hexsha": "1a1e7af6772d4364006b10ce4a185cdfc2099fe9",
-     "removed_lines": 0
     }
    ],
-   "history_lu": [],
+   "history_lu": [
+    {
+     "added_units": 13,
+     "hexsha": "1a1e7af6772d4364006b10ce4a185cdfc2099fe9",
+     "removed_units": 13
+    }
+   ],
    "id": [
     "str_len",
     "cpp"
@@ -423,21 +424,52 @@
      "added_lines": 7,
      "hexsha": "1a1e7af6772d4364006b10ce4a185cdfc2099fe9",
      "removed_lines": 0
-    },
-    {
-     "added_lines": 29,
-     "hexsha": "1a1e7af6772d4364006b10ce4a185cdfc2099fe9",
-     "removed_lines": 0
-    },
-    {
-     "added_lines": 29,
-     "hexsha": "13d9fb1316be4ecc6cba7822f66b9a98df7fa7e5",
-     "removed_lines": 21
     }
    ],
-   "history_lu": [],
+   "history_lu": [
+    {
+     "added_units": 29,
+     "hexsha": "1a1e7af6772d4364006b10ce4a185cdfc2099fe9",
+     "removed_units": 29
+    },
+    {
+     "added_units": 29,
+     "hexsha": "13d9fb1316be4ecc6cba7822f66b9a98df7fa7e5",
+     "removed_units": 29
+    }
+   ],
    "id": [
     "str_append",
+    "cpp"
+   ]
+  },
+  {
+   "added_by": "1a1e7af6772d4364006b10ce4a185cdfc2099fe9",
+   "files": [],
+   "history": [],
+   "history_lu": [],
+   "id": [
+    "snprintf",
+    "cpp"
+   ]
+  },
+  {
+   "added_by": "1a1e7af6772d4364006b10ce4a185cdfc2099fe9",
+   "files": [],
+   "history": [],
+   "history_lu": [],
+   "id": [
+    "malloc",
+    "cpp"
+   ]
+  },
+  {
+   "added_by": "1a1e7af6772d4364006b10ce4a185cdfc2099fe9",
+   "files": [],
+   "history": [],
+   "history_lu": [],
+   "id": [
+    "sprintf",
     "cpp"
    ]
   },
@@ -449,19 +481,20 @@
      "added_lines": 3,
      "hexsha": "13d9fb1316be4ecc6cba7822f66b9a98df7fa7e5",
      "removed_lines": 2
-    },
-    {
-     "added_lines": 21,
-     "hexsha": "13d9fb1316be4ecc6cba7822f66b9a98df7fa7e5",
-     "removed_lines": 15
-    },
-    {
-     "added_lines": 78,
-     "hexsha": "27df9c8edf70ba56b4e19367eefda102238616ed",
-     "removed_lines": 21
     }
    ],
-   "history_lu": [],
+   "history_lu": [
+    {
+     "added_units": 21,
+     "hexsha": "13d9fb1316be4ecc6cba7822f66b9a98df7fa7e5",
+     "removed_units": 21
+    },
+    {
+     "added_units": 78,
+     "hexsha": "27df9c8edf70ba56b4e19367eefda102238616ed",
+     "removed_units": 78
+    }
+   ],
    "id": [
     "str_append_chr",
     "cpp"
@@ -475,14 +508,15 @@
      "added_lines": 11,
      "hexsha": "13d9fb1316be4ecc6cba7822f66b9a98df7fa7e5",
      "removed_lines": 0
-    },
-    {
-     "added_lines": 27,
-     "hexsha": "13d9fb1316be4ecc6cba7822f66b9a98df7fa7e5",
-     "removed_lines": 0
     }
    ],
-   "history_lu": [],
+   "history_lu": [
+    {
+     "added_units": 27,
+     "hexsha": "13d9fb1316be4ecc6cba7822f66b9a98df7fa7e5",
+     "removed_units": 27
+    }
+   ],
    "id": [
     "str_equals",
     "cpp"
@@ -498,14 +532,15 @@
      "added_lines": 26,
      "hexsha": "7e1d09522e3eff5ecfb1af520d76990ad8d051a4",
      "removed_lines": 0
-    },
-    {
-     "added_lines": 76,
-     "hexsha": "7e1d09522e3eff5ecfb1af520d76990ad8d051a4",
-     "removed_lines": 0
     }
    ],
-   "history_lu": [],
+   "history_lu": [
+    {
+     "added_units": 76,
+     "hexsha": "7e1d09522e3eff5ecfb1af520d76990ad8d051a4",
+     "removed_units": 76
+    }
+   ],
    "id": [
     "str_replace",
     "cpp"
@@ -521,19 +556,20 @@
      "added_lines": 12,
      "hexsha": "be95825a49cfabce3336f3c1044ce160a5f7a835",
      "removed_lines": 0
-    },
-    {
-     "added_lines": 37,
-     "hexsha": "be95825a49cfabce3336f3c1044ce160a5f7a835",
-     "removed_lines": 0
-    },
-    {
-     "added_lines": 40,
-     "hexsha": "0b4818e07ae38186f1d2428169cd15562a38f85b",
-     "removed_lines": 33
     }
    ],
-   "history_lu": [],
+   "history_lu": [
+    {
+     "added_units": 37,
+     "hexsha": "be95825a49cfabce3336f3c1044ce160a5f7a835",
+     "removed_units": 37
+    },
+    {
+     "added_units": 40,
+     "hexsha": "0b4818e07ae38186f1d2428169cd15562a38f85b",
+     "removed_units": 40
+    }
+   ],
    "id": [
     "append",
     "cpp"
@@ -549,19 +585,20 @@
      "added_lines": 16,
      "hexsha": "be95825a49cfabce3336f3c1044ce160a5f7a835",
      "removed_lines": 0
-    },
-    {
-     "added_lines": 31,
-     "hexsha": "be95825a49cfabce3336f3c1044ce160a5f7a835",
-     "removed_lines": 0
-    },
-    {
-     "added_lines": 0,
-     "hexsha": "0b4818e07ae38186f1d2428169cd15562a38f85b",
-     "removed_lines": 6
     }
    ],
-   "history_lu": [],
+   "history_lu": [
+    {
+     "added_units": 31,
+     "hexsha": "be95825a49cfabce3336f3c1044ce160a5f7a835",
+     "removed_units": 31
+    },
+    {
+     "added_units": 0,
+     "hexsha": "0b4818e07ae38186f1d2428169cd15562a38f85b",
+     "removed_units": 0
+    }
+   ],
    "id": [
     "add",
     "cpp"
@@ -577,21 +614,66 @@
      "added_lines": 25,
      "hexsha": "be95825a49cfabce3336f3c1044ce160a5f7a835",
      "removed_lines": 0
-    },
-    {
-     "added_lines": 44,
-     "hexsha": "be95825a49cfabce3336f3c1044ce160a5f7a835",
-     "removed_lines": 0
-    },
-    {
-     "added_lines": 0,
-     "hexsha": "0b4818e07ae38186f1d2428169cd15562a38f85b",
-     "removed_lines": 44
     }
    ],
-   "history_lu": [],
+   "history_lu": [
+    {
+     "added_units": 44,
+     "hexsha": "be95825a49cfabce3336f3c1044ce160a5f7a835",
+     "removed_units": 44
+    },
+    {
+     "added_units": 0,
+     "hexsha": "0b4818e07ae38186f1d2428169cd15562a38f85b",
+     "removed_units": 0
+    }
+   ],
    "id": [
     "insert",
+    "cpp"
+   ]
+  },
+  {
+   "added_by": "be95825a49cfabce3336f3c1044ce160a5f7a835",
+   "files": [
+    "feature-K.c"
+   ],
+   "history": [
+    {
+     "added_lines": 12,
+     "hexsha": "0f449d4237ef01d9a35a04a07a8774b40116058b",
+     "removed_lines": 0
+    }
+   ],
+   "history_lu": [
+    {
+     "added_units": 19,
+     "hexsha": "0f449d4237ef01d9a35a04a07a8774b40116058b",
+     "removed_units": 19
+    }
+   ],
+   "id": [
+    "count",
+    "cpp"
+   ]
+  },
+  {
+   "added_by": "be95825a49cfabce3336f3c1044ce160a5f7a835",
+   "files": [],
+   "history": [],
+   "history_lu": [],
+   "id": [
+    "addafter",
+    "cpp"
+   ]
+  },
+  {
+   "added_by": "0b4818e07ae38186f1d2428169cd15562a38f85b",
+   "files": [],
+   "history": [],
+   "history_lu": [],
+   "id": [
+    "free",
     "cpp"
    ]
   },
@@ -605,19 +687,20 @@
      "added_lines": 14,
      "hexsha": "0f449d4237ef01d9a35a04a07a8774b40116058b",
      "removed_lines": 0
-    },
-    {
-     "added_lines": 23,
-     "hexsha": "0f449d4237ef01d9a35a04a07a8774b40116058b",
-     "removed_lines": 0
-    },
-    {
-     "added_lines": 0,
-     "hexsha": "6890262c1c503290f4f130e052b814ef3f041cd5",
-     "removed_lines": 10
     }
    ],
-   "history_lu": [],
+   "history_lu": [
+    {
+     "added_units": 23,
+     "hexsha": "0f449d4237ef01d9a35a04a07a8774b40116058b",
+     "removed_units": 23
+    },
+    {
+     "added_units": 0,
+     "hexsha": "6890262c1c503290f4f130e052b814ef3f041cd5",
+     "removed_units": 0
+    }
+   ],
    "id": [
     "display",
     "cpp"
@@ -625,24 +708,11 @@
   },
   {
    "added_by": "0f449d4237ef01d9a35a04a07a8774b40116058b",
-   "files": [
-    "feature-K.c"
-   ],
-   "history": [
-    {
-     "added_lines": 12,
-     "hexsha": "0f449d4237ef01d9a35a04a07a8774b40116058b",
-     "removed_lines": 0
-    },
-    {
-     "added_lines": 19,
-     "hexsha": "0f449d4237ef01d9a35a04a07a8774b40116058b",
-     "removed_lines": 0
-    }
-   ],
+   "files": [],
+   "history": [],
    "history_lu": [],
    "id": [
-    "count",
+    "printf",
     "cpp"
    ]
   }
