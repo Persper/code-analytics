@@ -1,8 +1,7 @@
 from typing import Collection, Set
 
 from persper.analytics2.utilities import (IWriteOnlyCallCommitGraph,
-                                          NodeFilesAccumulator,
-                                          NodeHistoryAccumulator, NodeId)
+                                          NodeFilesAccumulator, NodeId)
 from persper.analytics.call_graph.utils import line_attr, ns
 from persper.analytics.error import UnexpectedASTError
 
@@ -218,7 +217,7 @@ def update_graph(ccgraph, ast_list, change_stats, new_fname_to_old_fname):
 
 
 def update_graph_a2(ccg: IWriteOnlyCallCommitGraph, files: NodeFilesAccumulator, hexsha: str, language: str, ast, old_path: str, new_path: str):
-# This dups update_graph, but uses IWriteOnlyCallCommitGraph as 1st param.
+    # This dups update_graph, but uses IWriteOnlyCallCommitGraph as 1st param.
     file_renamed = old_path != new_path
     for function in ast.findall('./srcml:function', namespaces=ns):
         try:

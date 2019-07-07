@@ -11,9 +11,14 @@ class NodeHistoryAccumulator():
     (i.e. the added/removed lines to the same node in a single commit)
     """
 
-    def __init__(self, logical_units: bool = False):
+    def __init__(self, is_logical_units: bool = False):
+        """
+        params
+            is_logical_units: whether the accumulated "lines" are actually "logical units".
+                                This will affect the behavior of `apply` method.
+        """
+        self._logical_units = is_logical_units
         # [NodeId]: [added_lines, removed_lines]
-        self._logical_units = logical_units
         self._nodes = {}
 
     def clear(self):
@@ -56,7 +61,8 @@ class NodeHistoryAccumulator():
 
     def apply(self, graph: IWriteOnlyCallCommitGraph, commit_hexsha: str):
         """
-        Applies the node history contained in this instance to the specified call commit graph.
+        Applies the node history contained in this instance to the specified call commit graph,
+        determined by the value of `is_logical_units` when constructing the instance.
         params
             graph: the call commit graph to be updated.
             commit_hexsha: When updating the call commit graph, specify the current commit hexsha.

@@ -6,7 +6,7 @@ from typing import Iterable
 
 from persper.analytics2.abstractions.callcommitgraph import (
     Commit, Edge, ICallCommitGraph, IReadOnlyCallCommitGraph, Node,
-    NodeHistoryItem, NodeId)
+    NodeHistoryItem, NodeHistoryLogicUnitItem, NodeId)
 from persper.analytics2.memorycallcommitgraph import MemoryCallCommitGraph
 
 
@@ -78,7 +78,8 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     ccg.update_node_history(cppnode3, commit1.hexsha, 10, 0)
     ccg.update_node_history(csnode2, commit2.hexsha, 5, 0)
     ccg.update_node_history(csnode3, commit2.hexsha, 4, 0)
-    ccg.update_node_history_lu(cppnode1, commit1.hexsha, 20, -10)
+    ccg.update_node_history_lu(cppnode1, commit1.hexsha, 20, 5)
+    ccg.update_node_history_lu(cppnode1, commit1.hexsha, 17, 5)
     ccg.update_node_history_lu(cppnode2, commit1.hexsha, 15, 0)
     ccg.update_node_history_lu(cppnode3, commit1.hexsha, 10, 0)
 
@@ -145,6 +146,9 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     assert set(ccg.get_node(cppnode1).history) == {
         NodeHistoryItem(commit1.hexsha, 10, 0),
         NodeHistoryItem(commit2.hexsha, 20, 10)
+    }
+    assert set(ccg.get_node(cppnode1).history_lu) == {
+        NodeHistoryLogicUnitItem(commit1.hexsha, 17, 5)
     }
     assertNode(cppnode1, added_by=commit1.hexsha, files=cppFiles)
     assertNode(cppnode2, added_by=commit1.hexsha, files=cppFiles)
