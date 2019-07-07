@@ -11,7 +11,6 @@ from typing import Union, Set, List, Dict, Optional
 
 from persper.analytics.devrank import devrank
 from persper.analytics.score import normalize
-from persper.analytics.complexity import eval_project_complexity
 
 _logger = logging.getLogger(__name__)
 
@@ -252,14 +251,19 @@ class CallCommitGraph:
             for nbr, datadict in self._digraph.pred[node].items():
                 datadict['weight'] = self._digraph.nodes[node]['size']
 
-    def eval_project_complexity(self, r_n: float, r_e: float):
-        """
-        Evaluates project complexity.
+    def eval_project_complexity(self, r_n: float = 20, r_e: float = 10, commit_black_list: Optional[Set] = None):
+        """Evaluates project complexity.
+
+            complexity = graph_dev_eq + r_n*len(nodes) + r_e*len(edges)
+            graph_dev_eq = sum_by_node(added_units + removed_units)
+
         params
             r_n: The conversion factor from node count to logic units.
             r_e: The conversion factor from edge count to logic units.
         """
-        return eval_project_complexity(self._digraph, r_n, r_e)
+        commits_dev_eq = self.get_commits_dev_eq(commit_black_list=commit_black_list)
+        graph_dev_eq = sum(commits_dev_eq.values())
+        return graph_dev_eq + r_n * len(self._digraph.nodes) + r_e * len(self._digraph.edges)
 
     def _remove_invalid_nodes(self):
         if None in self.nodes():
