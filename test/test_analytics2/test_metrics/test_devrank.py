@@ -38,5 +38,5 @@ def test_devrank():
     ccg = MemoryCallCommitGraph()
     ccg.add_edge(node1, node2, "-")
     dr = extract_devrank(devrank(ccg, get_weight, alpha=1.0))
-    assert dr[node1] == pytest.approx(0.333333)
-    assert dr[node2] == pytest.approx(0.666666)
+    assert dr[node1] == pytest.approx(0.33333, rel=1e-4)
+    assert dr[node2] == pytest.approx(0.66666, rel=1e-4)

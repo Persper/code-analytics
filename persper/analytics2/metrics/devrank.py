@@ -63,7 +63,8 @@ def devrank(ccg: IReadOnlyCallCommitGraph, weight_func: Callable[[Node], float],
             to_ids.append(e.to_id)
         for to_id in to_ids:
             data.append(node_info[to_id].weight / size_sum)
-        p[node_info[node_id][0]] = len(to_ids) / universe_size
+        cur_node_info = node_info[node_id]
+        p[cur_node_info.index] = cur_node_info.weight / universe_size
 
     P = coo_matrix((data, (row, col)), shape=(num_nodes, num_nodes)).tocsr()
 
