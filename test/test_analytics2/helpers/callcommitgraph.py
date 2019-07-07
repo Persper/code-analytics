@@ -153,7 +153,10 @@ def commit_assertion_by_comment(expectedGraph, actualGraph, expectedHexsha, actu
     c2 = actualGraph.get_commit(actualHexsha)
     assert c1, "Expected-side of commit is missing."
     assert c2, "Actual-side of commit is missing."
-    assert c1.message == c2.message, "Commits are not the same by commit message."
+    c1_message = (c1.message or "").strip()
+    c2_message = (c2.message or "").strip()
+    assert c1_message == c2_message, \
+        "Commits are not the same by commit message. Expected: {0!r}; actual: {1!r}".format(c1_message, c2_message)
 
 
 def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallCommitGraph,
