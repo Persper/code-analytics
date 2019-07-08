@@ -26,6 +26,7 @@ pytest-cov = "*"
 gitpython = "*"
 sphinx = "*"
 python-louvain = "*"
+python-rocksdb = "*"
 
 [dev-packages]
 

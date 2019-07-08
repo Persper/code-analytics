@@ -5,9 +5,18 @@ import rocksdb
 
 class Cache:
     def __init__(self, rocksdb_path, serializer='pickle'):
+        """
+        :params serializers: available are 'pickle', 'json'.
+        """
         self._serializer = serializer
+        opts = self._config_rocksdb()
 
-        """ options to create a rocksdb instance """
+        self._db = rocksdb.DB(rocksdb_path, opts)
+
+    def _config_rocksdb(self):
+        """options used to create a rocksdb instance.
+        more about options: https://python-rocksdb.readthedocs.io/en/latest/api/options.html
+        """
         opts = rocksdb.Options()
         opts.create_if_missing = True
         opts.max_open_files = 300000
@@ -16,11 +25,10 @@ class Cache:
         opts.target_file_size_base = 67108864
 
         opts.table_factory = rocksdb.BlockBasedTableFactory(
-                filter_policy=rocksdb.BloomFilterPolicy(10),
-                block_cache=rocksdb.LRUCache(2 * (1024 ** 3)),
-                block_cache_compressed=rocksdb.LRUCache(500 * (1024 ** 2)))
-
-        self._db = rocksdb.DB(rocksdb_path, opts)
+            filter_policy=rocksdb.BloomFilterPolicy(10),
+            block_cache=rocksdb.LRUCache(2 * (1024 ** 3)),
+            block_cache_compressed=rocksdb.LRUCache(500 * (1024 ** 2)))
+        return opts
 
     def put(self, key, val):
         val = self._encode(val)
@@ -79,10 +87,11 @@ class Cache:
 
 if __name__ == "__main__":
     cache = Cache('./test_rock')
-    obj = {"a": 1, "b": "hello"}
+    obj = {"a": 1, "b": "hello", "c": [1, 3, 5]}
     key = 'test_obj1'
     cache.put(key, obj)
 
     obj_get = cache.get(key)
     print(obj_get['a'])
     print(obj_get['b'])
+    print(obj_get['c'])
