@@ -5,7 +5,7 @@ stages:
 
 test_ci:
   stage: test
-  image: hub.meri.dev/test-docker/test:latest
+  image: hub.meri.dev/base/ca_base:v-0.8
 #  only:
 #    - setup-ci
   before_script:
