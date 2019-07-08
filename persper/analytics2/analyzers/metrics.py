@@ -18,6 +18,7 @@ class DevRankAnalyzer(IPostAnalyzer):
         commit_devranks = self._metrics_provider.get_commit_devranks(0.1)
         developer_devranks = self._metrics_provider.get_developer_devranks(0.1)
         # TODO persist metrics results.
+        # You may inject required services, e.g. ORM or such interface from __init__
         print("Commit DevRanks:", commit_devranks)
         print("Developer DevRanks:", developer_devranks)
 

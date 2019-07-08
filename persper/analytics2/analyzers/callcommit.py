@@ -12,6 +12,9 @@ _logger = logging.getLogger(__name__)
 
 
 class CallCommitGraphAnalyzer(ICommitAnalyzer):
+    """
+    Analyzes each commit with graph servers, populating the specified call commit graph.
+    """
     def __init__(self, graph_servers: Iterable[IGraphServer], call_commit_graph: IWriteOnlyCallCommitGraph):
         assert graph_servers
         assert call_commit_graph

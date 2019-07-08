@@ -59,6 +59,8 @@ class RootContainer:
 
     @lazy
     def CGraphServer(self):
+        # Consider only using CPPGraphServer below for c/cpp.
+        # Analyzing with CGraphServer and CPPGraphServer can cause .h/.c files being analyzed twice. 
         return CGraphServer(self.ICallCommitGraph, "c", CGraphServer.C_FILENAME_REGEX)
 
     @lazy

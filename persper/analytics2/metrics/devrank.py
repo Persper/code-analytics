@@ -27,7 +27,7 @@ def devrank(ccg: IReadOnlyCallCommitGraph, weight_func: Callable[[Node], float],
 
     Args:
                nodes - A sequence of nodes.
-        weight_func  - A function that provides weight of the specified `Node`.
+         weight_func - A function that provides weight of the specified `Node`.
                alpha - A float between 0 and 1, DevRank's damping factor.
              epsilon - A float.
            max_iters - An integer, specify max number of iterations to run.

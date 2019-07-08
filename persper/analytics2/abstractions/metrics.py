@@ -1,3 +1,14 @@
+"""
+This module contains the abstractions of providers for various metrics we want to conclude from the analysis.
+
+The abstractions don't put restriction on where to get the underlying data (e.g. must from `IReadOnlyCallCommitGraph`),
+in the hope that in the future, the metrics can be evaluated on a remote database (e.g. with Stored Procedure
+or something simular), and transported back to the local site. This may significant reduce the network traffic.
+
+However, these abstractions assume the resulting metrics are representable by object model in the memory
+(i.e. not too large to be held in memory). The responsibility for persisting these objects is on the user
+of these interfaces, such as `DevRankAnalyzer` and `ModularityAnalyzer`.
+"""
 from typing import Dict, Set
 from abc import ABC, abstractmethod
 

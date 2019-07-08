@@ -15,6 +15,8 @@ class DefaultMetricsProvider(IDevRankProvider, IModularityScoreProvider):
         For other call commit graph implementation, such as DB-backed implementations,
         they should consider making their own DB-query-based metrics evaluation implementation
         to reduce overhead of non-performant I/O and data transfer over network.
+
+        See the module documentation of `persper.analytics2.abstractions.metrics` for more information.
     """
 
     def __init__(self, ccg: IReadOnlyCallCommitGraph):
