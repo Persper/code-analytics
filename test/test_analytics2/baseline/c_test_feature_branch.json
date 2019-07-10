@@ -424,6 +424,11 @@
      "added_lines": 7,
      "hexsha": "1a1e7af6772d4364006b10ce4a185cdfc2099fe9",
      "removed_lines": 0
+    },
+    {
+     "added_lines": 6,
+     "hexsha": "13d9fb1316be4ecc6cba7822f66b9a98df7fa7e5",
+     "removed_lines": 3
     }
    ],
    "history_lu": [
@@ -481,6 +486,11 @@
      "added_lines": 3,
      "hexsha": "13d9fb1316be4ecc6cba7822f66b9a98df7fa7e5",
      "removed_lines": 2
+    },
+    {
+     "added_lines": 30,
+     "hexsha": "27df9c8edf70ba56b4e19367eefda102238616ed",
+     "removed_lines": 4
     }
    ],
    "history_lu": [
@@ -556,6 +566,11 @@
      "added_lines": 12,
      "hexsha": "be95825a49cfabce3336f3c1044ce160a5f7a835",
      "removed_lines": 0
+    },
+    {
+     "added_lines": 26,
+     "hexsha": "0b4818e07ae38186f1d2428169cd15562a38f85b",
+     "removed_lines": 9
     }
    ],
    "history_lu": [
@@ -585,6 +600,11 @@
      "added_lines": 16,
      "hexsha": "be95825a49cfabce3336f3c1044ce160a5f7a835",
      "removed_lines": 0
+    },
+    {
+     "added_lines": 0,
+     "hexsha": "0b4818e07ae38186f1d2428169cd15562a38f85b",
+     "removed_lines": 5
     }
    ],
    "history_lu": [
@@ -614,6 +634,11 @@
      "added_lines": 25,
      "hexsha": "be95825a49cfabce3336f3c1044ce160a5f7a835",
      "removed_lines": 0
+    },
+    {
+     "added_lines": 0,
+     "hexsha": "0b4818e07ae38186f1d2428169cd15562a38f85b",
+     "removed_lines": 25
     }
    ],
    "history_lu": [
@@ -687,6 +712,11 @@
      "added_lines": 14,
      "hexsha": "0f449d4237ef01d9a35a04a07a8774b40116058b",
      "removed_lines": 0
+    },
+    {
+     "added_lines": 0,
+     "hexsha": "6890262c1c503290f4f130e052b814ef3f041cd5",
+     "removed_lines": 5
     }
    ],
    "history_lu": [
