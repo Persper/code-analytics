@@ -31,6 +31,9 @@ def create_dummy_commit(message: str = None, parents: Iterable[str] = None):
 
 
 def test_call_commit_graph(ccg: ICallCommitGraph):
+    """
+    Tests the basic traits of a call commit graph.
+    """
     # assert ccg
     # commits
     commit1 = create_dummy_commit()

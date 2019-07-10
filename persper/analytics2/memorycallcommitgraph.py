@@ -284,7 +284,7 @@ class MemoryCallCommitGraph(ICallCommitGraph):
             if historyitem.hexsha == commit_hexsha:
                 self._nodes_dict[node_id].history = [NodeHistoryItem(commit_hexsha,
                                                                      added_lines, removed_lines)]
-            return
+                return
         self._nodes_dict[node_id].history.append(NodeHistoryItem(commit_hexsha,
                                                                  added_lines, removed_lines))
 
