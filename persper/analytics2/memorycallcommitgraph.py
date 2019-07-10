@@ -1,7 +1,6 @@
 import json
 import logging
 import sys
-from collections import defaultdict
 from datetime import datetime
 from typing import Iterable, TextIO
 
@@ -78,8 +77,10 @@ class MemoryCallCommitGraph(ICallCommitGraph):
         self._nodes_dict = {}
         self._edges_dict = {}
         self._commits = {}
-        self._from_edges = defaultdict(list)
-        self._to_edges = defaultdict(list)
+        # Call sites
+        self._from_edges = {}
+        # Defintions
+        self._to_edges = {}
 
     @staticmethod
     def deserialize_dict(graph_data: dict) -> "MemoryCallCommitGraph":
@@ -147,18 +148,28 @@ class MemoryCallCommitGraph(ICallCommitGraph):
 
     def get_nodes_count(self, name: str = None, language: str = None,
                         from_id: NodeId = None, to_id: NodeId = None) -> int:
-        base_set = self._nodes_dict.values()
-        if name is None and language is None and from_id is None and to_id is None:
-            return len(base_set)
+        if name == None and language == None and from_id == None and to_id == None:
+            return len(self._nodes_dict)
+        if name != None and language != None:
+            id = NodeId(name, language)
+            node = self._nodes_dict.get(id, None)
+            if node == None:
+                return 0
+            if from_id != None and (from_id, id) not in self._edges_dict:
+                return 0
+            if to_id != None and (id, to_id) not in self._edges_dict:
+                return 0
+            return 1
         count = 0
-        for node in base_set:
-            if name is not None and node.node_id.name != name:
+        for node in self._nodes_dict.values():
+            node: Node
+            if name != None and node.node_id.name != name:
                 continue
-            if language is not None and node.node_id.language != language:
+            if language != None and node.node_id.language != language:
                 continue
-            if from_id is not None and node in self._from_edges[from_id]:
+            if from_id != None and (from_id, id) not in self._edges_dict:
                 continue
-            if to_id is not None and node in self._to_edges[to_id]:
+            if to_id != None and (id, to_id) not in self._edges_dict:
                 continue
             count += 1
         return count
@@ -166,49 +177,98 @@ class MemoryCallCommitGraph(ICallCommitGraph):
     def get_edge(self, from_id: NodeId, to_id: NodeId) -> Edge:
         return self._edges_dict[(from_id, to_id)]
 
-    def get_edges_count(self, from_name: str = None, from_language: str = None, to_name: str = None,
-                        to_language: str = None) -> int:
-        base_set = self._edges_dict.values()
-        if from_name is None and from_language is None and to_name is None and to_language is None:
-            return len(base_set)
+    def get_edges_count(self, from_name: str = None, from_language: str = None, to_name: str = None, to_language: str = None) -> int:
+        # case: all edges
+        if from_name == None and from_language == None and to_name == None and to_language == None:
+            return len(self._edges_dict)
+        base_set = self._edges_dict.keys()
+        # case: edges from one node
+        if from_name != None and from_language != None:
+            from_id = NodeId(from_name, from_language)
+            # case: edges from one node and to another
+            if to_name != None and to_language != None:
+                to_id = NodeId(to_name, to_language)
+                return 1 if (from_id, to_id) in self._edges_dict else 0
+            base_set = ((from_id, id) for id in self._from_edges.get(from_id, ()))
+        # case: edges to one node
+        if to_name != None and to_language != None:
+            to_id = NodeId(to_name, to_language)
+            base_set = ((id, to_id) for id in self._to_edges.get(to_id, ()))
         count = 0
-        for edge in base_set:
-            if from_name is not None and edge.from_id.name != from_name:
+        for from_id, to_id in base_set:
+            if from_name != None and from_id.name != from_name:
                 continue
-            if to_name is not None and edge.to_id.name != to_name:
+            if to_name != None and to_id.name != to_name:
                 continue
-            if from_language is not None and edge.from_id.language != from_language:
+            if from_language != None and from_id.language != from_language:
                 continue
-            if to_language is not None and edge.to_id.language != to_language:
+            if to_language != None and to_id.language != to_language:
                 continue
             count += 1
         return count
 
     def enum_edges(self, from_name: str = None, from_language: str = None, to_name: str = None, to_language: str = None) -> Iterable[Edge]:
-        base_set = self._edges_dict.values()
-        for edge in base_set:
-            if from_name is not None and edge.from_id.name != from_name:
-                continue
-            if to_name is not None and edge.to_id.name != to_name:
-                continue
-            if from_language is not None and edge.from_id.language != from_language:
-                continue
-            if to_language is not None and edge.to_id.language != to_language:
-                continue
-            yield edge
+        # case: all edges
+        if from_name == None and from_language == None and to_name == None and to_language == None:
+            return self._edges_dict.values()
+        base_set = self._edges_dict.keys()
+        # case: edges from one node
+        if from_name != None and from_language != None:
+            from_id = NodeId(from_name, from_language)
+            # case: edges from one node and to another
+            if to_name != None and to_language != None:
+                to_id = NodeId(to_name, to_language)
+                edge = self._edges_dict.get((from_id, to_id), None)
+                return edge or ()
+            base_set = ((from_id, id) for id in self._from_edges.get(from_id, ()))
+        # case: edges to one node
+        if to_name != None and to_language != None:
+            to_id = NodeId(to_name, to_language)
+            base_set = ((id, to_id) for id in self._to_edges.get(to_id, ()))
+
+        def naive_iterator():
+            nonlocal from_name, from_language, to_name, to_language
+            for edge in base_set:
+                from_id, to_id = edge
+                if from_name != None and from_id.name != from_name:
+                    continue
+                if to_name != None and to_id.name != to_name:
+                    continue
+                if from_language != None and from_id.language != from_language:
+                    continue
+                if to_language != None and to_id.language != to_language:
+                    continue
+                yield self._edges_dict[edge]
+
+        return naive_iterator()
 
     def enum_nodes(self, name: str = None, language: str = None, from_id: NodeId = None, to_id: NodeId = None) -> Iterable[Node]:
-        base_set = self._nodes_dict.values()
-        for node in base_set:
-            if name is not None and node.name != name:
-                continue
-            if language is not None and node.language != language:
-                continue
-            if from_id is not None and node in self._from_edges[from_id]:
-                continue
-            if to_id is not None and node in self._to_edges[to_id]:
-                continue
-        yield node
+        if name == None and language == None and from_id == None and to_id == None:
+            return self._nodes_dict.values()
+        if name != None and language != None:
+            id = NodeId(name, language)
+            node = self._nodes_dict.get(id, None)
+            if node == None:
+                return ()
+            if from_id != None and (from_id, id) not in self._edges_dict:
+                return ()
+            if to_id != None and (id, to_id) not in self._edges_dict:
+                return ()
+            return (node,)
+
+        def naive_iterator():
+            for node in self._nodes_dict.values():
+                node: Node
+                if name != None and node.node_id.name != name:
+                    continue
+                if language != None and node.node_id.language != language:
+                    continue
+                if from_id != None and (from_id, id) not in self._edges_dict:
+                    continue
+                if to_id != None and (id, to_id) not in self._edges_dict:
+                    continue
+                yield node
+        return naive_iterator()
 
     def enum_commits(self) -> Iterable[Commit]:
         for commit in self._commits.values():
@@ -220,13 +280,12 @@ class MemoryCallCommitGraph(ICallCommitGraph):
     def update_node_history(self, node_id: NodeId, commit_hexsha: str,
                             added_lines: int = 0, removed_lines: int = 0) -> None:
         self._ensure_node_exists(node_id, commit_hexsha)
-        for historyitem in self._nodes_dict[node_id].history:
-            if historyitem.hexsha == commit_hexsha:
-                self._nodes_dict[node_id].history = [NodeHistoryItem(commit_hexsha,
-                                                                     added_lines, removed_lines)]
-            return
-        self._nodes_dict[node_id].history.append(NodeHistoryItem(commit_hexsha,
-                                                                 added_lines, removed_lines))
+        history_list = self._nodes_dict[node_id].history
+        for i in range(0, len(history_list)):
+            if history_list[i].hexsha == commit_hexsha:
+                history_list[i] = NodeHistoryItem(commit_hexsha, added_lines, removed_lines)
+                return
+        history_list.append(NodeHistoryItem(commit_hexsha, added_lines, removed_lines))
 
     def update_node_files(self, node_id: NodeId, commit_hexsha: str,
                           files: Iterable[str] = None) -> None:
@@ -234,13 +293,22 @@ class MemoryCallCommitGraph(ICallCommitGraph):
         self._nodes_dict[node_id].files = files
 
     def add_edge(self, from_id: NodeId, to_id: NodeId, commit_hexsha: str) -> None:
+        self._ensure_node_exists(from_id, commit_hexsha)
+        self._ensure_node_exists(to_id, commit_hexsha)
         self._add_edge_direct(Edge(from_id, to_id, commit_hexsha))
 
     def _add_edge_direct(self, edge: Edge) -> None:
-
         self._edges_dict[(edge.from_id, edge.to_id)] = edge
-        self._from_edges[edge.from_id].append(edge.to_id)
-        self._to_edges[edge.to_id].append(edge.from_id)
+        edges = self._from_edges.get(edge.from_id, None)
+        if edges == None:
+            edges = list()
+            self._from_edges[edge.from_id] = edges
+        edges.append(edge.to_id)
+        edges = self._to_edges.get(edge.to_id, None)
+        if edges == None:
+            edges = set()
+            self._to_edges[edge.to_id] = edges
+        edges.add(edge.from_id)
 
     def flush(self) -> None:
         pass
@@ -250,3 +318,6 @@ class MemoryCallCommitGraph(ICallCommitGraph):
 
     def update_commit(self, commit: Commit) -> None:
         self._commits[commit.hexsha] = commit
+
+    def __repr__(self):
+        return "MemoryCallCommitGraph(Nodes=[{0}], Edges=[{1}])".format(len(self._nodes_dict), len(self._edges_dict))
