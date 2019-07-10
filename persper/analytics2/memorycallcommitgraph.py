@@ -280,13 +280,12 @@ class MemoryCallCommitGraph(ICallCommitGraph):
     def update_node_history(self, node_id: NodeId, commit_hexsha: str,
                             added_lines: int = 0, removed_lines: int = 0) -> None:
         self._ensure_node_exists(node_id, commit_hexsha)
-        for historyitem in self._nodes_dict[node_id].history:
-            if historyitem.hexsha == commit_hexsha:
-                self._nodes_dict[node_id].history = [NodeHistoryItem(commit_hexsha,
-                                                                     added_lines, removed_lines)]
+        history_list = self._nodes_dict[node_id].history
+        for i in range(0, len(history_list)):
+            if history_list[i].hexsha == commit_hexsha:
+                history_list[i] = NodeHistoryItem(commit_hexsha, added_lines, removed_lines)
                 return
-        self._nodes_dict[node_id].history.append(NodeHistoryItem(commit_hexsha,
-                                                                 added_lines, removed_lines))
+        history_list.append(NodeHistoryItem(commit_hexsha, added_lines, removed_lines))
 
     def update_node_files(self, node_id: NodeId, commit_hexsha: str,
                           files: Iterable[str] = None) -> None:

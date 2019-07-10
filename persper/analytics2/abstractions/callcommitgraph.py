@@ -14,7 +14,6 @@ class NodeId(NamedTuple):
 
     def __eq__(self, other):
         return self.name == other.name and self.language == other.language
-        
 
 
 class NodeHistoryItem:
@@ -33,6 +32,14 @@ class NodeHistoryItem:
 
     def __str__(self):
         return "{0}: +{1}, -{2}".format(self.hexsha, self.added_lines, self.removed_lines)
+
+    def __hash__(self):
+        return hash((self.hexsha, self.added_lines, self.removed_lines))
+
+    def __eq__(self, other: "NodeHistoryItem"):
+        return self.hexsha == other.hexsha and \
+            self.added_lines == other.added_lines and \
+            self.removed_lines == other.removed_lines
 
 
 class Node:

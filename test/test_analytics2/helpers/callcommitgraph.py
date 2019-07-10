@@ -69,8 +69,9 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     ccg.update_node_files(csnode3, commit2.hexsha, files=csFiles)
     ccg.update_node_files(javanode1, commit3.hexsha, files=javaFiles)
     ccg.update_node_history(cppnode1, commit1.hexsha, 10, 0)
-    # (10, 0) will be overwritten
-    ccg.update_node_history(cppnode1, commit1.hexsha, 20, -10)
+    ccg.update_node_history(cppnode1, commit2.hexsha, 15, 0)
+    # (15, 0) will be overwritten
+    ccg.update_node_history(cppnode1, commit2.hexsha, 20, 10)
     ccg.update_node_history(cppnode2, commit1.hexsha, 15, 0)
     ccg.update_node_history(cppnode3, commit1.hexsha, 10, 0)
     ccg.update_node_history(csnode2, commit2.hexsha, 5, 0)
@@ -136,6 +137,10 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
 
     assert ccg.get_node(NodeId("non_existent", "cpp")) is None
     assert ccg.get_node(NodeId(cppnode1.name, "non_existent")) is None
+    assert set(ccg.get_node(cppnode1).history) == {
+        NodeHistoryItem(commit1.hexsha, 10, 0),
+        NodeHistoryItem(commit2.hexsha, 20, 10)
+    }
     assertNode(cppnode1, added_by=commit1.hexsha, files=cppFiles)
     assertNode(cppnode2, added_by=commit1.hexsha, files=cppFiles)
     assertNode(cppnode3, added_by=commit1.hexsha, files=cppFiles)
