@@ -42,6 +42,32 @@ class NodeHistoryItem:
             self.removed_lines == other.removed_lines
 
 
+class NodeHistoryLogicUnitItem:
+    """
+    Represents an entry of node history, indicated by the commit hexsha and modified logic units.
+    """
+
+    def __init__(self, hexsha: str = None, added_units: int = 0, removed_units: int = 0):
+        self.hexsha = hexsha
+        self.added_units = added_units
+        self.removed_units = removed_units
+
+    def __repr__(self):
+        return "NodeHistoryLogicUnitItem(hexsha={0}, added_units={1}, removed_units={2})". \
+            format(self.hexsha, self.added_units, self.removed_units)
+
+    def __str__(self):
+        return "{0}: +{1}, -{2}".format(self.hexsha, self.added_units, self.removed_units)
+
+    def __hash__(self):
+        return hash((self.hexsha, self.added_units, self.removed_units))
+
+    def __eq__(self, other: "NodeHistoryLogicUnitItem"):
+        return self.hexsha == other.hexsha and \
+            self.added_units == other.added_units and \
+            self.removed_units == other.removed_units
+
+
 class Node:
     """
     Represents a node in the call commit graph.
@@ -51,10 +77,13 @@ class Node:
     """
 
     def __init__(self, node_id: NodeId = None, added_by: str = None,
-                 history: Collection[NodeHistoryItem] = None, files: Collection[str] = None):
+                 history: Collection[NodeHistoryItem] = None,
+                 history_lu: Collection[NodeHistoryLogicUnitItem] = None,
+                 files: Collection[str] = None):
         self._node_id = node_id
         self._added_by = added_by
         self._history = [] if history == None else history
+        self._history_lu = [] if history_lu == None else history_lu
         self._files = [] if files == None else files
 
     @property
@@ -82,6 +111,10 @@ class Node:
     @property
     def history(self) -> Collection[NodeHistoryItem]:
         return self._history
+
+    @property
+    def history_lu(self) -> Collection[NodeHistoryLogicUnitItem]:
+        return self._history_lu
 
     @history.setter
     def history(self, value: Collection[NodeHistoryItem]):
@@ -247,7 +280,20 @@ class IWriteOnlyCallCommitGraph(ABC):
     @abstractmethod
     def update_node_history(self, node_id: NodeId, commit_hexsha: str, added_lines: int = 0, removed_lines: int = 0) -> None:
         """
-        Sets or replaces the modification information of the specified node ID and commit hexsha.
+        Sets or replaces the modification information (by lines of code) of the specified node ID and commit hexsha.
+        remarks
+            If the node does not exist, it will be created.
+            If commit_hexsha doesn't exist in history, add the entry to history.
+            If commit_hexsha exists in history, the entry will be *replaced*.
+                Note the entire node history entry of this hexsha will be replaced rather than merged.
+            To accumulate multiple modifications to a node in the same commit, use `NodeHistoryAccumulator` helper class.
+        """
+        pass
+
+    @abstractmethod
+    def update_node_history_lu(self, node_id: NodeId, commit_hexsha: str, added_units: int = 0, removed_units: int = 0) -> None:
+        """
+        Sets or replaces the modification information (by count of logical units) of the specified node ID and commit hexsha.
         remarks
             If the node does not exist, it will be created.
             If commit_hexsha doesn't exist in history, add the entry to history.

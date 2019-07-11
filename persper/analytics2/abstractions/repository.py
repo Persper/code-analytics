@@ -27,7 +27,7 @@ class IWorkspaceFileFilter(ABC):
         return False
 
     @abstractmethod
-    def filter_folder(self, folder_name: str, folder_path) -> bool:
+    def filter_folder(self, folder_name: str, folder_path: str) -> bool:
         """
         Tests whether the specified folder passes the filter.
         remarks

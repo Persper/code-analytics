@@ -6,11 +6,9 @@ from typing import Iterable, TextIO
 
 import pytz
 
-from persper.analytics2.abstractions.callcommitgraph import (Commit, Edge,
-                                                             ICallCommitGraph,
-                                                             Node,
-                                                             NodeHistoryItem,
-                                                             NodeId)
+from persper.analytics2.abstractions.callcommitgraph import (
+    Commit, Edge, ICallCommitGraph, Node, NodeHistoryItem,
+    NodeHistoryLogicUnitItem, NodeId)
 from persper.analytics2.abstractions.repository import (ICommitInfo,
                                                         ICommitRepository)
 
@@ -25,9 +23,14 @@ def serialize_node_history_item(o: NodeHistoryItem) -> dict:
     return {"hexsha": o.hexsha, "added_lines": o.added_lines, "removed_lines": o.removed_lines}
 
 
+def serialize_node_history_lu_item(o: NodeHistoryLogicUnitItem) -> dict:
+    return {"hexsha": o.hexsha, "added_units": o.added_units, "removed_units": o.added_units}
+
+
 def serialize_node(o: Node) -> dict:
     return {"id": o.node_id, "added_by": o.added_by,
             "history": [serialize_node_history_item(h) for h in o.history],
+            "history_lu": [serialize_node_history_lu_item(h) for h in o.history_lu],
             "files": list(o.files)}
 
 
@@ -51,9 +54,14 @@ def deserialize_node_history_item(d: dict) -> NodeHistoryItem:
     return NodeHistoryItem(hexsha=d["hexsha"], added_lines=d["added_lines"], removed_lines=d["removed_lines"])
 
 
+def deserialize_node_history_lu_item(d: dict) -> NodeHistoryLogicUnitItem:
+    return NodeHistoryLogicUnitItem(hexsha=d["hexsha"], added_units=d["added_units"], removed_units=d["removed_units"])
+
+
 def deserialize_node(d: dict) -> NodeId:
     return Node(node_id=deserialize_node_id(d["id"]), added_by=d["added_by"],
                 history=[deserialize_node_history_item(i) for i in d["history"]],
+                history_lu=[deserialize_node_history_lu_item(i) for i in d["history_lu"]],
                 files=list(d["files"]))
 
 
@@ -281,11 +289,20 @@ class MemoryCallCommitGraph(ICallCommitGraph):
                             added_lines: int = 0, removed_lines: int = 0) -> None:
         self._ensure_node_exists(node_id, commit_hexsha)
         history_list = self._nodes_dict[node_id].history
-        for i in range(0, len(history_list)):
+        for i in range(len(history_list)):
             if history_list[i].hexsha == commit_hexsha:
                 history_list[i] = NodeHistoryItem(commit_hexsha, added_lines, removed_lines)
                 return
         history_list.append(NodeHistoryItem(commit_hexsha, added_lines, removed_lines))
+
+    def update_node_history_lu(self, node_id: NodeId, commit_hexsha: str,
+                               added_units: int = 0, removed_units: int = 0) -> None:
+        history_list = self._nodes_dict[node_id].history_lu
+        for i in range(len(history_list)):
+            if history_list[i].hexsha == commit_hexsha:
+                history_list[i] = NodeHistoryLogicUnitItem(commit_hexsha, added_units, removed_units)
+                return
+        history_list.append(NodeHistoryLogicUnitItem(commit_hexsha, added_units, removed_units))
 
     def update_node_files(self, node_id: NodeId, commit_hexsha: str,
                           files: Iterable[str] = None) -> None:

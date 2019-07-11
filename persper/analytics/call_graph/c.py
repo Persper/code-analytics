@@ -1,5 +1,8 @@
-from persper.analytics.call_graph.utils import ns, line_attr
-from typing import Set
+from typing import Collection, Set
+
+from persper.analytics2.utilities import (IWriteOnlyCallCommitGraph,
+                                          NodeFilesAccumulator, NodeId)
+from persper.analytics.call_graph.utils import line_attr, ns
 from persper.analytics.error import UnexpectedASTError
 
 
@@ -211,6 +214,30 @@ def update_graph(ccgraph, ast_list, change_stats, new_fname_to_old_fname):
             continue
         ccgraph.update_node_history_accurate(func, fstat)
         # ccgraph.update_node_history(func, fstat['adds'], fstat['dels'])
+
+
+def update_graph_a2(ccg: IWriteOnlyCallCommitGraph, files: NodeFilesAccumulator, hexsha: str, language: str, ast, old_path: str, new_path: str):
+    # This dups update_graph, but uses IWriteOnlyCallCommitGraph as 1st param.
+    file_renamed = old_path != new_path
+    for function in ast.findall('./srcml:function', namespaces=ns):
+        try:
+            caller_name, _, _ = _handle_function(function)
+        except UnexpectedFunctionNodeError as e:
+            print(type(e).__name__, e.args)
+            continue
+
+        caller_id = NodeId(caller_name, language)
+        if file_renamed:
+            files.put(caller_id, new_path, old_path)
+
+        for call in function.xpath('.//srcml:call', namespaces=ns):
+            try:
+                callee_name = _handle_call(call)
+            except NotFunctionCallError as e:
+                # do not print error since we expect this to happen a lot
+                continue
+            callee_id = NodeId(callee_name, language)
+            ccg.add_edge(caller_id, callee_id, hexsha)
 
 
 def get_func_ranges_c(root):

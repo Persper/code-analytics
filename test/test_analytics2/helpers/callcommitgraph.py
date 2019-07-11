@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import datetime, timedelta
 from random import randint
@@ -5,7 +6,8 @@ from typing import Iterable
 
 from persper.analytics2.abstractions.callcommitgraph import (
     Commit, Edge, ICallCommitGraph, IReadOnlyCallCommitGraph, Node,
-    NodeHistoryItem, NodeId)
+    NodeHistoryItem, NodeHistoryLogicUnitItem, NodeId)
+from persper.analytics2.memorycallcommitgraph import MemoryCallCommitGraph
 
 
 def commit_equals(x: Commit, y: Commit):
@@ -76,6 +78,10 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
     ccg.update_node_history(cppnode3, commit1.hexsha, 10, 0)
     ccg.update_node_history(csnode2, commit2.hexsha, 5, 0)
     ccg.update_node_history(csnode3, commit2.hexsha, 4, 0)
+    ccg.update_node_history_lu(cppnode1, commit1.hexsha, 20, 5)
+    ccg.update_node_history_lu(cppnode1, commit1.hexsha, 17, 5)
+    ccg.update_node_history_lu(cppnode2, commit1.hexsha, 15, 0)
+    ccg.update_node_history_lu(cppnode3, commit1.hexsha, 10, 0)
 
     ccg.add_edge(cppnode2, cppnode1, commit1.hexsha)
     ccg.add_edge(cppnode3, cppnode1, commit1.hexsha)
@@ -141,6 +147,9 @@ def test_call_commit_graph(ccg: ICallCommitGraph):
         NodeHistoryItem(commit1.hexsha, 10, 0),
         NodeHistoryItem(commit2.hexsha, 20, 10)
     }
+    assert set(ccg.get_node(cppnode1).history_lu) == {
+        NodeHistoryLogicUnitItem(commit1.hexsha, 17, 5)
+    }
     assertNode(cppnode1, added_by=commit1.hexsha, files=cppFiles)
     assertNode(cppnode2, added_by=commit1.hexsha, files=cppFiles)
     assertNode(cppnode3, added_by=commit1.hexsha, files=cppFiles)
@@ -183,6 +192,7 @@ def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallC
         n2 = actual.get_node(n1.node_id)
         assert n2, "Node missing: {0}".format(n1.node_id)
         assert n1.node_id == n2.node_id
+        print("Comparing node: {0} -- {1}".format(n1, n2))
         assertCommitEqual(n1.added_by, n2.added_by)
         keyExtractor = None
         if commit_assertion == commit_assertion_by_hexsha:
@@ -194,6 +204,7 @@ def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallC
             def f(h):
                 return h.message
             keyExtractor = f
+        # TODO Add history_lu assertion
         if keyExtractor:
             d1 = dict((keyExtractor, h) for h in n1.history)
             d2 = dict((keyExtractor, h) for h in n2.history)
@@ -218,9 +229,60 @@ def assert_graph_same(expected: IReadOnlyCallCommitGraph, actual: IReadOnlyCallC
     for b1 in expected.enum_edges():
         b2 = actual.get_edge(b1.from_id, b1.to_id)
         assert b2, "Edge missing: {0} -> {1}".format(b1.from_id, b1.to_id)
+        print("Comparing edge: {0} -- {1}".format(b1, b2))
         assertCommitEqual(b1.added_by, b2.added_by)
     if expected.get_edges_count() < actual.get_edges_count():
         # there are extra edges
         for n2 in actual.enum_edges():
             n1 = expected.get_edge(n2.from_id, n2.to_id)
             assert n1, "Extra edge: {0} -> {1}".format(b2.from_id, b2.to_id)
+
+
+_CONFIG_IS_GENERATING_BASELINE = os.environ.get(
+    "PERSPER_TEST_GENERATING_BASELINE", "").strip().lower() in {"1", "true", "on"}
+
+
+def set_is_generating_baseline(value: bool = True):
+    global _CONFIG_IS_GENERATING_BASELINE
+    _CONFIG_IS_GENERATING_BASELINE = value
+
+
+def _redact_serialized_commits(serialized_graph: dict):
+    commits = serialized_graph.get("commits", None)
+    if not commits:
+        return
+    for commit in commits:
+        commit: dict
+        for k in commit:
+            if k not in ("hex_sha", "message", "parents"):
+                commit[k] = None
+
+
+def check_graph_baseline(baseline_file_name: str, actual_graph: MemoryCallCommitGraph,
+                         commit_assertion=commit_assertion_by_hexsha):
+    """
+    Checks or generates call commit graph baseline, depending on how `set_is_generating_baseline` is called
+    before executing the tests.
+    """
+    baseline_folder = os.path.realpath(os.path.join(__file__, "..", "..", "baseline"))
+    os.makedirs(baseline_folder, exist_ok=True)
+    file_path = os.path.join(baseline_folder, baseline_file_name + ".json")
+    print("_CONFIG_IS_GENERATING_BASELINE=", _CONFIG_IS_GENERATING_BASELINE)
+    if _CONFIG_IS_GENERATING_BASELINE:
+        serialized = actual_graph.serialize_dict()
+        _redact_serialized_commits(serialized)
+        with open(file_path, "wt") as f:
+            json.dump(serialized, f, indent=True, sort_keys=True)
+    else:
+        expected_graph = None
+        with open(file_path, "rt") as f:
+            expected_graph = MemoryCallCommitGraph.load_from(f)
+        try:
+            assert_graph_same(expected_graph, actual_graph, commit_assertion)
+        except Exception:
+            # dump actual graph if there is assertion failure or error
+            file_path = os.path.join(baseline_folder, baseline_file_name + ".actual.json")
+            serialized = actual_graph.serialize_dict()
+            with open(file_path, "wt") as f:
+                json.dump(serialized, f, indent=True, sort_keys=True)
+            raise
