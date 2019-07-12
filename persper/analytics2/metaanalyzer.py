@@ -17,6 +17,10 @@ _whitespace_re = re.compile(r"\s+")
 class MetaAnalyzer():
     """
     Coordinates `ICommitAnalyzer` and `IPostAnalyzer` implementation, doing analysis through the commit history.
+
+    remarks
+        This class does not care where to save the analyzed results. It only decides the suitable time to
+        trigger the contained analyzers. The responsibility of persistence lies in the respective analyzers.
     """
 
     def __init__(self, repository: ICommitRepository,
@@ -29,9 +33,9 @@ class MetaAnalyzer():
             post_analyzers: a list of post analyzers. They will be invoked sequentially after the analysis ends successfully or in fault.
             origin_commit, terminal_commit: see `ICommitRepository.enum_commits` for details.
         remarks
-            You may use `load_state_dict` to load `origin_commit`, `terminal_commit`, and `analyzed_commits` from
-            dict after instantiating this class. Still you need to inject required services (indicated by required
-            parameters) so that you can instantiate this class.
+            You may use `load_state_dict` in this class to load `origin_commit`, `terminal_commit`, and `analyzed_commits`
+            from a simple `dict` after instantiating this class. Still in this case you need to inject required services
+            (indicated by required parameters) so that you can instantiate this class.
         """
         if not isinstance(repository, ICommitRepository):
             raise ValueError("Expect ICommitRepository instance for repository.")

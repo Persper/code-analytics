@@ -23,10 +23,14 @@ class lazy(object):
 
 class RootContainer:
     """
-    Maintains lifetime for the objects for analysis.
+    The root dependency injection (DI) container that maintains lifetime for the objects for analysis.
 
     This container is intended to have the same lifetime as `analytics_main` function.
     Almost all of the instances contained are singletons.
+
+    You may derive your own DI container from this class, overriding some of the factory methods
+    (or "properties", to be more exact) with or without `@lazy` decorator, and use it in your
+    code.
     """
 
     def __init__(self, i_commit_repository: "ICommitRepository"):

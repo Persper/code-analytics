@@ -1,3 +1,6 @@
+"""
+Example entry point of analytics2.
+"""
 import logging
 from persper.analytics2.repository import GitRepository
 from persper.analytics2.metaanalyzer import MetaAnalyzer

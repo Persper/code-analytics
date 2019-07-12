@@ -1,3 +1,6 @@
+"""
+Module for DevRank implementation with IReadOnlyCallCommitGraph.
+"""
 import logging
 from typing import Callable, Collection, Dict, Iterable, NamedTuple, Tuple
 
