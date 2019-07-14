@@ -14,12 +14,14 @@ from persper.analytics.commit_classifier import CommitClassifier
 from persper.analytics.git_tools import diff_with_commit, get_contents
 from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.score import commit_overall_scores
+from persper.analytics.diff_cache import cached_diff_with_commit
 
 _logger = logging.getLogger(__name__)
 
 
 class Analyzer:
     def __init__(self, repositoryRoot: str, graphServer: GraphServer,
+                 cache=None,
                  terminalCommit: str = 'HEAD',
                  firstParentOnly: bool = False,
                  commit_classifier: Optional[CommitClassifier] = None,
@@ -30,6 +32,7 @@ class Analyzer:
         # skip_rewind_diff will skip diff, but rewind commit start/end will still be notified to the GraphServer.
         self._repositoryRoot = repositoryRoot
         self._graphServer = graphServer
+        self._cache = cache
         self._repo = Repo(repositoryRoot)
         self._originCommit: Commit = None
         self._terminalCommit: Commit = self._repo.rev_parse(terminalCommit)
