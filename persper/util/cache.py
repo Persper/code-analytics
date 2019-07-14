@@ -26,8 +26,7 @@ class Cache:
 
         opts.table_factory = rocksdb.BlockBasedTableFactory(
             filter_policy=rocksdb.BloomFilterPolicy(10),
-            block_cache=rocksdb.LRUCache(2 * (1024 ** 3)),
-            block_cache_compressed=rocksdb.LRUCache(500 * (1024 ** 2)))
+            block_cache=rocksdb.LRUCache(1 * (1024 ** 3)))
         return opts
 
     def put(self, key, val):
@@ -44,7 +43,8 @@ class Cache:
         if type(key) is str:
             key = self.str2bytes(key)
         val = self._db.get(key)
-        val = self._decode(val)
+        if val is not None and type(val) is bytes:
+            val = self._decode(val)
         return val
 
     def delete(self, key):
@@ -74,14 +74,14 @@ class Cache:
     def json_encode(val):
         try:
             return json.dumps(val)
-        except:
+        except BaseException:
             return ''
 
     @staticmethod
     def json_decode(val):
         try:
             return json.loads(val)
-        except:
+        except BaseException:
             return None
 
 

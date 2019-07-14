@@ -282,10 +282,10 @@ class Analyzer:
         if self._skip_rewind_diff and seekingMode == CommitSeekingMode.Rewind:
             _logger.info("Skipped diff for rewinding commit.")
         else:
-            diff_index = diff_with_commit(self._repo, commit, parentCommit)
-            for analyzer_params in self._commit_analyzer_funs:
-                analyze_fun = analyzer_params[0]
-                analyze_fun(self, commit, diff_index, *analyzer_params[1:])
+            diff_index = cached_diff_with_commit(self._repo, commit, parentCommit, self._cache)
+            for analyze_fun in self._commit_analyzer_funs:
+                analyze_fun(self, commit, diff_index)
+
         # commit classification
         if self._commit_classifier and commit.hexsha not in self._clf_results:
             prob = self._commit_classifier.predict(
@@ -330,7 +330,7 @@ class Analyzer:
                 t2b0 = time.monotonic()
                 if old_src or new_src:
                     result = self._graphServer.update_graph(
-                        old_fname, old_src, new_fname, new_src, diff.diff)
+                        old_fname, old_src, new_fname, new_src, diff.diff, cache=self._cache)
                     if asyncio.iscoroutine(result):
                         await result
                 t2b += time.monotonic() - t2b0
