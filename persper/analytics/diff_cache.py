@@ -10,13 +10,13 @@ def cached_diff_with_commit(repo, commit, parentCommit, cache=None):
                               _get_hexsha_from_commit(commit),
                               _get_hexsha_from_commit(parentCommit)])
 
-        diff_index = cache.get(cache_key)
+        diff_index = cache.get(cache_key, serializer='pickle')
         if diff_index is not None:
             return diff_index
         else:
             diff_index = diff_with_commit(repo, commit, parentCommit)
             if diff_index is not None:
-                cache.put(cache_key, diff_index)
+                cache.put(cache_key, diff_index, serializer='pickle')
     else:
         diff_index = diff_with_commit(repo, commit, parentCommit)
     return diff_index

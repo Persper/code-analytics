@@ -1,12 +1,14 @@
 import json
 import pickle
 import rocksdb
+from lxml import etree
 
 
 class Cache:
-    def __init__(self, rocksdb_path, serializer='pickle'):
+    def __init__(self, rocksdb_path, serializer=None):
         """
-        :params serializers: available are 'pickle', 'json'.
+        :params serializers: available are 'pickle', 'json', 'xml'.
+        The default serializer is None.
         """
         self._serializer = serializer
         opts = self._config_rocksdb()
@@ -29,8 +31,11 @@ class Cache:
             block_cache=rocksdb.LRUCache(1 * (1024 ** 3)))
         return opts
 
-    def put(self, key, val):
-        val = self._encode(val)
+    def put(self, key, val, serializer=None):
+        """use instance scoped serializer if param serializer is None"""
+        if serializer is None:
+            serializer = self._serializer
+        val = self._encode(val, serializer)
 
         """prevent storing a key or value as a string"""
         if type(key) is str:
@@ -39,12 +44,14 @@ class Cache:
             val = self.str2bytes(val)
         self._db.put(key, val)
 
-    def get(self, key):
+    def get(self, key, serializer=None):
+        if serializer is None:
+            serializer = self._serializer
         if type(key) is str:
             key = self.str2bytes(key)
         val = self._db.get(key)
         if val is not None and type(val) is bytes:
-            val = self._decode(val)
+            val = self._decode(val, serializer)
         return val
 
     def delete(self, key):
@@ -52,18 +59,22 @@ class Cache:
             key = self.str2bytes(key)
         self._db.delete(key)
 
-    def _encode(self, val):
-        if self._serializer == 'json':
+    def _encode(self, val, serializer=None):
+        if serializer == 'json':
             val = self.json_encode(val)
-        elif self._serializer == 'pickle':
+        elif serializer == 'pickle':
             val = pickle.dumps(val)
+        elif serializer == 'xml':
+            val = self.xml_encode(val)
         return val
 
-    def _decode(self, val):
-        if self._serializer == 'json':
+    def _decode(self, val, serializer=None):
+        if serializer == 'json':
             val = self.json_decode(val)
-        elif self._serializer == 'pickle':
+        elif serializer == 'pickle':
             val = pickle.loads(val)
+        elif serializer == 'xml':
+            val = self.xml_decode(val)
         return val
 
     @staticmethod
@@ -84,9 +95,22 @@ class Cache:
         except BaseException:
             return None
 
+    @staticmethod
+    def xml_encode(val):
+        try:
+            return etree.tostring(val)
+        except BaseException:
+            return ''
+
+    @staticmethod
+    def xml_decode(val):
+        try:
+            return etree.fromstring(val)
+        except BaseException:
+            return None
 
 if __name__ == "__main__":
-    cache = Cache('./test_rock')
+    cache = Cache('./test_rock', serializer='pickle')
     obj = {"a": 1, "b": "hello", "c": [1, 3, 5]}
     key = 'test_obj1'
     cache.put(key, obj)

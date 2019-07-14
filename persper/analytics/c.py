@@ -128,10 +128,10 @@ class CGraphServer(GraphServer):
         ast = None
         if cache is not None:
             cache_key = ':'.join(['AST', filename, file_src])
-            ast = cache.get(cache_key)
+            ast = cache.get(cache_key, serializer='xml')
             if ast is None:
                 ast = src_to_tree(filename, file_src)
-                cache.put(cache_key, ast)
+                cache.put(cache_key, ast, serializer='xml')
         else:
             ast = src_to_tree(filename, file_src)
         return ast
