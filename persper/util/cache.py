@@ -50,6 +50,8 @@ class Cache:
         if type(key) is str:
             key = self.str2bytes(key)
         val = self._db.get(key)
+        if val == b'':
+            return None
         if val is not None and type(val) is bytes:
             val = self._decode(val, serializer)
         return val
@@ -63,7 +65,7 @@ class Cache:
         if serializer == 'json':
             val = self.json_encode(val)
         elif serializer == 'pickle':
-            val = pickle.dumps(val)
+            val = self.pickle_encode(val)
         elif serializer == 'xml':
             val = self.xml_encode(val)
         return val
@@ -72,7 +74,7 @@ class Cache:
         if serializer == 'json':
             val = self.json_decode(val)
         elif serializer == 'pickle':
-            val = pickle.loads(val)
+            val = self.pickle_decode(val)
         elif serializer == 'xml':
             val = self.xml_decode(val)
         return val
@@ -106,6 +108,20 @@ class Cache:
     def xml_decode(val):
         try:
             return etree.fromstring(val)
+        except BaseException:
+            return None
+
+    @staticmethod
+    def pickle_encode(val):
+        try:
+            return pickle.dumps(val)
+        except BaseException:
+            return ''
+
+    @staticmethod
+    def pickle_decode(val):
+        try:
+            return pickle.loads(val)
         except BaseException:
             return None
 
