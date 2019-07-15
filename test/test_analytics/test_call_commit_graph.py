@@ -124,6 +124,40 @@ def test_devrank_with_accurate_history():
     assert isclose(dev_drs[first_commit['authorEmail']], 1)
 
 
+def _update_history_action(ccgraph, node, hist_entry):
+    history = ccgraph._get_node_history(node)
+    history[ccgraph._current_commit_id] = hist_entry
+
+
+def test_devrank_with_history_actions():
+    ccgraph = CallCommitGraph()
+    first_commit = {
+        'hexsha': '0x01',
+        'authorName': 'koala',
+        'authorEmail': 'koala@persper.org',
+        'message': 'first commit'
+    }
+    ccgraph.add_commit(first_commit['hexsha'],
+                       first_commit['authorName'],
+                       first_commit['authorEmail'],
+                       first_commit['message'])
+    ccgraph.add_node('f1')
+    _update_history_action(ccgraph, 'f1', {'adds': 10, 'dels': 0, 'added_units': 20, 'removed_units': 0,
+                                           'actions': {'inserts': 20, 'deletes': 20, 'updates': 20, 'moves': 20}})
+    ccgraph.add_node('f2')
+    _update_history_action(ccgraph, 'f2', {'adds': 10, 'dels': 0, 'added_units': 40, 'removed_units': 0,
+                                           'actions': {'inserts': 10, 'deletes': 10, 'updates': 10, 'moves': 10}})
+    ccgraph.add_edge('f1', 'f2')
+
+    func_drs = ccgraph.function_devranks(0.85)
+    commit_drs = ccgraph.commit_devranks(0.85)
+    dev_drs = ccgraph.developer_devranks(0.85)
+    assert isclose(func_drs['f1'], 0.425, rel_tol=1e-2)
+    assert isclose(func_drs['f2'], 0.574, rel_tol=1e-2)
+    assert isclose(commit_drs[first_commit['hexsha']], 1)
+    assert isclose(dev_drs[first_commit['authorEmail']], 1)
+
+
 @pytest.mark.asyncio
 async def test_black_set():
     """

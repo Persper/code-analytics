@@ -185,7 +185,10 @@ class CallCommitGraph:
         """
         def _compute_node_commit_dev_eq(hist_entry):
             # use logical units if possible, otherwise fall back to LOC
-            if 'added_units' in hist_entry.keys() and 'removed_units' in hist_entry.keys():
+            if 'actions' in hist_entry:
+                actions = hist_entry['actions']
+                return actions['inserts'] + actions['deletes'] + actions['updates'] + actions['moves']
+            elif 'added_units' in hist_entry.keys() and 'removed_units' in hist_entry.keys():
                 return hist_entry['added_units'] + hist_entry['removed_units']
             else:
                 return hist_entry['adds'] + hist_entry['dels']
