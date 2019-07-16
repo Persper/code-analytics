@@ -7,6 +7,7 @@ import glob
 import subprocess
 import tempfile
 from lxml import etree
+from persper.analytics.diff_cache import get_hexsha_from_commit
 
 # Create our custom xml parser to handle very deep documents
 xml_parser = etree.XMLParser(huge_tree=True)
@@ -53,7 +54,27 @@ def transform_dir(input_dir, output_dir, extensions=('.c', '.h')):
     print("Tranformation completed, {} processed.".format(counter))
 
 
-def src_to_tree(filename, src):
+def src_to_tree(filename, src, cache=None, commit=None):
+    xml_str = None
+    if cache is not None:
+        cache_key = ':'.join(['AST:XML', get_hexsha_from_commit(commit), filename])
+        xml_str = cache.get(cache_key)
+        if xml_str is None:
+            xml_str = src_to_xml_str(filename, src)
+            if xml_str is not None:
+               cache.put(cache_key, xml_str)
+    else:
+        xml_str = src_to_xml_str(filename, src)
+
+    try:
+        root = etree.fromstring(xml_str)
+    except BaseException as ex:
+        print("ERROR: src_to_xml_str unable to parse xml file: {}".format(ex))
+        return None
+
+    return root
+
+def src_to_xml_str(filename, src):
     """
     Assume src is UTF-8 encoded.
     the temp file needs to have the right ext so that srcml can open it
@@ -75,15 +96,8 @@ def src_to_tree(filename, src):
         return None
 
     cmd = ['srcml', f.name, '--position']
-    xml_str = subprocess.run(cmd, stdout=subprocess.PIPE).stdout
-
-    try:
-        root = etree.fromstring(xml_str)
-    except BaseException as ex:
-        print("ERROR: src_to_tree unable to parse xml file: {}".format(ex))
-        return None
-
-    return root
+    xml_str = subprocess.run(cmd, close_fds=True, stdout=subprocess.PIPE).stdout
+    return xml_str
 
 
 def main():

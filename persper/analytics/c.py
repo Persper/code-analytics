@@ -68,7 +68,8 @@ class CGraphServer(GraphServer):
     def get_workspace_commit_hexsha(self):
         return self._workspace_commit_hexsha
 
-    def update_graph(self, old_filename, old_src, new_filename, new_src, patch, cache=None):
+    def update_graph(self, old_filename, old_src, new_filename, new_src, patch,
+                     cache=None, parent_commit=None, commit=None):
         ast_list = []
         old_ast = None
         new_ast = None
@@ -79,12 +80,12 @@ class CGraphServer(GraphServer):
 
         # Parse source codes into ASTs
         if old_src:
-            old_ast = self._get_ast(old_filename, old_src, cache)
+            old_ast = src_to_tree(old_filename, old_src, cache=cache, commit=parent_commit)
             if old_ast is None:
                 return -1
 
         if new_src:
-            new_ast = self._get_ast(new_filename, new_src, cache)
+            new_ast = src_to_tree(new_filename, new_src, cache=cache, commit=commit)
             if new_ast is None:
                 return -1
             ast_list = [new_ast]
@@ -123,15 +124,3 @@ class CGraphServer(GraphServer):
         except:
             print("Unknown error when parsing patch!")
         return adds, dels
-
-    def _get_ast(self, filename, file_src, cache):
-        ast = None
-        if cache is not None:
-            cache_key = ':'.join(['AST', filename, file_src])
-            ast = cache.get(cache_key, serializer='xml')
-            if ast is None:
-                ast = src_to_tree(filename, file_src)
-                cache.put(cache_key, ast, serializer='xml')
-        else:
-            ast = src_to_tree(filename, file_src)
-        return ast

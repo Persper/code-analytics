@@ -7,8 +7,8 @@ DIFF_INDEX_NS = 'diff_index'
 def cached_diff_with_commit(repo, commit, parentCommit, cache=None):
     if cache is not None:
         cache_key = ':'.join([DIFF_INDEX_NS,
-                              _get_hexsha_from_commit(commit),
-                              _get_hexsha_from_commit(parentCommit)])
+                              get_hexsha_from_commit(commit),
+                              get_hexsha_from_commit(parentCommit)])
 
         diff_index = cache.get(cache_key, serializer='pickle')
         if diff_index is not None:
@@ -22,7 +22,7 @@ def cached_diff_with_commit(repo, commit, parentCommit, cache=None):
     return diff_index
 
 
-def _get_hexsha_from_commit(commit):
+def get_hexsha_from_commit(commit):
     if commit is None:
         return 'none_commit'
     elif type(commit) is str:

@@ -333,7 +333,8 @@ class Analyzer:
                 t2b0 = time.monotonic()
                 if old_src or new_src:
                     result = self._graphServer.update_graph(
-                        old_fname, old_src, new_fname, new_src, diff.diff, cache=self._cache)
+                        old_fname, old_src, new_fname, new_src, diff.diff, cache=self._cache,
+                        parent_commit=parentCommit, commit=commit)
                     if asyncio.iscoroutine(result):
                         await result
                 t2b += time.monotonic() - t2b0
