@@ -74,20 +74,14 @@ def src_to_tree(filename, src):
         os.remove(f.name)
         return None
 
-    xml_path = f.name + ".xml"
-    cmd = 'srcml {} --position --filename {} -o {}'.format(f.name, '\"/' + filename + '\"', xml_path)
-    subprocess.call(cmd, shell=True)
+    cmd = ['srcml', f.name, '--position']
+    xml_str = subprocess.run(cmd, stdout=subprocess.PIPE).stdout
+
     try:
-        root = etree.parse(xml_path, parser=xml_parser).getroot()
-    except:
-        print("ERROR: src_to_tree unable to parse xml file.")
+        root = etree.fromstring(xml_str)
+    except BaseException as ex:
+        print("ERROR: src_to_tree unable to parse xml file: {}".format(ex))
         return None
-    finally:
-        if not f.closed:
-            f.close()
-        os.remove(f.name)
-        if os.path.exists(xml_path):
-            os.remove(xml_path)
 
     return root
 
@@ -98,6 +92,7 @@ def main():
     parser.add_argument('OUTPUT', help='output dir', type=str)
     args = parser.parse_args()
     transform_dir(args.SOURCE, args.OUTPUT)
+
 
 if __name__ == '__main__':
     main()
