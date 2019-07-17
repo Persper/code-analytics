@@ -124,14 +124,3 @@ class Cache:
             return pickle.loads(val)
         except BaseException:
             return None
-
-if __name__ == "__main__":
-    cache = Cache('./test_rock', serializer='pickle')
-    obj = {"a": 1, "b": "hello", "c": [1, 3, 5]}
-    key = 'test_obj1'
-    cache.put(key, obj)
-
-    obj_get = cache.get(key)
-    print(obj_get['a'])
-    print(obj_get['b'])
-    print(obj_get['c'])

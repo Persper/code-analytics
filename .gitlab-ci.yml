@@ -34,5 +34,4 @@ test_ci:
     - pipenv install --python 3.6
     - pipenv run pytest -s test/test_analytics
     - pipenv run pytest -s test/test_analytics2
-    - pipenv run python3.6 persper/util/cache.py
     - echo "Done"
