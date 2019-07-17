@@ -50,9 +50,7 @@ class Cache:
         if type(key) is str:
             key = self.str2bytes(key)
         val = self._db.get(key)
-        if val == b'':
-            return None
-        if val is not None and type(val) is bytes:
+        if val != b'' and val is not None and type(val) is bytes:
             val = self._decode(val, serializer)
         return val
 
@@ -60,6 +58,12 @@ class Cache:
         if type(key) is str:
             key = self.str2bytes(key)
         self._db.delete(key)
+
+    def put_raw(self, key, val):
+        self.put(key, val, serializer='raw')
+
+    def get_raw(self, key):
+        return self.get(key, serializer='raw')
 
     def _encode(self, val, serializer=None):
         if serializer == 'json':
