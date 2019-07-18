@@ -6,8 +6,13 @@ import os
 import glob
 import subprocess
 import tempfile
+from typing import Optional, Union, List
+
 from lxml import etree
+from git import Commit
+
 from persper.analytics.diff_cache import get_hexsha_from_commit
+from persper.util.cache import Cache
 
 # Create our custom xml parser to handle very deep documents
 xml_parser = etree.XMLParser(huge_tree=True)
@@ -54,7 +59,8 @@ def transform_dir(input_dir, output_dir, extensions=('.c', '.h')):
     print("Tranformation completed, {} processed.".format(counter))
 
 
-def src_to_tree(filename, src, cache=None, commit=None):
+def src_to_tree(filename: str, src: str, cache: Optional[Cache] = None,
+                commit: Union[Commit, str] = None) -> List[etree.Element]:
     xml_str = None
     if cache is not None:
         cache_key = ':'.join(['AST:XML', get_hexsha_from_commit(commit), filename])
@@ -74,7 +80,7 @@ def src_to_tree(filename, src, cache=None, commit=None):
 
     return root
 
-def src_to_xml_str(filename, src):
+def src_to_xml_str(filename: str, src: str) -> str:
     """
     Assume src is UTF-8 encoded.
     the temp file needs to have the right ext so that srcml can open it
