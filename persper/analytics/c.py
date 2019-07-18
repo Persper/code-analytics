@@ -1,5 +1,7 @@
 import re
-from typing import List
+from typing import List, Optional, Union
+from git import Commit
+
 from persper.analytics.inverse_diff import inverse_diff
 from persper.analytics.srcml import src_to_tree
 from persper.analytics.call_graph.c import update_graph, get_func_ranges_c
@@ -8,6 +10,7 @@ from persper.analytics.patch_parser import PatchParser
 from persper.analytics.graph_server import CommitSeekingMode, GraphServer
 from persper.analytics.call_commit_graph import CallCommitGraph
 from persper.analytics.exclude_patterns import EXCLUDE_PATTERNS
+from persper.util.cache import Cache
 
 
 def function_change_stats(old_ast, old_src, new_ast, new_src, patch, patch_parser, ranges_func):
@@ -68,7 +71,10 @@ class CGraphServer(GraphServer):
     def get_workspace_commit_hexsha(self):
         return self._workspace_commit_hexsha
 
-    def update_graph(self, old_filename, old_src, new_filename, new_src, patch):
+    def update_graph(self, old_filename: str, old_src: str, new_filename: str, new_src: str, patch: str,
+                     cache: Optional[Cache] = None,
+                     parent_commit: Optional[Union[Commit, str]] = None,
+                     commit: Optional[Union[Commit, str]] = None):
         ast_list = []
         old_ast = None
         new_ast = None
@@ -79,12 +85,12 @@ class CGraphServer(GraphServer):
 
         # Parse source codes into ASTs
         if old_src:
-            old_ast = src_to_tree(old_filename, old_src)
+            old_ast = src_to_tree(old_filename, old_src, cache=cache, commit=parent_commit)
             if old_ast is None:
                 return -1
 
         if new_src:
-            new_ast = src_to_tree(new_filename, new_src)
+            new_ast = src_to_tree(new_filename, new_src, cache=cache, commit=commit)
             if new_ast is None:
                 return -1
             ast_list = [new_ast]
