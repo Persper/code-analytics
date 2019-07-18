@@ -5,12 +5,13 @@ from lxml import etree
 
 
 class Cache:
-    def __init__(self, rocksdb_path, serializer=None):
+    def __init__(self, rocksdb_path: str, cache_size: int = 1, serializer: str = None):
         """
         :params serializers: available are 'pickle', 'json', 'xml'.
         The default serializer is None.
         """
         self._serializer = serializer
+        self._cache_size = cache_size
         opts = self._config_rocksdb()
 
         self._db = rocksdb.DB(rocksdb_path, opts)
@@ -28,7 +29,7 @@ class Cache:
 
         opts.table_factory = rocksdb.BlockBasedTableFactory(
             filter_policy=rocksdb.BloomFilterPolicy(10),
-            block_cache=rocksdb.LRUCache(1 * (1024 ** 3)))
+            block_cache=rocksdb.LRUCache(self._cache_size * (1024 ** 3)))
         return opts
 
     def put(self, key, val, serializer=None):
