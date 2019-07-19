@@ -49,8 +49,9 @@ class CGraphServer(GraphServer):
     # CGraphServer only analyzes files with the following suffixes
     _suffix_regex = re.compile(r'.+\.(h|c)$')
 
-    def __init__(self, exclude_patterns: List[str] = EXCLUDE_PATTERNS):
+    def __init__(self, exclude_patterns: List[str] = EXCLUDE_PATTERNS, cache: Optional[Cache] = None):
         super(CGraphServer, self).__init__(exclude_patterns=exclude_patterns)
+        self._cache = cache
         self._ccgraph = CallCommitGraph()
         self._pparser = PatchParser()
         self._seeking_mode = None
@@ -71,10 +72,7 @@ class CGraphServer(GraphServer):
     def get_workspace_commit_hexsha(self):
         return self._workspace_commit_hexsha
 
-    def update_graph(self, old_filename: str, old_src: str, new_filename: str, new_src: str, patch: str,
-                     cache: Optional[Cache] = None,
-                     parent_commit: Optional[Union[Commit, str]] = None,
-                     commit: Optional[Union[Commit, str]] = None):
+    def update_graph(self, old_filename: str, old_src: str, new_filename: str, new_src: str, patch: str):
         ast_list = []
         old_ast = None
         new_ast = None
@@ -85,12 +83,12 @@ class CGraphServer(GraphServer):
 
         # Parse source codes into ASTs
         if old_src:
-            old_ast = src_to_tree(old_filename, old_src, cache=cache, commit=parent_commit)
+            old_ast = src_to_tree(old_filename, old_src)
             if old_ast is None:
                 return -1
 
         if new_src:
-            new_ast = src_to_tree(new_filename, new_src, cache=cache, commit=commit)
+            new_ast = src_to_tree(new_filename, new_src, cache=self._cache, commit=self._workspace_commit_hexsha)
             if new_ast is None:
                 return -1
             ast_list = [new_ast]
