@@ -285,9 +285,10 @@ class Analyzer:
         if self._skip_rewind_diff and seekingMode == CommitSeekingMode.Rewind:
             _logger.info("Skipped diff for rewinding commit.")
         else:
-            diff_index = cached_diff_with_commit(self._repo, commit, parentCommit, self._cache)
-            for analyze_fun in self._commit_analyzer_funs:
-                analyze_fun(self, commit, diff_index)
+            diff_index = cached_diff_with_commit(self._repo, commit, parentCommit, cache=self._cache)
+            for analyzer_params in self._commit_analyzer_funs:
+                analyze_fun = analyzer_params[0]
+                analyze_fun(self, commit, diff_index, *analyzer_params[1:])
 
         # commit classification
         if self._commit_classifier and commit.hexsha not in self._clf_results:
