@@ -28,7 +28,8 @@ class Analyzer:
                  skip_rewind_diff: bool = False,
                  monolithic_commit_lines_threshold: int = 5000,
                  monolithic_file_bytes_threshold: int = 200000,
-                 lang: str = None):
+                 lang: str = None,
+                 create_patch: bool = True):
         # skip_rewind_diff will skip diff, but rewind commit start/end will still be notified to the GraphServer.
         self._repositoryRoot = repositoryRoot
         self._graphServer = graphServer
@@ -49,6 +50,7 @@ class Analyzer:
         self._commit_analyzer_funs = []
         self._commit_analyzer_data = {}
         self._lang = lang
+        self._create_patch = create_patch
         self._analyzing_index = 0
 
     def __getstate__(self):
@@ -210,6 +212,7 @@ class Analyzer:
                             analyzedCommits, commit.hexsha, message, status))
                     _logger.log(level, "Commit #%d %s (%s): %s",
                                 analyzedCommits, commit.hexsha, message, status)
+
                 self._analyzing_index += 1
                 lastCommit = self._graphServer.get_workspace_commit_hexsha()
                 if maxAnalyzedCommits and analyzedCommits >= maxAnalyzedCommits:
@@ -285,7 +288,8 @@ class Analyzer:
         if self._skip_rewind_diff and seekingMode == CommitSeekingMode.Rewind:
             _logger.info("Skipped diff for rewinding commit.")
         else:
-            diff_index = cached_diff_with_commit(self._repo, commit, parentCommit, cache=self._cache)
+            diff_index = cached_diff_with_commit(self._repo, commit, parentCommit, cache=self._cache,
+                                                 create_patch=self._create_patch)
             for analyzer_params in self._commit_analyzer_funs:
                 analyze_fun = analyzer_params[0]
                 analyze_fun(self, commit, diff_index, *analyzer_params[1:])

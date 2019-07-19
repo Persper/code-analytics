@@ -15,7 +15,8 @@ def diff_with_first_parent(repo: Repo, commit: Commit):
         return diff_with_commit(repo, commit, commit.parents[0])
 
 
-def diff_with_commit(repo: Repo, current_commit: Commit, base_commit_sha: str, ignore_space: bool = True):
+def diff_with_commit(repo: Repo, current_commit: Commit, base_commit_sha: str, ignore_space: bool = True,
+                     create_patch: bool = True):
     # about git.NULL_TREE: https://github.com/gitpython-developers/GitPython/blob/master/git/diff.py#L87
     if current_commit is None:
         current_commit = git.NULL_TREE
@@ -23,7 +24,7 @@ def diff_with_commit(repo: Repo, current_commit: Commit, base_commit_sha: str, i
         base_commit = repo.tree(EMPTY_TREE_SHA)
     else:
         base_commit = repo.commit(base_commit_sha)
-    return base_commit.diff(current_commit, create_patch=True, indent_heuristic=True,
+    return base_commit.diff(current_commit, create_patch=create_patch, indent_heuristic=True,
                             ignore_blank_lines=True, ignore_space_change=True, ignore_all_space=ignore_space)
 
 
