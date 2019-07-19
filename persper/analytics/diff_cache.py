@@ -8,7 +8,7 @@ DIFF_INDEX_NS = 'diff_index'
 
 
 def cached_diff_with_commit(repo: Repo, commit: Union[Commit, str], parentCommit: Union[Commit, str],
-                            cache: Optional[Cache] = None) -> DiffIndex:
+                            cache: Optional[Cache] = None, create_patch: bool = True) -> DiffIndex:
     if cache is not None:
         cache_key = ':'.join([DIFF_INDEX_NS,
                               get_hexsha_from_commit(commit),
@@ -18,11 +18,11 @@ def cached_diff_with_commit(repo: Repo, commit: Union[Commit, str], parentCommit
         if diff_index is not None:
             return diff_index
         else:
-            diff_index = diff_with_commit(repo, commit, parentCommit)
+            diff_index = diff_with_commit(repo, commit, parentCommit, create_patch=create_patch)
             if diff_index is not None:
                 cache.put(cache_key, diff_index, serializer='pickle')
     else:
-        diff_index = diff_with_commit(repo, commit, parentCommit)
+        diff_index = diff_with_commit(repo, commit, parentCommit, create_patch=create_patch)
     return diff_index
 
 
