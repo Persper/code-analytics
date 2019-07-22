@@ -283,7 +283,7 @@ class CallCommitGraph:
         """
         self._remove_invalid_nodes()
         self._set_all_nodes_size(black_set=black_set)
-        return devrank(self._digraph, 'size', alpha=alpha)
+        return devrank(self._digraph, 'size', alpha=alpha, top_in_degree=10)
 
     def commit_function_devranks(self, alpha, commit_black_list: Optional[Set] = None) -> Dict[str, Dict[str, float]]:
         """Show how a commit's devrank can be broken down into the partial devranks of the functions it changed

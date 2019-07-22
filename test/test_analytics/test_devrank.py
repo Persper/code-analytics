@@ -1,5 +1,13 @@
 import networkx as nx
-from persper.analytics.devrank import devrank
+from persper.analytics.devrank import devrank, reduce_graph
+
+
+def test_reduce_graph():
+    G = nx.DiGraph()
+    G.add_nodes_from([(1, {'size': 9}), (2, {'size': 8}), (3, {'size': 7}), (4, {'size': 6})])
+    G.add_edges_from([(1, 4), (2, 4), (3, 4)])
+    rg = reduce_graph(G, 'size', 2)
+    assert set(rg.edges()) == set([(1, 4), (2, 4)])
 
 
 def test_devrank():
