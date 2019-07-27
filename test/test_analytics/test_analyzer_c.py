@@ -126,4 +126,4 @@ async def test_analyzer_all_branches(az):
         ('insert', 'append')
     ]
     assert set(ccgraph.edges()) == set(edges_truth)
-    assert ccgraph.eval_project_complexity(20, 10) == 1157
+    assert ccgraph.eval_project_complexity() == 617
