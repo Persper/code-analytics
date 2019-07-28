@@ -78,6 +78,8 @@ def src_to_tree(filename: str, src: str, cache: Optional[Cache] = None,
         print("ERROR: src_to_xml_str unable to parse xml file: {}".format(ex))
         return None
 
+    # scrML will write source code to a tmp file, reset file name here
+    root.attrib['filename'] = filename
     return root
 
 def src_to_xml_str(filename: str, src: str) -> str:

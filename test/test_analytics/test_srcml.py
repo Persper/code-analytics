@@ -11,3 +11,4 @@ def test_src_to_tree():
         src = f.read()
     root = src_to_tree(filename, src)
     assert bool(re.match(r'.+\.cc$', root.attrib['filename']))
+    assert root.attrib['filename'] == 'patch_test_files/example.cc'
