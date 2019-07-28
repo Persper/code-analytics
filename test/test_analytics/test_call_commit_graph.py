@@ -240,10 +240,10 @@ def test_get_commits_dev_eq(simple_ccg):
 
 def test_commit_function_devranks(simple_ccg):
     commit_function_devranks_truth = {
-        '0x01': {'f1': 0.17789285465942728, 'f2': 0.3071409522544739},
+        '0x01': {'f1': 0.2164420116833485, 'f2': 0.2844638096249664},
         '0x02': {},
-        '0x03': {'f2': 0.41331313328071184, 'f3': 0.10165305980538702},
+        '0x03': {'f2': 0.3827969783842141, 'f3': 0.11629720030747084},
     }
     # verify the devranks in ground truth sum up to 1
-    assert sum([sum(d.values()) for d in commit_function_devranks_truth.values()]) == 1.0
+    assert isclose(sum([sum(d.values()) for d in commit_function_devranks_truth.values()]), 1.0)
     assert commit_function_devranks_truth == simple_ccg.commit_function_devranks(0.85)

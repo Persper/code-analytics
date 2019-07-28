@@ -263,8 +263,14 @@ class CallCommitGraph:
 
         black_set - A set of commit hexshas to be blacklisted
         """
+        devrank_edit_weight_dict = {
+            'inserts': 1,
+            'deletes': 0.1,
+            'updates': 1,
+            'moves': 0.5
+        }
         for node in self.nodes():
-            self._set_node_size(node, self.get_node_dev_eq(node))
+            self._set_node_size(node, self.get_node_dev_eq(node, edit_weight_dict=devrank_edit_weight_dict))
 
     def _set_node_size(self, node, size):
         if node is None:
