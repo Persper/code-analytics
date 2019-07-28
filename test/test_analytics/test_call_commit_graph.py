@@ -205,9 +205,13 @@ def simple_ccg():
     # add first commit with hexsha 0x01
     ccgraph.add_commit('0x01', None, None, None)
     ccgraph.add_node('f1')
-    ccgraph.update_node_history_accurate('f1', {'adds': 10, 'dels': 0, 'added_units': 20, 'removed_units': 0})
+    ccgraph.update_node_history_accurate('f1',
+        {'adds': 10, 'dels': 0, 'added_units': 20, 'removed_units': 0,
+         'actions': {'inserts': 50, 'deletes': 0, 'updates': 15, 'moves': 5}})
     ccgraph.add_node('f2')
-    ccgraph.update_node_history_accurate('f2', {'adds': 10, 'dels': 0, 'added_units': 40, 'removed_units': 0})
+    ccgraph.update_node_history_accurate('f2',
+        {'adds': 10, 'dels': 0, 'added_units': 40, 'removed_units': 0,
+         'actions': {'inserts': 60, 'deletes': 0, 'updates': 12, 'moves': 9}})
     ccgraph.add_edge('f1', 'f2')
 
     # add second commit with hexsha 0x02
@@ -217,22 +221,28 @@ def simple_ccg():
     # add third commit with hexsha 0x03
     ccgraph.add_commit('0x03', None, None, None)
     ccgraph.add_node('f3')
-    ccgraph.update_node_history_accurate('f3', {'adds': 5, 'dels': 0, 'added_units': 15, 'removed_units': 0})
-    ccgraph.update_node_history_accurate('f2', {'adds': 3, 'dels': 3, 'added_units': 12, 'removed_units': 13})
+    ccgraph.update_node_history_accurate('f3',
+        {'adds': 5, 'dels': 0, 'added_units': 15, 'removed_units': 0,
+         'actions': {'inserts': 25, 'deletes': 0, 'updates': 8, 'moves': 7}})
+    ccgraph.update_node_history_accurate('f2',
+        {'adds': 3, 'dels': 3, 'added_units': 12, 'removed_units': 13,
+         'actions': {'inserts': 12, 'deletes': 70, 'updates': 22, 'moves': 5}})
     ccgraph.add_edge('f3', 'f2')
     return ccgraph
 
 
 def test_get_commits_dev_eq(simple_ccg):
     # note that '0x02' is present in the ground truth
-    assert {'0x01': 60, '0x02': 0, '0x03': 40} == simple_ccg.get_commits_dev_eq()
+    assert {'0x01': 151, '0x02': 0, '0x03': 149} == simple_ccg.get_commits_dev_eq()
+    assert {'0x01': 302, '0x02': 0, '0x03': 298} == simple_ccg.get_commits_dev_eq(
+        edit_weight_dict={'inserts': 2, 'deletes': 2, 'updates': 2, 'moves': 2})
 
 
 def test_commit_function_devranks(simple_ccg):
     commit_function_devranks_truth = {
-        '0x01': {'f1': 0.15414381366361263, 'f2': 0.4493835852853403},
+        '0x01': {'f1': 0.17789285465942728, 'f2': 0.3071409522544739},
         '0x02': {},
-        '0x03': {'f2': 0.2808647408033377, 'f3': 0.11560786024770947}
+        '0x03': {'f2': 0.41331313328071184, 'f3': 0.10165305980538702},
     }
     # verify the devranks in ground truth sum up to 1
     assert sum([sum(d.values()) for d in commit_function_devranks_truth.values()]) == 1.0
