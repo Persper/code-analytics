@@ -3,6 +3,7 @@ call_commit_graph.py
 ====================================
 CallCommitGraph stores all relevant analysis results
 """
+import math
 import logging
 import community
 import networkx as nx
@@ -151,29 +152,38 @@ class CallCommitGraph:
             return {}
         return self._digraph.nodes[node]['history']
 
-    def get_node_dev_eq(self, node: str, commit_black_list: Optional[Set] = None) -> int:
+    def get_node_dev_eq(self, node: str, commit_black_list: Optional[Set] = None,
+                        edit_weight_dict: Optional[Dict[str, float]] = None) -> int:
         """Return a function node's development equivalent (dev eq), computed from its node history
         This serves as an interface function since the underlying dev eq algorithm might change.
 
         Args:
                          node - A str, the node's name
             commit_black_list - A set of strs, each element is a commit's hexsha
+             edit_weight_dict - A dict where keys are one of ['inserts', 'deletes', 'updates', 'moves'],
+                              - and values are float. Usually, we set the weight for 'inserts' to be 1 and other weights
+                              - relative to 'inserts'.
 
         Returns:
             An int representing the node's dev eq
         """
-        node_commits_dev_eq = self.get_node_commits_dev_eq(node, commit_black_list=commit_black_list)
+        node_commits_dev_eq = self.get_node_commits_dev_eq(
+            node, commit_black_list=commit_black_list, edit_weight_dict=edit_weight_dict)
         dev_eq = sum(node_commits_dev_eq.values())
 
         # take max between dev_eq and 1 to avoid zero division error
         return max(dev_eq, 1)
 
-    def get_node_commits_dev_eq(self, node: str, commit_black_list: Optional[Set] = None) -> Dict[str, int]:
+    def get_node_commits_dev_eq(self, node: str, commit_black_list: Optional[Set] = None,
+                                edit_weight_dict: Optional[Dict[str, float]] = None) -> Dict[str, int]:
         """Return a function node's development equivalent, broken down into each commit's contribution.
 
         Args:
                          node - A str, the node's name
             commit_black_list - A set of strs, each element is a commit's hexsha
+             edit_weight_dict - A dict where keys are one of ['inserts', 'deletes', 'updates', 'moves'],
+                              - and values are float. Usually, we set the weight for 'inserts' to be 1 and other weights
+                              - relative to 'inserts'.
 
         Returns:
             A dict with keys being commit hexshas and values being how much this commit
@@ -183,30 +193,42 @@ class CallCommitGraph:
                 Also Note: only commits that have non-zero dev eq for this node and aren't present
                     in the `commit_black_list` will be present in the returned dict
         """
-        def _compute_node_commit_dev_eq(hist_entry):
-            # use logical units if possible, otherwise fall back to LOC
+        def _compute_node_commit_dev_eq(hist_entry, edit_weight_dict):
+            # use tree edit operations count if possible, otherwise fall back to logic units or LOC
             if 'actions' in hist_entry:
                 actions = hist_entry['actions']
-                return actions['inserts'] + actions['deletes'] + actions['updates'] + actions['moves']
+                return sum([math.floor(edit_weight_dict[action] * actions[action]) for action in actions])
             elif 'added_units' in hist_entry.keys() and 'removed_units' in hist_entry.keys():
                 return hist_entry['added_units'] + hist_entry['removed_units']
             else:
                 return hist_entry['adds'] + hist_entry['dels']
+
+        if edit_weight_dict is None:
+            edit_weight_dict = {
+                'inserts': 1,
+                'deletes': 1,
+                'updates': 1,
+                'moves': 1,
+            }
 
         node_commits_dev_eq = {}
         node_history = self._get_node_history(node)
         for hexsha, hist_entry in node_history.items():
             if commit_black_list is not None and hexsha in commit_black_list:
                 continue
-            node_commits_dev_eq[hexsha] = _compute_node_commit_dev_eq(hist_entry)
+            node_commits_dev_eq[hexsha] = _compute_node_commit_dev_eq(hist_entry, edit_weight_dict)
         return node_commits_dev_eq
 
-    def get_commits_dev_eq(self, commit_black_list: Optional[Set] = None) -> Dict[str, int]:
+    def get_commits_dev_eq(self, commit_black_list: Optional[Set] = None,
+                           edit_weight_dict: Optional[Dict[str, float]] = None) -> Dict[str, int]:
         """Return all commits' overall development equivalent
 
         Args:
                          node - A str, the node's name
             commit_black_list - A set of strs, each element is a commit's hexsha
+             edit_weight_dict - A dict where keys are one of ['inserts', 'deletes', 'updates', 'moves'],
+                              - and values are float. Usually, we set the weight for 'inserts' to be 1 and other weights
+                              - relative to 'inserts'.
 
         Returns:
             A dict with keys being commit hexshas and values being how much this commit
@@ -221,7 +243,8 @@ class CallCommitGraph:
             commits_dev_eq[hexsha] = 0
 
         for node in self.nodes():
-            node_commits_dev_eq = self.get_node_commits_dev_eq(node, commit_black_list=commit_black_list)
+            node_commits_dev_eq = self.get_node_commits_dev_eq(
+                node, commit_black_list=commit_black_list, edit_weight_dict=edit_weight_dict)
             for hexsha, node_commit_dev_eq in node_commits_dev_eq.items():
                 commits_dev_eq[hexsha] += node_commit_dev_eq
         return commits_dev_eq
