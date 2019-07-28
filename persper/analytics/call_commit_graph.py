@@ -137,13 +137,14 @@ class CallCommitGraph:
         # A commit might update a node's history more than once when
         # a single FunctionNode corresponds to more than one actual functions
         if self._current_commit_id in node_history:
-            node_history[self._current_commit_id]['adds'] += fstat['adds']
-            node_history[self._current_commit_id]['dels'] += fstat['dels']
-            node_history[self._current_commit_id]['added_units'] += fstat['added_units']
-            node_history[self._current_commit_id]['removed_units'] += fstat['removed_units']
+            for k, v in fstat.items():
+                if type(v) == int:
+                    node_history[self._current_commit_id][k] += v
+                elif type(v) == dict:
+                    for k2, v2 in v.items():
+                        node_history[self._current_commit_id][k][k2] += v2
         else:
-            node_history[self._current_commit_id] = {'adds': fstat['adds'], 'dels': fstat['dels'],
-                                                     'added_units': fstat['added_units'], 'removed_units': fstat['removed_units']}
+            node_history[self._current_commit_id] = fstat
 
     # read/write access to node history are thourgh this function
     def _get_node_history(self, node: str) -> Dict[str, Dict[str, int]]:
