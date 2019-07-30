@@ -1,16 +1,6 @@
-from typing import Dict, List
 import numpy as np
-
-
-def normalize(scores: Dict[str, float]) -> Dict[str, float]:
-    normalized_scores = {}
-    score_sum = 0
-    for _, score in scores.items():
-        score_sum += score
-
-    for idx in scores:
-        normalized_scores[idx] = scores[idx] / score_sum
-    return normalized_scores
+from typing import Dict, List
+from persper.util.normalize_score import normalize_with_coef
 
 
 def commit_overall_scores(commit_devranks: Dict[str, float],
@@ -33,4 +23,4 @@ def commit_overall_scores(commit_devranks: Dict[str, float],
         else:
             overall_scores[sha] = np.dot(category_vec, label_weights) * dr
 
-    return normalize(overall_scores)
+    return normalize_with_coef(overall_scores)
