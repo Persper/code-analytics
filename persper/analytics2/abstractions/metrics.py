@@ -3,7 +3,7 @@ This module contains the abstractions of providers for various metrics we want t
 
 The abstractions don't put restriction on where to get the underlying data (e.g. must from `IReadOnlyCallCommitGraph`),
 in the hope that in the future, the metrics can be evaluated on a remote database (e.g. with Stored Procedure
-or something simular), and transported back to the local site. This may significant reduce the network traffic.
+or something similar), and transported back to the local site. This may significantly reduce the network traffic.
 
 However, these abstractions assume the resulting metrics are representable by object model in the memory
 (i.e. not too large to be held in memory). The responsibility for persisting these objects is on the user
