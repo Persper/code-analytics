@@ -278,12 +278,6 @@ class CallCommitGraph:
         # set node size even if it is None since we'd like to suppress the error
         self._digraph.nodes[node]['size'] = size
 
-    def _set_all_edges_weight(self):
-        self._set_all_nodes_size()
-        for node in self.nodes():
-            for nbr, datadict in self._digraph.pred[node].items():
-                datadict['weight'] = self._digraph.nodes[node]['size']
-
     def eval_project_complexity(self, commit_black_list: Optional[Set] = None):
         """Evaluates project complexity.
 
