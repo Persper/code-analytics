@@ -11,7 +11,7 @@ from networkx.readwrite import json_graph
 from typing import Union, Set, List, Dict, Optional
 
 from persper.analytics.devrank import devrank
-from persper.analytics.score import normalize
+from persper.util.normalize_score import normalize_with_coef
 
 _logger = logging.getLogger(__name__)
 
@@ -146,6 +146,12 @@ class CallCommitGraph:
         else:
             node_history[self._current_commit_id] = fstat
 
+    def update_node_files(self, node: str, new_files: Union[Set[str], List[str]]):
+        if node is None:
+            _logger.error("Argument node is None in update_node_files")
+            return
+        self._digraph.nodes[node]['files'] = set(new_files)
+
     # read/write access to node history are thourgh this function
     def _get_node_history(self, node: str) -> Dict[str, Dict[str, int]]:
         if node is None:
@@ -170,10 +176,7 @@ class CallCommitGraph:
         """
         node_commits_dev_eq = self.get_node_commits_dev_eq(
             node, commit_black_list=commit_black_list, edit_weight_dict=edit_weight_dict)
-        dev_eq = sum(node_commits_dev_eq.values())
-
-        # take max between dev_eq and 1 to avoid zero division error
-        return max(dev_eq, 1)
+        return sum(node_commits_dev_eq.values())
 
     def get_node_commits_dev_eq(self, node: str, commit_black_list: Optional[Set] = None,
                                 edit_weight_dict: Optional[Dict[str, float]] = None) -> Dict[str, int]:
@@ -250,12 +253,6 @@ class CallCommitGraph:
                 commits_dev_eq[hexsha] += node_commit_dev_eq
         return commits_dev_eq
 
-    def update_node_files(self, node: str, new_files: Union[Set[str], List[str]]):
-        if node is None:
-            _logger.error("Argument node is None in update_node_files")
-            return
-        self._digraph.nodes[node]['files'] = set(new_files)
-
     # TODO: provide other options for computing a node's size
     def _set_all_nodes_size(self, black_set=None):
         """ Compute node size after nodes have been added to the graph
@@ -278,12 +275,6 @@ class CallCommitGraph:
         # set node size even if it is None since we'd like to suppress the error
         self._digraph.nodes[node]['size'] = size
 
-    def _set_all_edges_weight(self):
-        self._set_all_nodes_size()
-        for node in self.nodes():
-            for nbr, datadict in self._digraph.pred[node].items():
-                datadict['weight'] = self._digraph.nodes[node]['size']
-
     def eval_project_complexity(self, commit_black_list: Optional[Set] = None):
         """Evaluates project complexity.
 
@@ -294,8 +285,17 @@ class CallCommitGraph:
         return sum(commits_dev_eq.values())
 
     def _remove_invalid_nodes(self):
+        # remove None node
         if None in self.nodes():
             self._digraph.remove_node(None)
+
+        # remove nodes that have zero dev equivalent
+        remove_set: Set[str] = set()
+        for node in self.nodes():
+            if self.get_node_dev_eq(node) == 0:
+                remove_set.add(node)
+        for node in remove_set:
+            self._digraph.remove_node(node)
 
     def function_devranks(self, alpha, black_set=None):
         """
@@ -363,8 +363,10 @@ class CallCommitGraph:
         Returns:
             A dict with keys being commit hexshas and values being commit devranks
 
-                Note: all commits are guaranteed to be present in the returned dict,
-                even if their devrank is 0 or they're present in the `black_set`
+        Note:
+            1. All commits are guaranteed to be present in the returned dict,
+                even if their devrank is 0 or they're present in the `black_set`.
+            2. All devranks sum up to 1.
         """
         commit_devranks = {}
         commit_function_devranks = self.commit_function_devranks(alpha, commit_black_list=black_set)

@@ -192,10 +192,15 @@ async def test_black_set():
 def test_remove_invalid_nodes():
     ccgraph = CallCommitGraph()
     ccgraph.add_node('f1')
+    ccgraph.add_node('f2')
+    ccgraph.add_node('f3')
     ccgraph.add_node(None)
     ccgraph.add_edge('f1', None)
+    ccgraph.add_edge('f1', 'f2')
+    ccgraph.update_node_history_accurate(
+        'f1', {'actions': {'inserts': 10, 'deletes': 10, 'updates': 10, 'moves': 10}})
 
-    func_drs = ccgraph.function_devranks(0.85)
+    func_drs = ccgraph.function_devranks(0.5)
     assert isclose(func_drs['f1'], 1, rel_tol=1e-2)
 
 
