@@ -199,9 +199,9 @@ class CallCommitGraph:
         """
         def _compute_node_commit_dev_eq(hist_entry, edit_weight_dict):
             # use tree edit operations count if possible, otherwise fall back to logic units or LOC
-            if 'actions' in hist_entry:
-                actions = hist_entry['actions']
-                return sum([math.floor(edit_weight_dict[action] * actions[action]) for action in actions])
+            if 'stats' in hist_entry:
+                stats = hist_entry['stats']
+                return sum([math.floor(edit_weight_dict[op] * stats[op]) for op in stats])
             elif 'added_units' in hist_entry.keys() and 'removed_units' in hist_entry.keys():
                 return hist_entry['added_units'] + hist_entry['removed_units']
             else:

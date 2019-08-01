@@ -129,7 +129,7 @@ def _update_history_action(ccgraph, node, hist_entry):
     history[ccgraph._current_commit_id] = hist_entry
 
 
-def test_devrank_with_history_actions():
+def test_devrank_with_history_stats():
     ccgraph = CallCommitGraph()
     first_commit = {
         'hexsha': '0x01',
@@ -143,10 +143,10 @@ def test_devrank_with_history_actions():
                        first_commit['message'])
     ccgraph.add_node('f1')
     _update_history_action(ccgraph, 'f1', {'adds': 10, 'dels': 0, 'added_units': 20, 'removed_units': 0,
-                                           'actions': {'inserts': 20, 'deletes': 20, 'updates': 20, 'moves': 20}})
+                                           'stats': {'inserts': 20, 'deletes': 20, 'updates': 20, 'moves': 20}})
     ccgraph.add_node('f2')
     _update_history_action(ccgraph, 'f2', {'adds': 10, 'dels': 0, 'added_units': 40, 'removed_units': 0,
-                                           'actions': {'inserts': 10, 'deletes': 10, 'updates': 10, 'moves': 10}})
+                                           'stats': {'inserts': 10, 'deletes': 10, 'updates': 10, 'moves': 10}})
     ccgraph.add_edge('f1', 'f2')
 
     func_drs = ccgraph.function_devranks(0.85)
@@ -180,8 +180,6 @@ async def test_black_set():
     ccgraph = az.get_graph()
     devdict = ccgraph.commit_devranks(0.85)
     devdict2 = ccgraph.commit_devranks(0.85, black_set=set([parent_sha]))
-    print(devdict)
-    print(devdict2)
     # CallCommitGraph.commit_devranks guarantee all commits to be present,
     # even if their devrank is 0 or they're present in the `black_set`
     assert devdict[parent_sha] > 0
@@ -198,7 +196,7 @@ def test_remove_invalid_nodes():
     ccgraph.add_edge('f1', None)
     ccgraph.add_edge('f1', 'f2')
     ccgraph.update_node_history_accurate(
-        'f1', {'actions': {'inserts': 10, 'deletes': 10, 'updates': 10, 'moves': 10}})
+        'f1', {'stats': {'inserts': 10, 'deletes': 10, 'updates': 10, 'moves': 10}})
 
     func_drs = ccgraph.function_devranks(0.5)
     assert isclose(func_drs['f1'], 1, rel_tol=1e-2)
@@ -212,11 +210,11 @@ def simple_ccg():
     ccgraph.add_node('f1')
     ccgraph.update_node_history_accurate('f1',
         {'adds': 10, 'dels': 0, 'added_units': 20, 'removed_units': 0,
-         'actions': {'inserts': 50, 'deletes': 0, 'updates': 15, 'moves': 5}})
+         'stats': {'inserts': 50, 'deletes': 0, 'updates': 15, 'moves': 5}})
     ccgraph.add_node('f2')
     ccgraph.update_node_history_accurate('f2',
         {'adds': 10, 'dels': 0, 'added_units': 40, 'removed_units': 0,
-         'actions': {'inserts': 60, 'deletes': 0, 'updates': 12, 'moves': 9}})
+         'stats': {'inserts': 60, 'deletes': 0, 'updates': 12, 'moves': 9}})
     ccgraph.add_edge('f1', 'f2')
 
     # add second commit with hexsha 0x02
@@ -228,10 +226,10 @@ def simple_ccg():
     ccgraph.add_node('f3')
     ccgraph.update_node_history_accurate('f3',
         {'adds': 5, 'dels': 0, 'added_units': 15, 'removed_units': 0,
-         'actions': {'inserts': 25, 'deletes': 0, 'updates': 8, 'moves': 7}})
+         'stats': {'inserts': 25, 'deletes': 0, 'updates': 8, 'moves': 7}})
     ccgraph.update_node_history_accurate('f2',
         {'adds': 3, 'dels': 3, 'added_units': 12, 'removed_units': 13,
-         'actions': {'inserts': 12, 'deletes': 70, 'updates': 22, 'moves': 5}})
+         'stats': {'inserts': 12, 'deletes': 70, 'updates': 22, 'moves': 5}})
     ccgraph.add_edge('f3', 'f2')
     return ccgraph
 
