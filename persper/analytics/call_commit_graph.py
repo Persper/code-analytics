@@ -159,6 +159,32 @@ class CallCommitGraph:
             return {}
         return self._digraph.nodes[node]['history']
 
+    def get_node_commits_add_loc(self, node: str, commit_black_list: Optional[Set] = None) -> Dict[str, int]:
+        """Return a function node's additions in lines of code (LOC), broken down into each commit's contribution."""
+        node_commits_add_loc: Dict[str, int] = {}
+        node_history = self._get_node_history(node)
+        for hexsha, hist_entry in node_history.items():
+            if commit_black_list is not None and hexsha in commit_black_list:
+                continue
+            node_commits_add_loc[hexsha] = hist_entry['adds']
+        return node_commits_add_loc
+
+    def get_node_commits_del_loc(self, node: str, commit_black_list: Optional[Set] = None) -> Dict[str, int]:
+        """Return a function node's deletions in lines of code (LOC), broken down into each commit's contribution."""
+        node_commits_del_loc: Dict[str, int] = {}
+        node_history = self._get_node_history(node)
+        for hexsha, hist_entry in node_history.items():
+            if commit_black_list is not None and hexsha in commit_black_list:
+                continue
+            node_commits_del_loc[hexsha] = hist_entry['dels']
+        return node_commits_del_loc
+
+    def get_node_add_loc(self, node: str, commit_black_list: Optional[Set] = None) -> int:
+        return sum(self.get_node_commits_add_loc(node, commit_black_list=commit_black_list).values())
+
+    def get_node_del_loc(self, node: str, commit_black_list: Optional[Set] = None) -> int:
+        return sum(self.get_node_commits_del_loc(node, commit_black_list=commit_black_list).values())
+
     def get_node_dev_eq(self, node: str, commit_black_list: Optional[Set] = None,
                         edit_weight_dict: Optional[Dict[str, float]] = None) -> int:
         """Return a function node's development equivalent (dev eq), computed from its node history
