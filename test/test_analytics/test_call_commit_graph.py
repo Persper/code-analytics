@@ -250,3 +250,23 @@ def test_commit_function_devranks(simple_ccg):
     # verify the devranks in ground truth sum up to 1
     assert isclose(sum([sum(d.values()) for d in commit_function_devranks_truth.values()]), 1.0)
     assert commit_function_devranks_truth == simple_ccg.commit_function_devranks(0.85)
+
+def test_get_node_commits_add_loc(simple_ccg):
+    assert simple_ccg.get_node_commits_add_loc('f1') == {'0x01': 10}
+    assert simple_ccg.get_node_commits_add_loc('f2') == {'0x01': 10, '0x03': 3}
+    assert simple_ccg.get_node_commits_add_loc('f3') == {'0x03': 5}
+
+def test_get_node_commits_del_loc(simple_ccg):
+    assert simple_ccg.get_node_commits_del_loc('f1') == {'0x01': 0}
+    assert simple_ccg.get_node_commits_del_loc('f2') == {'0x01': 0, '0x03': 3}
+    assert simple_ccg.get_node_commits_del_loc('f3') == {'0x03': 0}
+
+def test_get_node_del_loc(simple_ccg):
+    assert simple_ccg.get_node_add_loc('f1') == 10
+    assert simple_ccg.get_node_add_loc('f2') == 13
+    assert simple_ccg.get_node_add_loc('f3') == 5
+
+def test_get_node_del_loc(simple_ccg):
+    assert simple_ccg.get_node_del_loc('f1') == 0
+    assert simple_ccg.get_node_del_loc('f2') == 3
+    assert simple_ccg.get_node_del_loc('f3') == 0 
