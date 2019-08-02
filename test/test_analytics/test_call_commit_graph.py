@@ -243,9 +243,9 @@ def test_get_commits_dev_eq(simple_ccg):
 
 def test_commit_function_devranks(simple_ccg):
     commit_function_devranks_truth = {
-        '0x01': {'f1': 0.2164420116833485, 'f2': 0.2844638096249664},
+        '0x01': {'f1': 0.2157005963974098, 'f2': 0.2843240269071233},
         '0x02': {},
-        '0x03': {'f2': 0.3827969783842141, 'f3': 0.11629720030747084},
+        '0x03': {'f2': 0.3826088757145239, 'f3': 0.11736650098094356},
     }
     # verify the devranks in ground truth sum up to 1
     assert isclose(sum([sum(d.values()) for d in commit_function_devranks_truth.values()]), 1.0)
@@ -270,3 +270,13 @@ def test_get_node_del_loc(simple_ccg):
     assert simple_ccg.get_node_del_loc('f1') == 0
     assert simple_ccg.get_node_del_loc('f2') == 3
     assert simple_ccg.get_node_del_loc('f3') == 0 
+
+def test_devrank_with_very_small_dev_eq():
+    ccgraph = CallCommitGraph()
+    # add first commit with hexsha 0x01
+    ccgraph.add_commit('0x01', None, None, None)
+    ccgraph.add_node('f1')
+    ccgraph.update_node_history_accurate('f1',
+        {'adds': 0, 'dels': 1, 'added_units': 0, 'removed_units': 0,
+         'stats': {'inserts': 0, 'deletes': 1, 'updates': 0, 'moves': 0}})
+    assert {'f1': 1.0} == ccgraph.function_devranks(0.5)

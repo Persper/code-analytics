@@ -227,7 +227,7 @@ class CallCommitGraph:
             # use tree edit operations count if possible, otherwise fall back to logic units or LOC
             if 'stats' in hist_entry:
                 stats = hist_entry['stats']
-                return sum([math.floor(edit_weight_dict[op] * stats[op]) for op in stats])
+                return sum([math.ceil(edit_weight_dict[op] * stats[op]) for op in stats])
             elif 'added_units' in hist_entry.keys() and 'removed_units' in hist_entry.keys():
                 return hist_entry['added_units'] + hist_entry['removed_units']
             else:
