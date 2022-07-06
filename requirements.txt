@@ -9,7 +9,7 @@ requests==2.13.0
 spacy==1.8.2
 scipy==0.18.1
 GitPython==2.1.10
-lxml==4.2.1
+lxml==4.9.1
 sh==1.12.14
 scikit_learn==0.19.1
 pydotplus==2.0.2
